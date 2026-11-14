@@ -1026,7 +1026,7 @@
         // 1. API BASE URL & LOCALSTORAGE KEY
         // ============================================================
         const API_BASE = (() => {
-            if (window.location.protocol === "file:") return "http://127.0.0.1:8000";
+            if (window.location.protocol === "file:") return "";
             if (
                 ["localhost", "127.0.0.1"].includes(window.location.hostname) &&
                 window.location.port !== "8000"

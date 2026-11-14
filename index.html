@@ -1,0 +1,2458 @@
+
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Fallah | مستشار القرار الزراعي الذكي ببيانات ناسا</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        /* وضع كبار السن: تكبير مريح للنصوص وزيادة التباين */
+        html.senior-mode {
+            font-size: 19px;
+        }
+        html.senior-mode .text-slate-500,
+        html.senior-mode .text-slate-600 {
+            color: #1e293b !important;
+        }
+        html.senior-mode .agri-card {
+            border-width: 2px !important;
+            border-color: #cbd5e1 !important;
+        }
+        html.senior-mode .choice-card {
+            border-width: 2px !important;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 8% 12%, rgba(22, 163, 74, 0.08), transparent 34%),
+                radial-gradient(circle at 92% 15%, rgba(14, 165, 233, 0.09), transparent 36%),
+                radial-gradient(circle at 50% 90%, rgba(234, 179, 8, 0.07), transparent 42%);
+            background-attachment: fixed;
+        }
+
+        .font-mono-tech {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .bg-agri-grid {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(22, 163, 74, 0.035) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(2, 132, 199, 0.035) 1px, transparent 1px);
+        }
+
+        .agri-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 12px 32px -12px rgba(15, 23, 42, 0.08), 0 2px 8px -2px rgba(15, 23, 42, 0.04);
+        }
+
+        .custom-select, .custom-input, .custom-textarea {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            color: #0f172a;
+            transition: all 0.2s ease;
+        }
+        .custom-select:focus, .custom-input:focus, .custom-textarea:focus {
+            outline: none;
+            border-color: #16a34a;
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.14);
+        }
+
+        .choice-card {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            color: #1e293b;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            user-select: none;
+        }
+        .choice-card:hover {
+            border-color: #16a34a;
+            background: #f0fdf4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px -6px rgba(22, 163, 74, 0.18);
+        }
+        .choice-card.selected {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
+            border-color: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+            color: #14532d;
+        }
+        .choice-card.selected .icon-box {
+            background: #16a34a;
+            color: #ffffff;
+            border-color: #15803d;
+        }
+
+        .step-container {
+            display: none;
+        }
+        .step-container.active {
+            display: block;
+            animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseRadar {
+            0% { transform: scale(0.78); opacity: 0.75; }
+            100% { transform: scale(2.05); opacity: 0; }
+        }
+        .radar-wave {
+            animation: pulseRadar 2.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+        }
+
+        #egypt-map {
+            height: 310px;
+            width: 100%;
+            border-radius: 1rem;
+            border: 1.5px solid #cbd5e1;
+            z-index: 1;
+            background-color: #0b132b;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 7px;
+            width: 7px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #16a34a;
+        }
+
+        @media print {
+            body {
+                background: #ffffff !important;
+                background-image: none !important;
+                color: #0f172a !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #results-view {
+                display: block !important;
+            }
+            .agri-card {
+                box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="bg-agri-grid min-h-screen flex flex-col">
+
+    <!-- 1. الشريط العلوي للنظام والشفافية وإعدادات المزارع -->
+    <div class="no-print bg-white border-b border-slate-200 text-xs py-2 px-4 text-slate-600">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center gap-2 font-extrabold text-sky-700">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-600 animate-pulse"></span>
+                <span>NASA EARTH OBSERVATORY • FALLAH DECISION SYSTEM</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 md:gap-3">
+                <span id="api-status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-mono-tech text-[11px] font-bold">
+                    <span id="api-status-dot" class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span id="api-status-text">API: CHECKING...</span>
+                </span>
+
+                <span id="utc-clock" class="hidden sm:inline font-mono-tech text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full">UTC 00:00:00</span>
+
+                <!-- زر منهجية الحساب الشفافة -->
+                <button type="button" onclick="openMethodologyModal()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold text-xs transition-all">
+                    <i data-lucide="calculator" class="w-3.5 h-3.5 text-amber-600"></i>
+                    <span>إزاي بنحسب؟</span>
+                </button>
+
+                <!-- زر وضع كبار السن -->
+                <button type="button" id="senior-mode-btn" onclick="toggleSeniorMode()" aria-pressed="false" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-green-50 text-slate-800 border border-slate-300 font-bold text-xs transition-all">
+                    <i data-lucide="eye" class="w-3.5 h-3.5 text-green-700"></i>
+                    <span id="senior-mode-label">وضع كبار السن</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- الهيدر الرئيسي -->
+    <header class="no-print border-b border-slate-200/90 bg-white/90 backdrop-blur-md sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-600 to-sky-600 flex items-center justify-center shadow-md shadow-green-600/20 text-white">
+                    <i data-lucide="sprout" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <h1 class="font-black text-lg md:text-xl text-slate-900 leading-tight">
+                        مستشار الفلاح الفضائي <span class="text-green-600">NASA Fallah</span>
+                    </h1>
+                    <p class="text-slate-500 text-xs font-semibold">بيانات أقمار ناسا + توقعات الطقس + اقتصاديات الأرض في قرار واحد</p>
+                </div>
+            </div>
+
+            <!-- شريط الخطوات -->
+            <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                <button type="button" onclick="goToStep(1)" id="prog-1" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-600 text-white font-bold text-xs shadow-sm transition-all">
+                    <span class="w-5 h-5 rounded-full bg-white text-green-700 flex items-center justify-center text-[11px] font-black">1</span>
+                    <span>الموقع والمحصول</span>
+                </button>
+                <button type="button" onclick="goToStep(2)" id="prog-2" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 font-bold text-xs transition-all">
+                    <span class="w-5 h-5 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center text-[11px] font-black">2</span>
+                    <span>التربة والري</span>
+                </button>
+                <button type="button" onclick="goToStep(3)" id="prog-3" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 font-bold text-xs transition-all">
+                    <span class="w-5 h-5 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center text-[11px] font-black">3</span>
+                    <span>التوثيق والفحص</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto px-4 py-6 flex-grow">
+
+        <!-- بانر تعريفي سريع -->
+        <div id="hero-guide" class="no-print mb-6 agri-card rounded-3xl p-5 border-r-4 border-r-green-600">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex items-start gap-3 bg-green-50/70 p-3.5 rounded-2xl border border-green-200/70">
+                    <div class="w-8 h-8 rounded-xl bg-green-600 text-white flex items-center justify-center font-black shrink-0">1</div>
+                    <div>
+                        <h3 class="font-extrabold text-sm text-slate-900">اضغط على الخريطة وحدد محصولك</h3>
+                        <p class="text-xs text-slate-600 mt-0.5">حدد أرضك بالمحافظة أو الخريطة التفاعلية، وأضف محصولاً ثانياً للمقارنة إن أردت</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3 bg-sky-50/70 p-3.5 rounded-2xl border border-sky-200/70">
+                    <div class="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black shrink-0">2</div>
+                    <div>
+                        <h3 class="font-extrabold text-sm text-slate-900">تحليل مناخي وتنبيه الموعد</h3>
+                        <p class="text-xs text-slate-600 mt-0.5">مطابقة فورية مع بيانات NASA POWER ومتوسط السنوات وتنبيه التبكير والتأخير</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3 bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200/70">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shrink-0">3</div>
+                    <div>
+                        <h3 class="font-extrabold text-sm text-slate-900">عائد اقتصادي وتقويم زراعي</h3>
+                        <p class="text-xs text-slate-600 mt-0.5">احسب صافي الربح وتوفير المياه بالمتر المكعب وجدول الري والتسميد حتى الحصاد</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تنبيه الأخطاء -->
+        <div id="error-banner" class="hidden no-print mb-6 rounded-2xl bg-orange-50 border-2 border-orange-400 p-4 text-orange-950 flex items-start gap-3 shadow-sm">
+            <i data-lucide="alert-triangle" class="w-5 h-5 text-orange-600 shrink-0 mt-0.5"></i>
+            <div class="flex-grow">
+                <h4 class="font-extrabold text-sm text-orange-800">يرجى مراجعة البيانات</h4>
+                <p id="error-message" class="text-xs md:text-sm mt-0.5 leading-relaxed font-semibold"></p>
+            </div>
+            <button type="button" onclick="hideError()" class="text-orange-700 hover:text-orange-950 p-1">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- قسم النموذج التفاعلي (Wizard View)                        -->
+        <!-- ========================================================= -->
+        <section id="wizard-view" class="no-print grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- العمود الأيمن: خطوات الإدخال (8 أعمدة) -->
+            <div class="lg:col-span-8 agri-card rounded-3xl p-5 md:p-7">
+                <form id="farm-form" onsubmit="event.preventDefault(); submitAnalysis();">
+
+                    <!-- الخطوة 1: الموقع والخريطة والمحصول والمقارنة -->
+                    <div id="step-1" class="step-container active space-y-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-4">
+                            <div>
+                                <span class="text-xs font-extrabold text-green-700 uppercase">الخطوة 1 من 3</span>
+                                <h2 class="text-xl font-black text-slate-900 mt-0.5">موقع الأرض والمحصول وميعاد الزراعة</h2>
+                            </div>
+                            <button type="button" onclick="resetSavedForm()" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-orange-600 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-orange-50 border border-slate-200 transition-all">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                <span>مسح الاختيارات المحفوظة</span>
+                            </button>
+                        </div>
+
+                        <!-- المحافظة + GPS + خريطة القمر الصناعي التفاعلية -->
+                        <div class="space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <label for="governorate-select" class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-green-600"></i>
+                                    <span>1. المحافظة <span class="text-orange-600">*</span></span>
+                                </label>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <button type="button" id="gps-btn" onclick="detectGPS()" class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 border border-sky-300 hover:bg-sky-100 transition-all">
+                                        <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+                                        <span>تحديد موقعي بالـ GPS</span>
+                                    </button>
+                                    <button type="button" onclick="clearMapPin()" class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 transition-all">
+                                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                                        <span>مسح الإحداثيات</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <select id="governorate-select" class="custom-select w-full rounded-2xl px-4 py-3 text-sm font-bold" onchange="onGovernorateChange()">
+                                <option value="">-- اختر المحافظة --</option>
+                            </select>
+
+                            <!-- خريطة القمر الصناعي العالمية التفاعلية (Satellite GPS Map) -->
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between text-xs text-slate-600 font-semibold">
+                                    <span>خريطة القمر الصناعي (Satellite GPS Map) — اضغط على أي نقطة لتحديد أرضك:</span>
+                                    <span id="map-pin-badge" class="font-mono-tech text-[11px] text-sky-700 bg-sky-50 px-2 py-0.5 rounded-lg border border-sky-200">جاهزة للنقر</span>
+                                </div>
+                                <div id="egypt-map"></div>
+                            </div>
+
+                            <!-- إحداثيات GPS -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label for="latitude-input" class="block text-xs font-bold text-slate-600 mb-1">خط العرض Latitude (اختياري)</label>
+                                    <input id="latitude-input" type="number" step="any" min="-90" max="90" placeholder="مثال: 30.0444" class="custom-input w-full rounded-xl px-3.5 py-2 text-xs font-mono-tech" oninput="onCoordsInput()">
+                                </div>
+                                <div>
+                                    <label for="longitude-input" class="block text-xs font-bold text-slate-600 mb-1">خط الطول Longitude (اختياري)</label>
+                                    <input id="longitude-input" type="number" step="any" min="-180" max="180" placeholder="مثال: 31.2357" class="custom-input w-full rounded-xl px-3.5 py-2 text-xs font-mono-tech" oninput="onCoordsInput()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- المحصول الأول -->
+                        <div class="space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <label class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                                    <i data-lucide="sprout" class="w-4 h-4 text-green-600"></i>
+                                    <span>2. المحصول الأساسي <span class="text-orange-600">*</span></span>
+                                </label>
+                                <div class="relative w-full sm:w-56">
+                                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2"></i>
+                                    <input id="crop-search" type="text" placeholder="ابحث عن محصول..." class="custom-input w-full rounded-xl pr-8 pl-3 py-1.5 text-xs" oninput="filterCrops(this.value)">
+                                </div>
+                            </div>
+                            <div id="crops-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 max-h-60 overflow-y-auto custom-scrollbar p-1"></div>
+                        </div>
+
+                        <!-- مقارنة محصول ثاني (اختياري) -->
+                        <div class="rounded-2xl bg-amber-50/70 border border-amber-300/80 p-4 space-y-2">
+                            <label for="compare-crop-select" class="text-xs md:text-sm font-extrabold text-amber-900 flex items-center gap-2">
+                                <i data-lucide="git-compare" class="w-4 h-4 text-amber-600"></i>
+                                <span>مقارنة مع محصول ثاني في نفس الأرض والميعاد (اختياري)</span>
+                            </label>
+                            <select id="compare-crop-select" class="custom-select w-full rounded-xl px-3.5 py-2.5 text-xs md:text-sm font-bold" onchange="onFormFieldChange()">
+                                <option value="">-- بدون مقارنة (تحليل محصول واحد فقط) --</option>
+                            </select>
+                            <p class="text-[11px] text-amber-800 font-semibold">عند اختيار محصول ثاني، ستظهر لك مقارنة تفصيلية في الملاءمة، استهلاك المياه، المخاطر، وصافي الربح.</p>
+                        </div>
+
+                        <!-- شهر الزراعة -->
+                        <div class="space-y-3">
+                            <label class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-4 h-4 text-green-600"></i>
+                                <span>3. شهر الزراعة <span class="text-orange-600">*</span></span>
+                            </label>
+                            <div id="months-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2"></div>
+                        </div>
+
+                        <div class="flex justify-end pt-3 border-t border-slate-200">
+                            <button type="button" onclick="nextStep(1)" class="inline-flex items-center gap-2 px-7 py-3 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-black text-sm shadow-md shadow-green-600/20 transition-all">
+                                <span>التالي: التربة والري</span>
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- الخطوة 2: التربة والري والمشكلات -->
+                    <div id="step-2" class="step-container space-y-6">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                            <div>
+                                <span class="text-xs font-extrabold text-sky-700 uppercase">الخطوة 2 من 3</span>
+                                <h2 class="text-xl font-black text-slate-900 mt-0.5">خصائص التربة والري وحالة الحقل</h2>
+                            </div>
+                            <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">5 أسئلة إجبارية</span>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <label class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="droplets" class="w-4 h-4 text-sky-600"></i>
+                                <span>4. طريقة الري الحالية <span class="text-orange-600">*</span></span>
+                            </label>
+                            <div id="irrigation-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <label class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="waves" class="w-4 h-4 text-sky-600"></i>
+                                <span>5. مصدر مياه الري <span class="text-orange-600">*</span></span>
+                            </label>
+                            <div id="water-source-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5"></div>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <label class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="layers" class="w-4 h-4 text-amber-600"></i>
+                                <span>6. نوع التربة <span class="text-orange-600">*</span></span>
+                            </label>
+                            <div id="soil-type-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <label class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="cloud-rain" class="w-4 h-4 text-sky-600"></i>
+                                <span>7. هل تتجمع مياه راكدة بعد الري؟ <span class="text-orange-600">*</span></span>
+                            </label>
+                            <div id="standing-water-grid" class="grid grid-cols-3 gap-2.5"></div>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <label class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="shield-alert" class="w-4 h-4 text-orange-600"></i>
+                                <span>8. أبرز مشكلة تواجهها حالياً <span class="text-orange-600">*</span></span>
+                            </label>
+                            <div id="problems-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-3 border-t border-slate-200">
+                            <button type="button" onclick="goToStep(1)" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm border border-slate-300 transition-all">
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                <span>السابق</span>
+                            </button>
+                            <button type="button" onclick="nextStep(2)" class="inline-flex items-center gap-2 px-7 py-3 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-black text-sm shadow-md shadow-green-600/20 transition-all">
+                                <span>التالي: التوثيق والفحص</span>
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- الخطوة 3: التوثيق الاختياري والانطلاق -->
+                    <div id="step-3" class="step-container space-y-6">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                            <div>
+                                <span class="text-xs font-extrabold text-green-700 uppercase">الخطوة 3 من 3</span>
+                                <h2 class="text-xl font-black text-slate-900 mt-0.5">المساحة والتحاليل ولغة التقرير (اختيارية)</h2>
+                            </div>
+                            <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">اختياري بالكامل</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="farmer-name" class="block text-xs font-extrabold text-slate-700 mb-1.5">اسم المزارع / المزرعة</label>
+                                <input id="farmer-name" type="text" placeholder="مثال: مزرعة الخير" class="custom-input w-full rounded-xl px-3.5 py-2.5 text-sm" oninput="onFormFieldChange()">
+                            </div>
+
+                            <div>
+                                <label for="report-language" class="block text-xs font-extrabold text-slate-700 mb-1.5">لغة التقرير والنتائج</label>
+                                <select id="report-language" class="custom-select w-full rounded-xl px-3.5 py-2.5 text-sm font-bold" onchange="onFormFieldChange()">
+                                    <option value="ar">العربية (ar)</option>
+                                    <option value="en">English (en)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="farm-area" class="block text-xs font-extrabold text-slate-700 mb-1.5">مساحة المزرعة (لحساب العائد وتوفير المياه الكلي)</label>
+                                <input id="farm-area" type="number" step="0.1" min="0.1" placeholder="مثال: 5" class="custom-input w-full rounded-xl px-3.5 py-2.5 text-sm font-mono-tech" oninput="onFormFieldChange()">
+                            </div>
+
+                            <div>
+                                <label for="farm-area-unit" class="block text-xs font-extrabold text-slate-700 mb-1.5">وحدة المساحة</label>
+                                <select id="farm-area-unit" class="custom-select w-full rounded-xl px-3.5 py-2.5 text-sm font-bold" onchange="onFormFieldChange()">
+                                    <option value="فدان">فدان</option>
+                                    <option value="هكتار">هكتار</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="soil-photo-url" class="block text-xs font-extrabold text-slate-700 mb-1.5">رابط صورة التربة (إن وجد)</label>
+                                <input id="soil-photo-url" type="url" placeholder="https://..." class="custom-input w-full rounded-xl px-3.5 py-2.5 text-xs font-mono-tech" oninput="onFormFieldChange()">
+                            </div>
+
+                            <div>
+                                <label for="crop-photo-url" class="block text-xs font-extrabold text-slate-700 mb-1.5">رابط صورة المحصول (إن وجد)</label>
+                                <input id="crop-photo-url" type="url" placeholder="https://..." class="custom-input w-full rounded-xl px-3.5 py-2.5 text-xs font-mono-tech" oninput="onFormFieldChange()">
+                            </div>
+                        </div>
+
+                        <div class="rounded-2xl bg-sky-50/70 border border-sky-200 p-4 space-y-3">
+                            <div class="flex items-center gap-2 text-xs font-extrabold text-sky-800">
+                                <i data-lucide="flask-conical" class="w-4 h-4"></i>
+                                <span>نتائج التحاليل المعملية (اختيارية)</span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                                <div>
+                                    <label for="soil-ph" class="block text-[11px] font-bold text-slate-600 mb-1">pH التربة</label>
+                                    <input id="soil-ph" type="number" step="0.1" placeholder="7.5" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onFormFieldChange()">
+                                </div>
+                                <div>
+                                    <label for="soil-ec" class="block text-[11px] font-bold text-slate-600 mb-1">ملوحة التربة EC</label>
+                                    <input id="soil-ec" type="number" step="0.1" placeholder="1.8" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onFormFieldChange()">
+                                </div>
+                                <div>
+                                    <label for="soil-n" class="block text-[11px] font-bold text-slate-600 mb-1">نيتروجين N</label>
+                                    <input id="soil-n" type="number" step="1" placeholder="ppm" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onFormFieldChange()">
+                                </div>
+                                <div>
+                                    <label for="water-ec" class="block text-[11px] font-bold text-slate-600 mb-1">ملوحة المياه EC</label>
+                                    <input id="water-ec" type="number" step="0.1" placeholder="0.9" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onFormFieldChange()">
+                                </div>
+                                <div>
+                                    <label for="water-ph" class="block text-[11px] font-bold text-slate-600 mb-1">pH المياه</label>
+                                    <input id="water-ph" type="number" step="0.1" placeholder="7.2" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onFormFieldChange()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="additional-notes" class="block text-xs font-extrabold text-slate-700 mb-1.5">ملاحظات إضافية</label>
+                            <textarea id="additional-notes" rows="3" placeholder="اكتب أي تفاصيل أخرى عن الأرض أو المحصول السابق..." class="custom-textarea w-full rounded-2xl px-4 py-3 text-sm" oninput="onFormFieldChange()"></textarea>
+                        </div>
+
+                        <div class="flex flex-wrap justify-between items-center gap-3 pt-3 border-t border-slate-200">
+                            <button type="button" onclick="goToStep(2)" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm border border-slate-300 transition-all">
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                <span>السابق</span>
+                            </button>
+
+                            <button type="submit" id="analyze-submit-btn" class="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-l from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-black text-sm md:text-base shadow-lg shadow-green-600/25 transition-all">
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                                <span>تحليل الأرض وإصدار بطاقة القرار</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- العمود الأيسر: ملخص الأرض الحي (4 أعمدة) -->
+            <aside class="lg:col-span-4 agri-card rounded-3xl p-5 space-y-4 lg:sticky lg:top-24">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-green-600 animate-pulse"></span>
+                        <h3 class="font-black text-sm text-slate-900">ملخص بيانات أرضك الحي</h3>
+                    </div>
+                    <span class="font-mono-tech text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full">AUTO-SAVED</span>
+                </div>
+
+                <!-- بطاقة إحداثيات القمر الصناعي -->
+                <div class="rounded-2xl bg-gradient-to-br from-sky-50 via-white to-green-50 border border-sky-200 p-4 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold text-sky-800 flex items-center gap-1.5">
+                            <i data-lucide="satellite" class="w-4 h-4 text-sky-600"></i>
+                            <span>نطاق الرصد الفضائي</span>
+                        </span>
+                        <span id="twin-coord-type" class="font-mono-tech text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-sky-200 text-sky-700">WAITING</span>
+                    </div>
+                    <div id="twin-coords" class="font-mono-tech text-xs font-extrabold text-slate-800 bg-white/90 px-3 py-2 rounded-xl border border-slate-200 text-center">
+                        LAT -- / LON --
+                    </div>
+                </div>
+
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between items-center bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200/80">
+                        <span class="text-slate-500 font-bold">المحافظة:</span>
+                        <span id="twin-gov" class="font-extrabold text-slate-900">غير محددة</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200/80">
+                        <span class="text-slate-500 font-bold">المحصول الأساسي:</span>
+                        <span id="twin-crop" class="font-extrabold text-green-700">غير محدد</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-amber-50/70 px-3.5 py-2.5 rounded-xl border border-amber-200/80">
+                        <span class="text-amber-800 font-bold">محصول المقارنة:</span>
+                        <span id="twin-compare-crop" class="font-extrabold text-amber-900">لا يوجد</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200/80">
+                        <span class="text-slate-500 font-bold">شهر الزراعة:</span>
+                        <span id="twin-month" class="font-extrabold text-sky-700">غير محدد</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200/80">
+                        <span class="text-slate-500 font-bold">التربة والري:</span>
+                        <span id="twin-soil-irr" class="font-extrabold text-slate-800">-- / --</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200/80">
+                        <span class="text-slate-500 font-bold">الصرف والمشكلة:</span>
+                        <span id="twin-drain-prob" class="font-extrabold text-orange-700">-- / --</span>
+                    </div>
+                </div>
+
+                <!-- شريط اكتمال الأسئلة الـ 8 -->
+                <div class="bg-green-50/70 rounded-2xl p-3.5 border border-green-200">
+                    <div class="flex justify-between items-center text-xs mb-2">
+                        <span class="font-extrabold text-green-900">اكتمال الأسئلة الإجبارية</span>
+                        <span id="twin-completion-text" class="font-mono-tech font-black text-green-700">0 / 8</span>
+                    </div>
+                    <div class="w-full h-2.5 rounded-full bg-white border border-green-200 overflow-hidden">
+                        <div id="twin-completion-bar" class="h-full bg-gradient-to-l from-green-600 to-sky-500 transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- شاشة التحميل (Satellite Sync Loading)                     -->
+        <!-- ========================================================= -->
+        <section id="loading-view" class="hidden no-print max-w-2xl mx-auto my-12 agri-card rounded-3xl p-8 text-center space-y-6">
+            <div class="relative w-24 h-24 mx-auto flex items-center justify-center">
+                <div class="absolute inset-0 rounded-full border-2 border-green-500/40 radar-wave"></div>
+                <div class="w-20 h-20 rounded-full bg-green-50 border-2 border-green-500 flex items-center justify-center shadow-lg shadow-green-500/20">
+                    <i data-lucide="satellite" class="w-10 h-10 text-green-600 animate-pulse"></i>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-xl font-black text-slate-900">جاري الاتصال بأقمار ناسا وتحليل مزرعتك...</h2>
+                <p id="loading-phase" class="text-sm text-sky-700 mt-2 font-bold">سحب بيانات الطقس لآخر 30 يوماً من NASA POWER...</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-bold text-slate-700 pt-2">
+                <div class="bg-sky-50 rounded-2xl p-3 border border-sky-200">NASA POWER Daily</div>
+                <div class="bg-green-50 rounded-2xl p-3 border border-green-200">ROI & Water Savings</div>
+                <div class="bg-amber-50 rounded-2xl p-3 border border-amber-200">Open-Meteo Forecast</div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- شاشة النتائج وبطاقة القرار الزراعي (Results View)         -->
+        <!-- ========================================================= -->
+        <section id="results-view" class="hidden space-y-6">
+
+            <!-- شريط الإجراءات والمشاركة والطباعة -->
+            <div class="no-print flex flex-wrap justify-between items-center gap-3">
+                <button type="button" onclick="backToWizard()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 text-xs md:text-sm font-extrabold border border-slate-300 shadow-sm transition-all">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4 text-green-600"></i>
+                    <span>تعديل بيانات المزرعة</span>
+                </button>
+
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <button type="button" onclick="openMethodologyModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs md:text-sm font-extrabold border border-amber-300 transition-all">
+                        <i data-lucide="calculator" class="w-4 h-4 text-amber-600"></i>
+                        <span>إزاي بنحسب؟</span>
+                    </button>
+                    <button type="button" onclick="shareWhatsApp()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm font-extrabold shadow-sm transition-all">
+                        <i data-lucide="share-2" class="w-4 h-4"></i>
+                        <span>مشاركة عبر واتساب</span>
+                    </button>
+                    <button type="button" onclick="downloadReportJSON()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs md:text-sm font-extrabold border border-sky-300 transition-all">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>JSON</span>
+                    </button>
+                    <button type="button" onclick="window.print()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs md:text-sm font-black shadow-sm transition-all">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        <span>حفظ كـ PDF / طباعة</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- بطاقة القرار القابلة للطباعة -->
+            <div id="printable-decision-card" class="space-y-6">
+
+                <!-- 1. ملخص الملاءمة والدرجة + تنبيه الموعد المبكر/المتأخر -->
+                <div class="agri-card rounded-3xl p-6 md:p-7 border-t-4 border-t-green-600">
+                    <div class="flex flex-col md:flex-row items-center gap-6">
+                        <!-- المقياس الدائري -->
+                        <div class="relative w-36 h-36 shrink-0 flex items-center justify-center">
+                            <svg class="w-36 h-36 -rotate-90" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="52" stroke="#e2e8f0" stroke-width="10" fill="none" />
+                                <circle id="score-ring" cx="60" cy="60" r="52" stroke="#16a34a" stroke-width="10" stroke-linecap="round" fill="none" stroke-dasharray="326.73" stroke-dashoffset="326.73" class="transition-all duration-700" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                                <span id="res-score-value" class="font-mono-tech text-3xl font-black text-slate-900">--</span>
+                                <span class="text-[11px] text-slate-500 font-extrabold">من 100</span>
+                            </div>
+                        </div>
+
+                        <div class="flex-grow space-y-3 text-center md:text-right">
+                            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                                <span id="res-suitability-badge" class="px-3.5 py-1 rounded-full text-xs font-black border">--</span>
+                                <span id="res-confidence-badge" class="hidden px-3 py-1 rounded-full text-xs font-bold bg-slate-100 border border-slate-200 text-slate-700"></span>
+                                <span id="res-assessment-type" class="px-3 py-1 rounded-full text-xs font-bold bg-sky-50 border border-sky-200 text-sky-800"></span>
+                            </div>
+
+                            <h2 id="res-status-text" class="text-lg md:text-2xl font-black text-slate-900 leading-snug">--</h2>
+
+                            <div id="res-meta-pills" class="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs text-slate-700 font-semibold"></div>
+
+                            <!-- تنبيه الميعاد المبكر / المتأخر -->
+                            <div id="res-timing-alert-box" class="hidden rounded-2xl p-3.5 text-xs md:text-sm font-bold flex items-start gap-2.5 text-right border"></div>
+
+                            <div id="res-unjudged-box" class="hidden rounded-2xl bg-amber-50 border border-amber-300 px-4 py-2.5 text-xs text-amber-900 font-bold"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. مقارنة محصولين جنباً إلى جنب (إن وُجدت) -->
+                <div id="res-comparison-section" class="hidden agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-amber-500 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="font-black text-base md:text-lg text-slate-900 flex items-center gap-2">
+                            <i data-lucide="git-compare" class="w-5 h-5 text-amber-600"></i>
+                            <span>مقارنة المحصولين جنباً إلى جنب</span>
+                        </h3>
+                        <span id="res-comparison-winner-pill" class="px-3.5 py-1 rounded-full text-xs font-black bg-green-100 text-green-800 border border-green-300"></span>
+                    </div>
+
+                    <p id="res-comparison-summary" class="text-sm font-bold text-slate-700 bg-amber-50/70 border border-amber-200 rounded-2xl p-3.5"></p>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs md:text-sm text-right border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-800">
+                                    <th class="p-3 rounded-r-xl font-black">وجه المقارنة</th>
+                                    <th id="cmp-col-1" class="p-3 font-black text-green-800">المحصول الأول</th>
+                                    <th id="cmp-col-2" class="p-3 rounded-l-xl font-black text-sky-800">المحصول الثاني</th>
+                                </tr>
+                            </thead>
+                            <tbody id="res-comparison-tbody" class="divide-y divide-slate-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. لوحة التكلفة والعائد وتوفير المياه (ROI & Water Savings) -->
+                <div id="res-economics-section" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- البطاقة الاقتصادية -->
+                    <div class="lg:col-span-6 agri-card rounded-3xl p-5 md:p-6 space-y-4 border-t-4 border-t-amber-400">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="font-black text-base text-slate-900 flex items-center gap-2">
+                                <i data-lucide="coins" class="w-5 h-5 text-amber-500"></i>
+                                <span>حاسبة التكلفة والعائد المتوقع</span>
+                            </h3>
+                            <span id="res-econ-area-badge" class="text-xs font-extrabold px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">للفدان الواحد</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
+                                <div class="text-xs text-slate-500 font-bold">تكلفة الفدان التقديرية</div>
+                                <div id="res-econ-cost" class="font-mono-tech text-lg font-black text-slate-900 mt-1">--</div>
+                            </div>
+                            <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
+                                <div class="text-xs text-slate-500 font-bold">الإنتاجية المتوقعة / فدان</div>
+                                <div id="res-econ-yield" class="font-mono-tech text-lg font-black text-slate-900 mt-1">--</div>
+                            </div>
+                            <div class="bg-green-50 rounded-2xl p-3.5 border border-green-200">
+                                <div class="text-xs text-green-800 font-bold">صافي الربح / فدان</div>
+                                <div id="res-econ-profit" class="font-mono-tech text-lg font-black text-green-700 mt-1">--</div>
+                            </div>
+                            <div class="bg-amber-50 rounded-2xl p-3.5 border border-amber-200">
+                                <div class="text-xs text-amber-900 font-bold">العائد على الاستثمار ROI</div>
+                                <div id="res-econ-roi" class="font-mono-tech text-lg font-black text-amber-700 mt-1">--</div>
+                            </div>
+                        </div>
+
+                        <div id="res-econ-total-box" class="hidden rounded-2xl bg-green-600 text-white p-3.5 text-xs md:text-sm font-bold flex flex-wrap justify-between gap-2"></div>
+                        <p id="res-econ-disclaimer" class="text-[11px] text-slate-500 leading-relaxed"></p>
+                    </div>
+
+                    <!-- بطاقة توفير المياه قبل / بعد -->
+                    <div class="lg:col-span-6 agri-card rounded-3xl p-5 md:p-6 space-y-4 border-t-4 border-t-sky-500">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="font-black text-base text-slate-900 flex items-center gap-2">
+                                <i data-lucide="droplets" class="w-5 h-5 text-sky-600"></i>
+                                <span>حاسبة توفير المياه (قبل / بعد)</span>
+                            </h3>
+                            <span id="res-water-save-pct" class="font-mono-tech text-xs font-black px-3 py-1 rounded-full bg-sky-100 text-sky-800 border border-sky-300">توفير 0%</span>
+                        </div>
+
+                        <div class="space-y-3 bg-sky-50/60 rounded-2xl p-4 border border-sky-200">
+                            <div>
+                                <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                                    <span>قبل (الري بالغمر التقليدي)</span>
+                                    <span id="res-water-flood" class="font-mono-tech font-black text-slate-900">-- م³/فدان</span>
+                                </div>
+                                <div class="w-full h-3 rounded-full bg-slate-200 overflow-hidden">
+                                    <div class="h-full bg-orange-400 rounded-full" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs font-bold text-sky-900 mb-1">
+                                    <span id="res-water-rec-label">بعد (النظام المقترح)</span>
+                                    <span id="res-water-rec" class="font-mono-tech font-black text-sky-700">-- م³/فدان</span>
+                                </div>
+                                <div class="w-full h-3 rounded-full bg-slate-200 overflow-hidden">
+                                    <div id="res-water-rec-bar" class="h-full bg-gradient-to-l from-sky-600 to-green-500 rounded-full transition-all duration-700" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-sky-50 rounded-2xl p-3.5 border border-sky-200">
+                                <div class="text-xs text-sky-800 font-bold">الوفْر المائي للفدان</div>
+                                <div id="res-water-saved-feddan" class="font-mono-tech text-lg font-black text-sky-700 mt-1">--</div>
+                            </div>
+                            <div class="bg-green-50 rounded-2xl p-3.5 border border-green-200">
+                                <div class="text-xs text-green-800 font-bold">إجمالي الوفْر للمساحة</div>
+                                <div id="res-water-saved-total" class="font-mono-tech text-lg font-black text-green-700 mt-1">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. التقويم الزراعي التفاعلي (Timeline) -->
+                <div id="res-calendar-section" class="hidden agri-card rounded-3xl p-5 md:p-6 space-y-4 border-t-4 border-t-green-500">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h3 class="font-black text-base md:text-lg text-slate-900 flex items-center gap-2">
+                                <i data-lucide="calendar-days" class="w-5 h-5 text-green-600"></i>
+                                <span>التقويم الزراعي التفاعلي ومواعيد الري والتسميد</span>
+                            </h3>
+                            <p id="res-calendar-subtitle" class="text-xs text-slate-600 font-semibold mt-0.5"></p>
+                        </div>
+                        <span id="res-calendar-duration" class="font-mono-tech text-xs font-black px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-200"></span>
+                    </div>
+
+                    <div id="res-calendar-timeline" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+
+                <!-- 5. قياسات NASA POWER (آخر 30 يوماً + مناخ شهر الزراعة) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-7 agri-card rounded-3xl p-5 md:p-6 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="font-black text-base text-slate-900 flex items-center gap-2">
+                                <i data-lucide="satellite" class="w-5 h-5 text-sky-600"></i>
+                                <span>قياسات NASA POWER (آخر 30 يوماً)</span>
+                            </h3>
+                            <span id="res-nasa-period" class="font-mono-tech text-[11px] font-bold text-sky-800 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">--</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
+                                <div class="flex items-center gap-1.5 text-xs text-slate-600 font-bold">
+                                    <i data-lucide="thermometer" class="w-4 h-4 text-orange-500"></i>
+                                    <span>متوسط الحرارة</span>
+                                </div>
+                                <div id="res-temp-30" class="font-mono-tech text-xl font-black text-slate-900 mt-1.5">--</div>
+                            </div>
+                            <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
+                                <div class="flex items-center gap-1.5 text-xs text-slate-600 font-bold">
+                                    <i data-lucide="cloud-rain" class="w-4 h-4 text-sky-600"></i>
+                                    <span>إجمالي الأمطار</span>
+                                </div>
+                                <div id="res-rain-30" class="font-mono-tech text-xl font-black text-slate-900 mt-1.5">--</div>
+                            </div>
+                            <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
+                                <div class="flex items-center gap-1.5 text-xs text-slate-600 font-bold">
+                                    <i data-lucide="droplets" class="w-4 h-4 text-green-600"></i>
+                                    <span>الرطوبة النسبية</span>
+                                </div>
+                                <div id="res-rh-30" class="font-mono-tech text-xl font-black text-slate-900 mt-1.5">--</div>
+                            </div>
+                            <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
+                                <div class="flex items-center gap-1.5 text-xs text-slate-600 font-bold">
+                                    <i data-lucide="wind" class="w-4 h-4 text-sky-500"></i>
+                                    <span>سرعة الرياح</span>
+                                </div>
+                                <div id="res-wind-30" class="font-mono-tech text-xl font-black text-slate-900 mt-1.5">--</div>
+                            </div>
+                        </div>
+
+                        <div id="res-data-quality" class="text-[11px] text-slate-500 font-semibold flex flex-wrap gap-3 pt-1"></div>
+                    </div>
+
+                    <!-- مناخ شهر الزراعة المرجعي -->
+                    <div class="lg:col-span-5 agri-card rounded-3xl p-5 md:p-6 space-y-4">
+                        <div class="flex items-center justify-between gap-2">
+                            <h3 class="font-black text-base text-slate-900 flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-5 h-5 text-green-600"></i>
+                                <span>مناخ شهر الزراعة المرجعي</span>
+                            </h3>
+                            <span id="res-clim-source" class="text-[11px] font-bold text-green-800 bg-green-50 border border-green-200 px-2.5 py-0.5 rounded-full">متوسط سنوات ناسا</span>
+                        </div>
+                        <div id="res-climatology-body" class="grid grid-cols-2 gap-3"></div>
+                    </div>
+                </div>
+
+                <!-- 6. تحليل العوامل التفصيلي + توصية الري + البدائل -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div id="res-checks-section" class="lg:col-span-7 agri-card rounded-3xl p-5 md:p-6 space-y-4">
+                        <h3 class="font-black text-base text-slate-900 flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-5 h-5 text-green-600"></i>
+                            <span>تحليل عوامل الملاءمة التفصيلي</span>
+                        </h3>
+                        <div id="res-checks-list" class="space-y-2.5"></div>
+                    </div>
+
+                    <div class="lg:col-span-5 space-y-6">
+                        <div id="res-irrigation-box" class="agri-card rounded-3xl p-5 md:p-6 border-r-4 border-r-sky-600 space-y-2">
+                            <h3 class="font-black text-base text-sky-800 flex items-center gap-2">
+                                <i data-lucide="droplets" class="w-5 h-5 text-sky-600"></i>
+                                <span>توصية نظام الري</span>
+                            </h3>
+                            <p id="res-irrigation-text" class="text-sm text-slate-700 font-semibold leading-relaxed"></p>
+                        </div>
+
+                        <div id="res-alternatives-box" class="hidden agri-card rounded-3xl p-5 md:p-6 border-r-4 border-r-green-600 space-y-3">
+                            <h3 class="font-black text-base text-green-800 flex items-center gap-2">
+                                <i data-lucide="sprout" class="w-5 h-5 text-green-600"></i>
+                                <span>محاصيل أنسب لظروف أرضك</span>
+                            </h3>
+                            <div id="res-alternatives-list" class="space-y-2.5"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. توقعات Open-Meteo لـ 16 يوماً + النظرة الشهرية -->
+                <div id="res-forecast-section" class="hidden agri-card rounded-3xl p-5 md:p-6 space-y-5 border-t-4 border-t-sky-500">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="font-black text-base md:text-lg text-slate-900 flex items-center gap-2">
+                            <i data-lucide="cloud-sun" class="w-5 h-5 text-sky-600"></i>
+                            <span>توقعات الطقس للأسبوعين القادمين والنظرة الشهرية</span>
+                        </h3>
+                        <span class="font-mono-tech text-[11px] font-bold text-sky-800 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">Open-Meteo Live Forecast</span>
+                    </div>
+
+                    <div id="res-forecast-alerts" class="space-y-2"></div>
+                    <div id="res-forecast-days" class="flex gap-3 overflow-x-auto custom-scrollbar pb-2"></div>
+
+                    <div id="res-outlook-box" class="hidden rounded-2xl bg-sky-50/70 border border-sky-200 p-4 space-y-1.5">
+                        <div class="text-xs font-black text-sky-800">الاتجاه العام للـ 30 يوماً القادمة (استرشادي):</div>
+                        <p id="res-outlook-text" class="text-xs md:text-sm text-slate-700 font-semibold leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <!-- 8. المخاطر والتوصيات العملية -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="agri-card rounded-3xl p-5 md:p-6 space-y-3">
+                        <h3 class="font-black text-base text-orange-800 flex items-center gap-2">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-orange-600"></i>
+                            <span>المخاطر المحتملة</span>
+                        </h3>
+                        <ul id="res-risks-list" class="space-y-2 text-sm text-slate-700 font-semibold"></ul>
+                    </div>
+
+                    <div class="agri-card rounded-3xl p-5 md:p-6 space-y-3">
+                        <h3 class="font-black text-base text-green-800 flex items-center gap-2">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-green-600"></i>
+                            <span>التوصيات والنصائح العملية</span>
+                        </h3>
+                        <ul id="res-tips-list" class="space-y-2 text-sm text-slate-700 font-semibold"></ul>
+                    </div>
+                </div>
+
+                <!-- 9. قسم الشفافية المدمج في التقرير (إزاي بنحسب؟) -->
+                <div id="res-methodology-inline" class="hidden agri-card rounded-3xl p-5 md:p-6 space-y-4 border-t-4 border-t-amber-500">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="font-black text-base text-slate-900 flex items-center gap-2">
+                            <i data-lucide="calculator" class="w-5 h-5 text-amber-600"></i>
+                            <span>شفافية الحسابات: كيف حُسِبت درجة ملاءمة أرضك؟</span>
+                        </h3>
+                        <span id="res-meth-formula" class="font-mono-tech text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1 rounded-full"></span>
+                    </div>
+                    <div id="res-meth-factors" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5"></div>
+                </div>
+
+                <!-- 10. الملاحظات + البيانات الناقصة + القيود العلمية -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="agri-card rounded-3xl p-5 space-y-3">
+                        <h3 class="font-black text-sm text-slate-900 flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-sky-600"></i>
+                            <span>ملخص الملاحظات الميدانية</span>
+                        </h3>
+                        <ul id="res-observations-list" class="space-y-2 text-xs text-slate-700 font-semibold leading-relaxed"></ul>
+                    </div>
+
+                    <div class="agri-card rounded-3xl p-5 space-y-3">
+                        <h3 class="font-black text-sm text-amber-800 flex items-center gap-2">
+                            <i data-lucide="clipboard-list" class="w-4 h-4 text-amber-600"></i>
+                            <span>بيانات ناقصة يُنصح باستكمالها</span>
+                        </h3>
+                        <ul id="res-missing-list" class="space-y-2 text-xs text-slate-700 font-semibold leading-relaxed"></ul>
+                    </div>
+
+                    <div class="agri-card rounded-3xl p-5 space-y-3">
+                        <h3 class="font-black text-sm text-slate-900 flex items-center gap-2">
+                            <i data-lucide="info" class="w-4 h-4 text-sky-600"></i>
+                            <span>القيود العلمية ومصداقية النموذج</span>
+                        </h3>
+                        <ul id="res-limitations-list" class="space-y-2 text-xs text-slate-600 font-semibold leading-relaxed"></ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- نافذة منهجية الحساب الشفافة ("إزاي بنحسب؟") -->
+    <div id="methodology-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[88vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-200 p-6 md:p-7 space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                        <i data-lucide="calculator" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 id="modal-meth-title" class="font-black text-lg text-slate-900">منهجية الحساب والتقييم في NASA Fallah</h3>
+                        <p class="text-xs text-slate-500 font-semibold">شفافية كاملة لمصادر البيانات الفعلية والمعادلات والأوزان</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeMethodologyModal()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div id="modal-meth-body" class="space-y-5 text-sm text-slate-700">
+                <div class="text-center py-6 text-slate-500 font-bold">جاري تحميل المنهجية...</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="no-print border-t border-slate-200 bg-white py-4 px-4 text-center text-xs font-semibold text-slate-500 mt-10">
+        NASA Fallah v1.5.0 • منصة إرشادية مجانية 100% تعتمد على بيانات NASA POWER و Open-Meteo • لا تغني عن استشارة المهندس الزراعي
+    </footer>
+
+    <script>
+        // ============================================================
+        // 1. API BASE URL & LOCALSTORAGE KEY
+        // ============================================================
+        const API_BASE = (() => {
+            if (window.location.protocol === "file:") return "http://127.0.0.1:8000";
+            if (
+                ["localhost", "127.0.0.1"].includes(window.location.hostname) &&
+                window.location.port !== "8000"
+            ) {
+                return "http://127.0.0.1:8000";
+            }
+            return "";
+        })();
+
+        const STORAGE_KEY = "nasa_fallah_state_v15";
+        const SENIOR_KEY = "nasa_fallah_senior_mode";
+
+        const FALLBACK_OPTIONS = {
+            governorates: [
+                "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "البحر الأحمر",
+                "البحيرة", "الفيوم", "الغربية", "الإسماعيلية", "المنوفية",
+                "المنيا", "القليوبية", "الوادي الجديد", "السويس", "أسوان",
+                "أسيوط", "بني سويف", "بورسعيد", "دمياط", "جنوب سيناء",
+                "كفر الشيخ", "مطروح", "الأقصر", "قنا", "شمال سيناء",
+                "الشرقية", "سوهاج"
+            ],
+            crops: [
+                "القمح", "الأرز", "الذرة", "القطن", "قصب السكر",
+                "بنجر السكر", "الطماطم", "البطاطس", "البصل", "الثوم",
+                "الفول البلدي", "الفاصوليا", "العدس", "الحمص", "الفول السوداني",
+                "عباد الشمس", "السمسم", "البرسيم", "العنب", "المانجو",
+                "الموالح", "الموز", "الزيتون", "الفراولة", "مش متأكد"
+            ],
+            months: [
+                { number: 1, name: "يناير" }, { number: 2, name: "فبراير" },
+                { number: 3, name: "مارس" }, { number: 4, name: "أبريل" },
+                { number: 5, name: "مايو" }, { number: 6, name: "يونيو" },
+                { number: 7, name: "يوليو" }, { number: 8, name: "أغسطس" },
+                { number: 9, name: "سبتمبر" }, { number: 10, name: "أكتوبر" },
+                { number: 11, name: "نوفمبر" }, { number: 12, name: "ديسمبر" }
+            ],
+            irrigation_methods: ["الغمر", "التنقيط", "الرش", "أخرى"],
+            water_sources: ["مياه النيل أو الترع", "مياه الآبار", "مياه معالجة", "مصدر آخر"],
+            soil_types: ["رملية", "طينية", "طميية", "لا أعرف"],
+            standing_water: ["نعم", "لا", "أحيانًا"],
+            agricultural_problems: [
+                "نقص المياه", "ملوحة التربة", "اصفرار النباتات",
+                "الآفات والحشرات", "الأمراض النباتية", "ضعف نمو المحصول",
+                "لا توجد مشكلة", "مشكلة أخرى"
+            ]
+        };
+
+        const GOV_COORDS = {
+            "القاهرة": [30.0444, 31.2357], "الجيزة": [30.0131, 31.2089],
+            "الإسكندرية": [31.2001, 29.9187], "الدقهلية": [31.0364, 31.3807],
+            "البحر الأحمر": [27.2579, 33.8116], "البحيرة": [30.8481, 30.3436],
+            "الفيوم": [29.3084, 30.8428], "الغربية": [30.8754, 31.0335],
+            "الإسماعيلية": [30.5965, 32.2719], "المنوفية": [30.5972, 30.9876],
+            "المنيا": [28.1099, 30.7503], "القليوبية": [30.3292, 31.2168],
+            "الوادي الجديد": [25.4514, 30.5463], "السويس": [29.9668, 32.5498],
+            "أسوان": [24.0889, 32.8998], "أسيوط": [27.1809, 31.1837],
+            "بني سويف": [29.0661, 31.0994], "بورسعيد": [31.2653, 32.3019],
+            "دمياط": [31.4175, 31.8144], "جنوب سيناء": [28.1099, 33.5840],
+            "كفر الشيخ": [31.1107, 30.9388], "مطروح": [31.3543, 27.2373],
+            "الأقصر": [25.6872, 32.6396], "قنا": [26.1551, 32.7160],
+            "شمال سيناء": [31.1321, 33.8033], "الشرقية": [30.5877, 31.5020],
+            "سوهاج": [26.5569, 31.6948]
+        };
+
+        let appOptions = { ...FALLBACK_OPTIONS };
+        let lastAnalysisResponse = null;
+        let egyptMap = null;
+        let mapMarker = null;
+
+        const formState = {
+            crop: "",
+            planting_month: null,
+            irrigation_method: "",
+            water_source: "",
+            soil_type: "",
+            standing_water: "",
+            agricultural_problem: ""
+        };
+
+        // ============================================================
+        // 2. CLOCK, SENIOR MODE & API HEALTH
+        // ============================================================
+        function updateUtcClock() {
+            const now = new Date();
+            const hh = String(now.getUTCHours()).padStart(2, "0");
+            const mm = String(now.getUTCMinutes()).padStart(2, "0");
+            const ss = String(now.getUTCSeconds()).padStart(2, "0");
+            const el = document.getElementById("utc-clock");
+            if (el) el.textContent = `UTC ${hh}:${mm}:${ss}`;
+        }
+
+        function applySeniorMode(enabled) {
+            const html = document.documentElement;
+            const btn = document.getElementById("senior-mode-btn");
+            const label = document.getElementById("senior-mode-label");
+            if (enabled) {
+                html.classList.add("senior-mode");
+                btn.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-600 text-white border border-green-700 font-bold text-xs transition-all";
+                btn.setAttribute("aria-pressed", "true");
+                label.textContent = "وضع كبار السن: مفعّل";
+            } else {
+                html.classList.remove("senior-mode");
+                btn.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-green-50 text-slate-800 border border-slate-300 font-bold text-xs transition-all";
+                btn.setAttribute("aria-pressed", "false");
+                label.textContent = "وضع كبار السن";
+            }
+            if (egyptMap) setTimeout(() => egyptMap.invalidateSize(), 150);
+        }
+
+        function toggleSeniorMode() {
+            const isNowEnabled = !document.documentElement.classList.contains("senior-mode");
+            localStorage.setItem(SENIOR_KEY, isNowEnabled ? "1" : "0");
+            applySeniorMode(isNowEnabled);
+        }
+
+        async function checkApiHealth() {
+            const dot = document.getElementById("api-status-dot");
+            const text = document.getElementById("api-status-text");
+            try {
+                const res = await fetch(`${API_BASE}/api/health`);
+                if (!res.ok) throw new Error("Health failed");
+                const data = await res.json();
+                dot.className = "w-2 h-2 rounded-full bg-green-600";
+                text.textContent = `API: ONLINE v${data.version || "1.5.0"}`;
+            } catch {
+                dot.className = "w-2 h-2 rounded-full bg-orange-500";
+                text.textContent = "API: OFFLINE";
+            }
+        }
+
+        // ============================================================
+        // 3. INTERACTIVE GLOBAL SATELLITE GPS MAP (ESRI WORLD IMAGERY)
+        // ============================================================
+        function initEgyptMap() {
+            const mapContainer = document.getElementById("egypt-map");
+            if (typeof L === "undefined") {
+                mapContainer.innerHTML =
+                    '<div class="h-full flex items-center justify-center text-xs text-slate-200 p-4 text-center">تعذر تحميل خريطة القمر الصناعي (تحقق من الاتصال بالإنترنت). يمكنك اختيار المحافظة أو إدخال الإحداثيات يدوياً.</div>';
+                return;
+            }
+
+            egyptMap = L.map("egypt-map", {
+                center: [26.8, 30.8],
+                zoom: 3,
+                minZoom: 2,
+                maxZoom: 19,
+                dragging: true,
+                scrollWheelZoom: true,
+                zoomControl: true,
+                touchZoom: true,
+                doubleClickZoom: true,
+                boxZoom: true,
+                worldCopyJump: true
+            });
+
+            // 1. طبقة القمر الصناعي الحقيقية المجانية من Esri World Imagery
+            L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                {
+                    attribution: "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+                    maxZoom: 19
+                }
+            ).addTo(egyptMap);
+
+            // 2. طبقة أسماء المدن والحدود فوق صور القمر الصناعي
+            L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+                {
+                    attribution: "Labels &copy; Esri",
+                    maxZoom: 19,
+                    pane: "overlayPane"
+                }
+            ).addTo(egyptMap);
+
+            // عند ضغط الفلاح في أي نقطة على الخريطة: نقل الدبوس فوراً وملء الإحداثيات
+            egyptMap.on("click", (e) => {
+                const wrapped = e.latlng.wrap();
+                const lat = Number(wrapped.lat.toFixed(5));
+                const lng = Number(wrapped.lng.toFixed(5));
+                document.getElementById("latitude-input").value = lat;
+                document.getElementById("longitude-input").value = lng;
+                placeMapMarker(lat, lng, false);
+                onFormFieldChange();
+            });
+
+            // إصلاح الشاشة الرمادية بعد التحميل وعند تغيّر أبعاد الحاوية
+            setTimeout(() => {
+                if (egyptMap) egyptMap.invalidateSize();
+            }, 250);
+
+            if (typeof ResizeObserver !== "undefined") {
+                const observer = new ResizeObserver(() => {
+                    if (egyptMap) egyptMap.invalidateSize();
+                });
+                observer.observe(mapContainer);
+            }
+        }
+
+        function placeMapMarker(lat, lng, pan = true) {
+            if (!egyptMap || typeof L === "undefined") return;
+            if (mapMarker) {
+                mapMarker.setLatLng([lat, lng]);
+            } else {
+                mapMarker = L.marker([lat, lng]).addTo(egyptMap);
+            }
+            mapMarker.bindPopup(`موقع الأرض المحدد<br>Lat: ${lat}, Lon: ${lng}`).openPopup();
+            if (pan) {
+                egyptMap.setView([lat, lng], Math.max(egyptMap.getZoom(), 11), { animate: true });
+            }
+            document.getElementById("map-pin-badge").textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            egyptMap.invalidateSize();
+        }
+
+        function clearMapPin() {
+            document.getElementById("latitude-input").value = "";
+            document.getElementById("longitude-input").value = "";
+            if (mapMarker && egyptMap) {
+                egyptMap.removeLayer(mapMarker);
+                mapMarker = null;
+            }
+            document.getElementById("map-pin-badge").textContent = "جاهزة للنقر";
+            const gov = document.getElementById("governorate-select").value;
+            if (egyptMap) {
+                if (gov && GOV_COORDS[gov]) {
+                    egyptMap.setView(GOV_COORDS[gov], 10, { animate: true });
+                } else {
+                    egyptMap.setView([26.8, 30.8], 3, { animate: true });
+                }
+                egyptMap.invalidateSize();
+            }
+            onFormFieldChange();
+        }
+
+        function onGovernorateChange() {
+            const gov = document.getElementById("governorate-select").value;
+            if (egyptMap) {
+                if (gov && GOV_COORDS[gov]) {
+                    egyptMap.setView(GOV_COORDS[gov], 10, { animate: true });
+                } else {
+                    egyptMap.setView([26.8, 30.8], 3, { animate: true });
+                }
+                setTimeout(() => egyptMap && egyptMap.invalidateSize(), 150);
+            }
+            onFormFieldChange();
+        }
+
+        function onCoordsInput() {
+            const latVal = document.getElementById("latitude-input").value.trim();
+            const lonVal = document.getElementById("longitude-input").value.trim();
+            if (latVal !== "" && lonVal !== "") {
+                const lat = Number(latVal);
+                const lon = Number(lonVal);
+                if (!Number.isNaN(lat) && !Number.isNaN(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+                    placeMapMarker(lat, lon, true);
+                }
+            }
+            onFormFieldChange();
+        }
+
+        // ============================================================
+        // 4. OPTIONS LOADING & FORM RENDERING
+        // ============================================================
+        async function loadOptions() {
+            try {
+                const res = await fetch(`${API_BASE}/api/options`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data.governorates)) appOptions = data;
+                }
+            } catch {
+                // Keep FALLBACK_OPTIONS silently
+            }
+            restoreSavedState();
+            renderAllOptionControls();
+        }
+
+        function renderAllOptionControls() {
+            const govSelect = document.getElementById("governorate-select");
+            const currentGov = govSelect.value;
+            govSelect.innerHTML = '<option value="">-- اختر المحافظة --</option>';
+            appOptions.governorates.forEach((gov) => {
+                const opt = document.createElement("option");
+                opt.value = gov;
+                opt.textContent = gov;
+                govSelect.appendChild(opt);
+            });
+            if (currentGov && appOptions.governorates.includes(currentGov)) {
+                govSelect.value = currentGov;
+            }
+
+            renderCompareDropdown();
+            filterCrops(document.getElementById("crop-search").value);
+
+            const monthsGrid = document.getElementById("months-grid");
+            monthsGrid.innerHTML = "";
+            appOptions.months.forEach((m) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = `choice-card rounded-2xl py-2.5 px-2 text-center text-xs font-extrabold ${formState.planting_month === m.number ? "selected" : ""}`;
+                btn.textContent = `${m.number}. ${m.name}`;
+                btn.onclick = () => {
+                    formState.planting_month = m.number;
+                    renderAllOptionControls();
+                    onFormFieldChange();
+                };
+                monthsGrid.appendChild(btn);
+            });
+
+            renderChoiceGroup("irrigation-grid", appOptions.irrigation_methods, "irrigation_method", {
+                "الغمر": "waves",
+                "التنقيط": "droplets",
+                "الرش": "cloud-rain",
+                "أخرى": "sliders-horizontal"
+            });
+
+            renderChoiceGroup("water-source-grid", appOptions.water_sources, "water_source", {
+                "مياه النيل أو الترع": "waves",
+                "مياه الآبار": "arrow-down-circle",
+                "مياه معالجة": "recycle",
+                "مصدر آخر": "help-circle"
+            });
+
+            renderChoiceGroup("soil-type-grid", appOptions.soil_types, "soil_type", {
+                "رملية": "sun",
+                "طينية": "layers",
+                "طميية": "sprout",
+                "لا أعرف": "help-circle"
+            });
+
+            renderChoiceGroup("standing-water-grid", appOptions.standing_water, "standing_water", {
+                "نعم": "alert-triangle",
+                "لا": "check-circle-2",
+                "أحيانًا": "clock"
+            });
+
+            renderChoiceGroup("problems-grid", appOptions.agricultural_problems, "agricultural_problem", {
+                "نقص المياه": "droplet",
+                "ملوحة التربة": "sparkles",
+                "اصفرار النباتات": "leaf",
+                "الآفات والحشرات": "bug",
+                "الأمراض النباتية": "shield-alert",
+                "ضعف نمو المحصول": "trending-down",
+                "لا توجد مشكلة": "check-circle-2",
+                "مشكلة أخرى": "help-circle"
+            });
+
+            lucide.createIcons();
+            syncDigitalTwin();
+        }
+
+        function renderCompareDropdown() {
+            const sel = document.getElementById("compare-crop-select");
+            const prev = sel.value;
+            sel.innerHTML = '<option value="">-- بدون مقارنة (تحليل محصول واحد فقط) --</option>';
+            appOptions.crops
+                .filter((c) => c !== "مش متأكد" && c !== formState.crop)
+                .forEach((c) => {
+                    const opt = document.createElement("option");
+                    opt.value = c;
+                    opt.textContent = c;
+                    sel.appendChild(opt);
+                });
+            if (prev && prev !== formState.crop && prev !== "مش متأكد") {
+                sel.value = prev;
+            } else {
+                sel.value = "";
+            }
+        }
+
+        function renderCropsGrid(cropsList) {
+            const grid = document.getElementById("crops-grid");
+            grid.innerHTML = "";
+            if (!cropsList.length) {
+                grid.innerHTML = '<div class="col-span-full text-center text-xs text-slate-500 py-4 font-bold">لا يوجد محصول مطابق للبحث</div>';
+                return;
+            }
+            cropsList.forEach((crop) => {
+                const isUnknown = crop === "مش متأكد";
+                const card = document.createElement("button");
+                card.type = "button";
+                card.className = `choice-card rounded-2xl px-3 py-2.5 text-right flex items-center gap-2 text-xs font-extrabold ${formState.crop === crop ? "selected" : ""}`;
+                card.onclick = () => {
+                    formState.crop = crop;
+                    renderCompareDropdown();
+                    filterCrops(document.getElementById("crop-search").value);
+                    onFormFieldChange();
+                };
+                card.innerHTML = `
+                    <span class="icon-box w-6 h-6 rounded-lg border border-slate-200 bg-white flex items-center justify-center shrink-0 text-green-700">
+                        <i data-lucide="${isUnknown ? "help-circle" : "sprout"}" class="w-3.5 h-3.5"></i>
+                    </span>
+                    <span class="truncate">${escapeHtml(crop)}</span>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function filterCrops(query) {
+            const q = (query || "").trim();
+            const filtered = q ? appOptions.crops.filter((c) => c.includes(q)) : appOptions.crops;
+            renderCropsGrid(filtered);
+        }
+
+        function renderChoiceGroup(containerId, items, stateKey, iconMap) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = "";
+            items.forEach((item) => {
+                const icon = (iconMap && iconMap[item]) || "check";
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = `choice-card rounded-2xl p-3 flex items-center gap-2.5 text-right text-xs font-extrabold ${formState[stateKey] === item ? "selected" : ""}`;
+                btn.onclick = () => {
+                    formState[stateKey] = item;
+                    renderChoiceGroup(containerId, items, stateKey, iconMap);
+                    lucide.createIcons();
+                    onFormFieldChange();
+                };
+                btn.innerHTML = `
+                    <span class="icon-box w-7 h-7 rounded-xl border border-slate-200 bg-white flex items-center justify-center shrink-0 text-sky-700">
+                        <i data-lucide="${icon}" class="w-3.5 h-3.5"></i>
+                    </span>
+                    <span class="leading-snug">${escapeHtml(item)}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        // ============================================================
+        // 5. LOCALSTORAGE AUTO-SAVE & RESTORE
+        // ============================================================
+        function onFormFieldChange() {
+            syncDigitalTwin();
+            saveStateToLocalStorage();
+        }
+
+        function saveStateToLocalStorage() {
+            try {
+                const stateToSave = {
+                    formState,
+                    governorate: document.getElementById("governorate-select").value,
+                    compare_crop: document.getElementById("compare-crop-select").value,
+                    latitude: document.getElementById("latitude-input").value,
+                    longitude: document.getElementById("longitude-input").value,
+                    farmer_name: document.getElementById("farmer-name").value,
+                    language: document.getElementById("report-language").value,
+                    farm_area: document.getElementById("farm-area").value,
+                    farm_area_unit: document.getElementById("farm-area-unit").value,
+                    soil_photo_url: document.getElementById("soil-photo-url").value,
+                    crop_photo_url: document.getElementById("crop-photo-url").value,
+                    soil_ph: document.getElementById("soil-ph").value,
+                    soil_ec: document.getElementById("soil-ec").value,
+                    soil_n: document.getElementById("soil-n").value,
+                    water_ec: document.getElementById("water-ec").value,
+                    water_ph: document.getElementById("water-ph").value,
+                    additional_notes: document.getElementById("additional-notes").value
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+            } catch {
+                // Ignore storage quota errors
+            }
+        }
+
+        function restoreSavedState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const saved = JSON.parse(raw);
+                if (saved.formState) Object.assign(formState, saved.formState);
+
+                const setVal = (id, val) => {
+                    if (val !== undefined && val !== null) document.getElementById(id).value = val;
+                };
+
+                if (saved.governorate) {
+                    const govSel = document.getElementById("governorate-select");
+                    if (!Array.from(govSel.options).some((o) => o.value === saved.governorate)) {
+                        const opt = document.createElement("option");
+                        opt.value = saved.governorate;
+                        opt.textContent = saved.governorate;
+                        govSel.appendChild(opt);
+                    }
+                    govSel.value = saved.governorate;
+                }
+
+                setVal("latitude-input", saved.latitude);
+                setVal("longitude-input", saved.longitude);
+                setVal("farmer-name", saved.farmer_name);
+                setVal("report-language", saved.language || "ar");
+                setVal("farm-area", saved.farm_area);
+                setVal("farm-area-unit", saved.farm_area_unit || "فدان");
+                setVal("soil-photo-url", saved.soil_photo_url);
+                setVal("crop-photo-url", saved.crop_photo_url);
+                setVal("soil-ph", saved.soil_ph);
+                setVal("soil-ec", saved.soil_ec);
+                setVal("soil-n", saved.soil_n);
+                setVal("water-ec", saved.water_ec);
+                setVal("water-ph", saved.water_ph);
+                setVal("additional-notes", saved.additional_notes);
+
+                if (saved.compare_crop) {
+                    const cmpSel = document.getElementById("compare-crop-select");
+                    const opt = document.createElement("option");
+                    opt.value = saved.compare_crop;
+                    opt.textContent = saved.compare_crop;
+                    cmpSel.appendChild(opt);
+                    cmpSel.value = saved.compare_crop;
+                }
+
+                if (saved.latitude && saved.longitude) {
+                    placeMapMarker(Number(saved.latitude), Number(saved.longitude), true);
+                } else if (saved.governorate && GOV_COORDS[saved.governorate] && egyptMap) {
+                    egyptMap.setView(GOV_COORDS[saved.governorate], 10);
+                }
+            } catch {
+                // Ignore corrupted localStorage
+            }
+        }
+
+        function resetSavedForm() {
+            localStorage.removeItem(STORAGE_KEY);
+            Object.keys(formState).forEach((k) => {
+                formState[k] = k === "planting_month" ? null : "";
+            });
+            [
+                "governorate-select", "compare-crop-select", "latitude-input", "longitude-input",
+                "farmer-name", "farm-area", "soil-photo-url", "crop-photo-url",
+                "soil-ph", "soil-ec", "soil-n", "water-ec", "water-ph", "additional-notes", "crop-search"
+            ].forEach((id) => {
+                document.getElementById(id).value = "";
+            });
+            document.getElementById("report-language").value = "ar";
+            document.getElementById("farm-area-unit").value = "فدان";
+            clearMapPin();
+            if (egyptMap) {
+                egyptMap.setView([26.8, 30.8], 3);
+                egyptMap.invalidateSize();
+            }
+            renderAllOptionControls();
+        }
+
+        // ============================================================
+        // 6. STEP NAVIGATION, GPS & VALIDATION
+        // ============================================================
+        function goToStep(stepNumber) {
+            hideError();
+            [1, 2, 3].forEach((n) => {
+                const stepEl = document.getElementById(`step-${n}`);
+                const progEl = document.getElementById(`prog-${n}`);
+                const badgeEl = progEl.querySelector("span:first-child");
+                if (n === stepNumber) {
+                    stepEl.classList.add("active");
+                    progEl.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-600 text-white font-bold text-xs shadow-sm transition-all";
+                    badgeEl.className = "w-5 h-5 rounded-full bg-white text-green-700 flex items-center justify-center text-[11px] font-black";
+                } else {
+                    stepEl.classList.remove("active");
+                    progEl.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 font-bold text-xs transition-all";
+                    badgeEl.className = "w-5 h-5 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center text-[11px] font-black";
+                }
+            });
+            if (stepNumber === 1 && egyptMap) {
+                setTimeout(() => egyptMap.invalidateSize(), 150);
+            }
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function nextStep(currentStep) {
+            hideError();
+            if (currentStep === 1) {
+                const gov = document.getElementById("governorate-select").value;
+                if (!gov) return showError("يرجى اختيار المحافظة أولاً.");
+                if (!formState.crop) return showError("يرجى اختيار المحصول الأساسي أو اختيار «مش متأكد».");
+                if (!formState.planting_month) return showError("يرجى اختيار شهر الزراعة.");
+                if (!validateCoordinatesInput()) return;
+                goToStep(2);
+            } else if (currentStep === 2) {
+                if (!formState.irrigation_method) return showError("يرجى اختيار طريقة الري.");
+                if (!formState.water_source) return showError("يرجى اختيار مصدر مياه الري.");
+                if (!formState.soil_type) return showError("يرجى اختيار نوع التربة.");
+                if (!formState.standing_water) return showError("يرجى الإجابة عن سؤال تجمع المياه بعد الري.");
+                if (!formState.agricultural_problem) return showError("يرجى تحديد المشكلة الزراعية أو اختيار «لا توجد مشكلة».");
+                goToStep(3);
+            }
+        }
+
+        function validateCoordinatesInput() {
+            const latVal = document.getElementById("latitude-input").value.trim();
+            const lonVal = document.getElementById("longitude-input").value.trim();
+            if ((latVal === "") !== (lonVal === "")) {
+                showError("عند إدخال إحداثيات الموقع يجب إدخال خط العرض وخط الطول معاً.");
+                return false;
+            }
+            if (latVal !== "" && lonVal !== "") {
+                const lat = Number(latVal);
+                const lon = Number(lonVal);
+                if (Number.isNaN(lat) || lat < -90 || lat > 90) {
+                    showError("قيمة خط العرض Latitude يجب أن تكون بين -90 و 90.");
+                    return false;
+                }
+                if (Number.isNaN(lon) || lon < -180 || lon > 180) {
+                    showError("قيمة خط الطول Longitude يجب أن تكون بين -180 و 180.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function detectGPS() {
+            hideError();
+            if (!navigator.geolocation) {
+                showError("متصفحك لا يدعم تحديد الموقع الجغرافي تلقائياً.");
+                return;
+            }
+            const btn = document.getElementById("gps-btn");
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>جاري التحديد...</span>';
+            lucide.createIcons();
+
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const lat = Number(pos.coords.latitude.toFixed(5));
+                    const lon = Number(pos.coords.longitude.toFixed(5));
+                    document.getElementById("latitude-input").value = lat;
+                    document.getElementById("longitude-input").value = lon;
+                    placeMapMarker(lat, lon, true);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-green-600"></i><span>تم التقاط GPS بنجاح</span>';
+                    lucide.createIcons();
+                    onFormFieldChange();
+                },
+                () => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i data-lucide="navigation" class="w-3.5 h-3.5"></i><span>تحديد موقعي بالـ GPS</span>';
+                    lucide.createIcons();
+                    showError("تعذر الوصول لإحداثيات GPS. يمكنك الضغط مباشرة على الخريطة أو اختيار المحافظة.");
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        function syncDigitalTwin() {
+            const gov = document.getElementById("governorate-select").value;
+            const compareCrop = document.getElementById("compare-crop-select").value;
+            const latInput = document.getElementById("latitude-input").value.trim();
+            const lonInput = document.getElementById("longitude-input").value.trim();
+
+            if (latInput !== "" && lonInput !== "") {
+                document.getElementById("twin-coords").textContent = `LAT ${Number(latInput).toFixed(4)} / LON ${Number(lonInput).toFixed(4)}`;
+                document.getElementById("twin-coord-type").textContent = "GPS / MAP";
+            } else if (gov && GOV_COORDS[gov]) {
+                const [lat, lon] = GOV_COORDS[gov];
+                document.getElementById("twin-coords").textContent = `LAT ${lat.toFixed(4)} / LON ${lon.toFixed(4)}`;
+                document.getElementById("twin-coord-type").textContent = "GOV APPROX";
+            } else {
+                document.getElementById("twin-coords").textContent = "LAT -- / LON --";
+                document.getElementById("twin-coord-type").textContent = "WAITING";
+            }
+
+            document.getElementById("twin-gov").textContent = gov || "غير محددة";
+            document.getElementById("twin-crop").textContent = formState.crop || "غير محدد";
+            document.getElementById("twin-compare-crop").textContent = compareCrop || "لا يوجد";
+
+            const monthObj = appOptions.months.find((m) => m.number === formState.planting_month);
+            document.getElementById("twin-month").textContent = monthObj ? `${monthObj.name} (${monthObj.number})` : "غير محدد";
+
+            document.getElementById("twin-soil-irr").textContent = `${formState.soil_type || "--"} / ${formState.irrigation_method || "--"}`;
+            document.getElementById("twin-drain-prob").textContent = `${formState.standing_water || "--"} / ${formState.agricultural_problem || "--"}`;
+
+            const answeredCount = [
+                gov,
+                formState.crop,
+                formState.planting_month,
+                formState.irrigation_method,
+                formState.water_source,
+                formState.soil_type,
+                formState.standing_water,
+                formState.agricultural_problem
+            ].filter(Boolean).length;
+
+            document.getElementById("twin-completion-text").textContent = `${answeredCount} / 8`;
+            document.getElementById("twin-completion-bar").style.width = `${(answeredCount / 8) * 100}%`;
+        }
+
+        // ============================================================
+        // 7. PAYLOAD & POST /api/analyze
+        // ============================================================
+        function buildPayload() {
+            const gov = document.getElementById("governorate-select").value;
+            const payload = {
+                governorate: gov,
+                crop: formState.crop,
+                planting_month: formState.planting_month,
+                irrigation_method: formState.irrigation_method,
+                water_source: formState.water_source,
+                soil_type: formState.soil_type,
+                standing_water: formState.standing_water,
+                agricultural_problem: formState.agricultural_problem,
+                language: document.getElementById("report-language").value || "ar"
+            };
+
+            const compareCrop = document.getElementById("compare-crop-select").value;
+            if (compareCrop && compareCrop !== formState.crop && compareCrop !== "مش متأكد") {
+                payload.compare_crop = compareCrop;
+            }
+
+            const farmerName = document.getElementById("farmer-name").value.trim();
+            if (farmerName) payload.farmer_name = farmerName;
+
+            const areaRaw = document.getElementById("farm-area").value.trim();
+            if (areaRaw !== "") {
+                const area = Number(areaRaw);
+                if (!Number.isNaN(area) && area > 0) {
+                    payload.farm_area = area;
+                    payload.farm_area_unit = document.getElementById("farm-area-unit").value;
+                }
+            }
+
+            const soilPhoto = document.getElementById("soil-photo-url").value.trim();
+            if (soilPhoto) payload.soil_photo_url = soilPhoto;
+
+            const cropPhoto = document.getElementById("crop-photo-url").value.trim();
+            if (cropPhoto) payload.crop_photo_url = cropPhoto;
+
+            const soilLab = {};
+            const soilPh = document.getElementById("soil-ph").value.trim();
+            const soilEc = document.getElementById("soil-ec").value.trim();
+            const soilN = document.getElementById("soil-n").value.trim();
+            if (soilPh !== "") soilLab.ph = Number(soilPh);
+            if (soilEc !== "") soilLab.ec = Number(soilEc);
+            if (soilN !== "") soilLab.nitrogen_ppm = Number(soilN);
+            if (Object.keys(soilLab).length > 0) payload.soil_lab_results = soilLab;
+
+            const waterLab = {};
+            const waterEc = document.getElementById("water-ec").value.trim();
+            const waterPh = document.getElementById("water-ph").value.trim();
+            if (waterEc !== "") waterLab.ec = Number(waterEc);
+            if (waterPh !== "") waterLab.ph = Number(waterPh);
+            if (Object.keys(waterLab).length > 0) payload.irrigation_water_results = waterLab;
+
+            const notes = document.getElementById("additional-notes").value.trim();
+            if (notes) payload.additional_notes = notes;
+
+            const latRaw = document.getElementById("latitude-input").value.trim();
+            const lonRaw = document.getElementById("longitude-input").value.trim();
+            if (latRaw !== "" && lonRaw !== "") {
+                payload.latitude = Number(latRaw);
+                payload.longitude = Number(lonRaw);
+            }
+
+            return payload;
+        }
+
+        async function submitAnalysis() {
+            hideError();
+
+            const gov = document.getElementById("governorate-select").value;
+            if (!gov || !formState.crop || !formState.planting_month) {
+                goToStep(1);
+                return showError("يرجى استكمال أسئلة الخطوة الأولى (المحافظة والمحصول وشهر الزراعة).");
+            }
+            if (
+                !formState.irrigation_method ||
+                !formState.water_source ||
+                !formState.soil_type ||
+                !formState.standing_water ||
+                !formState.agricultural_problem
+            ) {
+                goToStep(2);
+                return showError("يرجى استكمال جميع الأسئلة الإجبارية في الخطوة الثانية.");
+            }
+            if (!validateCoordinatesInput()) {
+                goToStep(1);
+                return;
+            }
+
+            saveStateToLocalStorage();
+            const payload = buildPayload();
+            showLoadingView();
+
+            try {
+                const res = await fetch(`${API_BASE}/api/analyze`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json().catch(() => null);
+
+                if (!res.ok) {
+                    const detailMsg =
+                        (data && data.detail && (data.detail.message || (typeof data.detail === "string" ? data.detail : ""))) ||
+                        "حدث خطأ أثناء تحليل البيانات من الخادم.";
+                    throw new Error(detailMsg);
+                }
+
+                lastAnalysisResponse = data;
+                renderResults(data);
+            } catch (err) {
+                hideLoadingView();
+                document.getElementById("wizard-view").classList.remove("hidden");
+                document.getElementById("hero-guide").classList.remove("hidden");
+                if (egyptMap) setTimeout(() => egyptMap.invalidateSize(), 150);
+                showError(err.message || "تعذر الاتصال بخادم NASA Fallah. تأكد من تشغيل خادم البايثون على المنفذ 8000.");
+            }
+        }
+
+        function reanalyzeWithAlternativeCrop(cropArabicName) {
+            formState.crop = cropArabicName;
+            renderAllOptionControls();
+            saveStateToLocalStorage();
+            submitAnalysis();
+        }
+
+        // ============================================================
+        // 8. LOADING & RESULTS RENDERING
+        // ============================================================
+        let loadingTimer = null;
+
+        function showLoadingView() {
+            document.getElementById("wizard-view").classList.add("hidden");
+            document.getElementById("hero-guide").classList.add("hidden");
+            document.getElementById("results-view").classList.add("hidden");
+            document.getElementById("loading-view").classList.remove("hidden");
+
+            const phases = [
+                "سحب بيانات الطقس الفعلية لآخر 30 يوماً من NASA POWER...",
+                "مقارنة شهر الزراعة مع المتوسط المناخي التاريخي لعدة سنوات...",
+                "حساب التكلفة والعائد وتوفير المياه وبناء التقويم الزراعي...",
+                "جلب توقعات الـ 16 يوماً والنظرة الشهرية من Open-Meteo..."
+            ];
+            let i = 0;
+            const phaseEl = document.getElementById("loading-phase");
+            phaseEl.textContent = phases[0];
+            clearInterval(loadingTimer);
+            loadingTimer = setInterval(() => {
+                i = (i + 1) % phases.length;
+                phaseEl.textContent = phases[i];
+            }, 1300);
+        }
+
+        function hideLoadingView() {
+            clearInterval(loadingTimer);
+            document.getElementById("loading-view").classList.add("hidden");
+        }
+
+        function backToWizard() {
+            document.getElementById("results-view").classList.add("hidden");
+            document.getElementById("wizard-view").classList.remove("hidden");
+            document.getElementById("hero-guide").classList.remove("hidden");
+            if (egyptMap) setTimeout(() => egyptMap.invalidateSize(), 150);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function renderResults(data) {
+            hideLoadingView();
+            document.getElementById("results-view").classList.remove("hidden");
+
+            const assessment = data.assessment || {};
+            const climate = data.climate || {};
+            const summary = climate.summary || {};
+            const location = data.location || {};
+            const farm = data.farm || {};
+            const lang = assessment.language || "ar";
+
+            // 1. Score Ring & Suitability
+            const score = assessment.suitability_score;
+            const scoreEl = document.getElementById("res-score-value");
+            const ringEl = document.getElementById("score-ring");
+            const circumference = 2 * Math.PI * 52;
+
+            if (typeof score === "number") {
+                scoreEl.textContent = score;
+                ringEl.style.strokeDashoffset = circumference - (circumference * Math.max(0, Math.min(100, score))) / 100;
+            } else {
+                scoreEl.textContent = "—";
+                ringEl.style.strokeDashoffset = circumference;
+            }
+
+            const suitMap = {
+                suitable: {
+                    text: lang === "ar" ? "مناسب للزراعة" : "Suitable",
+                    cls: "bg-green-100 text-green-800 border-green-300",
+                    stroke: "#16a34a"
+                },
+                suitable_with_conditions: {
+                    text: lang === "ar" ? "مناسب بشروط" : "Suitable with conditions",
+                    cls: "bg-amber-100 text-amber-900 border-amber-300",
+                    stroke: "#eab308"
+                },
+                not_suitable: {
+                    text: lang === "ar" ? "غير مناسب حالياً" : "Not suitable",
+                    cls: "bg-orange-100 text-orange-900 border-orange-300",
+                    stroke: "#f97316"
+                },
+                not_evaluated: {
+                    text: lang === "ar" ? "اقتراح محاصيل مناسبة" : "Crop suggestions",
+                    cls: "bg-sky-100 text-sky-900 border-sky-300",
+                    stroke: "#0284c7"
+                }
+            };
+
+            const suitInfo = suitMap[assessment.suitability] || suitMap.suitable_with_conditions;
+            const suitBadge = document.getElementById("res-suitability-badge");
+            suitBadge.textContent = suitInfo.text;
+            suitBadge.className = `px-3.5 py-1 rounded-full text-xs font-black border ${suitInfo.cls}`;
+            ringEl.style.stroke = suitInfo.stroke;
+
+            const confBadge = document.getElementById("res-confidence-badge");
+            if (assessment.suitability_confidence) {
+                const confLabels = {
+                    high: lang === "ar" ? "دقة التقييم: عالية" : "Confidence: High",
+                    medium: lang === "ar" ? "دقة التقييم: متوسطة" : "Confidence: Medium",
+                    low: lang === "ar" ? "دقة التقييم: منخفضة" : "Confidence: Low"
+                };
+                confBadge.textContent = confLabels[assessment.suitability_confidence] || assessment.suitability_confidence;
+                confBadge.classList.remove("hidden");
+            } else {
+                confBadge.classList.add("hidden");
+            }
+
+            document.getElementById("res-assessment-type").textContent = assessment.assessment_type || "تقييم أولي إرشادي";
+            document.getElementById("res-status-text").textContent = assessment.crop_suitability_status || "";
+
+            const metaPills = document.getElementById("res-meta-pills");
+            const pills = [
+                `📍 ${farm.governorate || ""} (${Number(location.latitude).toFixed(3)}, ${Number(location.longitude).toFixed(3)})`,
+                `🌱 ${farm.crop || ""}`,
+                `📅 الشهر: ${farm.planting_month || ""}`,
+                `💧 ${farm.irrigation_method || ""}`,
+                `🧱 التربة: ${farm.soil_type || ""}`
+            ];
+            if (farm.farmer_name) pills.unshift(`👤 ${farm.farmer_name}`);
+            if (farm.farm_area) pills.push(`📐 ${farm.farm_area} ${farm.farm_area_unit || ""}`);
+            metaPills.innerHTML = pills.map((p) => `<span class="bg-slate-100 border border-slate-200 px-3 py-1 rounded-xl">${escapeHtml(p)}</span>`).join("");
+
+            // Early / Late Planting Timing Alert
+            const timingBox = document.getElementById("res-timing-alert-box");
+            const timing = assessment.planting_timing_alert;
+            if (timing && timing.message) {
+                timingBox.classList.remove("hidden");
+                if (timing.status === "on_time") {
+                    timingBox.className = "rounded-2xl p-3.5 text-xs md:text-sm font-bold flex items-start gap-2.5 text-right border bg-green-50 border-green-300 text-green-900";
+                    timingBox.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5 text-green-600 shrink-0 mt-0.5"></i><span>${escapeHtml(timing.message)}</span>`;
+                } else {
+                    timingBox.className = "rounded-2xl p-3.5 text-xs md:text-sm font-bold flex items-start gap-2.5 text-right border bg-orange-50 border-orange-300 text-orange-950";
+                    timingBox.innerHTML = `<i data-lucide="clock" class="w-5 h-5 text-orange-600 shrink-0 mt-0.5"></i><span>${escapeHtml(timing.message)}</span>`;
+                }
+            } else {
+                timingBox.classList.add("hidden");
+            }
+
+            const unjudgedBox = document.getElementById("res-unjudged-box");
+            if (Array.isArray(assessment.unjudged_factors) && assessment.unjudged_factors.length > 0) {
+                const factorNames = { temperature: "الحرارة", soil: "نوع التربة", irrigation: "طريقة الري" };
+                const names = assessment.unjudged_factors.map((f) => factorNames[f] || f).join("، ");
+                unjudgedBox.textContent = `ملاحظة: الدرجة أولية لأن العوامل التالية لم تُقيَّم بالكامل: ${names}.`;
+                unjudgedBox.classList.remove("hidden");
+            } else {
+                unjudgedBox.classList.add("hidden");
+            }
+
+            // 2. Side-by-Side Comparison
+            const cmpSec = document.getElementById("res-comparison-section");
+            const cmp = data.crop_comparison;
+            if (cmp && cmp.primary && cmp.secondary) {
+                cmpSec.classList.remove("hidden");
+                const p1 = cmp.primary;
+                const p2 = cmp.secondary;
+                document.getElementById("cmp-col-1").textContent = `${p1.crop} (${p1.crop_en})`;
+                document.getElementById("cmp-col-2").textContent = `${p2.crop} (${p2.crop_en})`;
+                document.getElementById("res-comparison-summary").textContent = cmp.summary || "";
+                document.getElementById("res-comparison-winner-pill").textContent =
+                    cmp.winner === "tie"
+                        ? "تعادل بين المحصولين"
+                        : `الأفضل: ${cmp.winner_crop}`;
+
+                const rows = [
+                    ["درجة الملاءمة", `${p1.suitability_score}/100 (${p1.suitability_label})`, `${p2.suitability_score}/100 (${p2.suitability_label})`],
+                    ["مستوى الطلب المائي", p1.water_demand_level, p2.water_demand_level],
+                    ["نظام الري المقترح", p1.recommended_irrigation || "—", p2.recommended_irrigation || "—"],
+                    ["الاستهلاك المائي المتوقع", `${formatNum(p1.water_m3_per_feddan)} م³/فدان`, `${formatNum(p2.water_m3_per_feddan)} م³/فدان`],
+                    ["توفير المياه مقارنة بالغمر", `${formatNum(p1.water_saved_vs_flood_m3)} م³/فدان`, `${formatNum(p2.water_saved_vs_flood_m3)} م³/فدان`],
+                    ["صافي الربح التقديري / فدان", `${formatNum(p1.net_profit_per_feddan_egp)} ج.م`, `${formatNum(p2.net_profit_per_feddan_egp)} ج.م`],
+                    ["العائد على الاستثمار ROI", `${p1.roi_percent}%`, `${p2.roi_percent}%`],
+                    ["عدد المخاطر المسجلة", `${p1.risks_count} مخاطر`, `${p2.risks_count} مخاطر`]
+                ];
+
+                document.getElementById("res-comparison-tbody").innerHTML = rows.map(([label, v1, v2]) => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-extrabold text-slate-700">${escapeHtml(label)}</td>
+                        <td class="p-3 font-bold text-slate-900">${escapeHtml(v1)}</td>
+                        <td class="p-3 font-bold text-slate-900">${escapeHtml(v2)}</td>
+                    </tr>
+                `).join("");
+            } else {
+                cmpSec.classList.add("hidden");
+            }
+
+            // 3. ROI & Water Savings
+            const econSec = document.getElementById("res-economics-section");
+            const ew = data.economics_and_water;
+            if (ew && ew.economics && ew.water_savings) {
+                econSec.classList.remove("hidden");
+                const ec = ew.economics;
+                const ws = ew.water_savings;
+
+                document.getElementById("res-econ-area-badge").textContent = ew.is_area_user_specified
+                    ? `المساحة: ${ew.area_feddan} فدان`
+                    : "تقدير للفدان الواحد (1 فدان)";
+                document.getElementById("res-econ-cost").textContent = `${formatNum(ec.cost_per_feddan_egp)} ج.م`;
+                document.getElementById("res-econ-yield").textContent = `${ec.expected_yield_ton_per_feddan} طن`;
+                document.getElementById("res-econ-profit").textContent = `${formatNum(ec.net_profit_per_feddan_egp)} ج.م`;
+                document.getElementById("res-econ-roi").textContent = `${ec.roi_percent}%`;
+
+                const totalBox = document.getElementById("res-econ-total-box");
+                if (ew.is_area_user_specified) {
+                    totalBox.classList.remove("hidden");
+                    totalBox.innerHTML = `
+                        <span>إجمالي التكلفة (${ew.area_feddan} فدان): ${formatNum(ec.total_cost_egp)} ج.م</span>
+                        <span>إجمالي صافي الربح المتوقع: ${formatNum(ec.total_net_profit_egp)} ج.م</span>
+                    `;
+                } else {
+                    totalBox.classList.add("hidden");
+                }
+                document.getElementById("res-econ-disclaimer").textContent = ew.disclaimer || "";
+
+                const floodM3 = ws.traditional_flood_m3_per_feddan;
+                const recM3 = ws.recommended_method_m3_per_feddan;
+                const ratioPct = floodM3 > 0 ? Math.max(10, Math.round((recM3 / floodM3) * 100)) : 100;
+
+                document.getElementById("res-water-save-pct").textContent = `توفير ${ws.water_saved_percent_vs_flood}%`;
+                document.getElementById("res-water-flood").textContent = `${formatNum(floodM3)} م³/فدان`;
+                document.getElementById("res-water-rec-label").textContent = `بعد (${ws.recommended_method})`;
+                document.getElementById("res-water-rec").textContent = `${formatNum(recM3)} م³/فدان`;
+                document.getElementById("res-water-rec-bar").style.width = `${ratioPct}%`;
+                document.getElementById("res-water-saved-feddan").textContent = `${formatNum(ws.saved_vs_flood_m3_per_feddan)} م³`;
+                document.getElementById("res-water-saved-total").textContent = `${formatNum(ws.total_water_saved_vs_flood_m3)} م³`;
+            } else {
+                econSec.classList.add("hidden");
+            }
+
+            // 4. Interactive Crop Calendar
+            const calSec = document.getElementById("res-calendar-section");
+            const cal = data.crop_calendar;
+            if (cal && Array.isArray(cal.stages) && cal.stages.length > 0) {
+                calSec.classList.remove("hidden");
+                document.getElementById("res-calendar-subtitle").textContent =
+                    `من زراعة ${cal.planting_month_name} (${cal.reference_planting_date}) حتى الحصاد المتوقع (${cal.estimated_harvest_date})`;
+                document.getElementById("res-calendar-duration").textContent = `مدة الموسم ≈ ${cal.total_duration_days} يوماً`;
+
+                document.getElementById("res-calendar-timeline").innerHTML = cal.stages.map((st) => `
+                    <div class="rounded-2xl p-4 border ${st.critical ? "bg-orange-50/70 border-orange-300" : "bg-slate-50 border-slate-200"} flex flex-col justify-between gap-3">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black ${st.critical ? "bg-orange-600 text-white" : "bg-green-600 text-white"}">
+                                    المرحلة ${st.stage_number} ${st.critical ? "• حرجة" : ""}
+                                </span>
+                                <span class="font-mono-tech text-[11px] font-bold text-slate-600">يوم ${st.start_day}–${st.end_day}</span>
+                            </div>
+                            <h4 class="font-black text-sm text-slate-900">${escapeHtml(st.stage_name)}</h4>
+                            <div class="text-[11px] font-mono-tech font-bold text-sky-700">${escapeHtml(st.estimated_start_date)} → ${escapeHtml(st.estimated_end_date)}</div>
+                            <div class="bg-white rounded-xl p-2.5 border border-slate-200/80 text-xs text-slate-700 font-semibold">
+                                <span class="text-sky-700 font-extrabold">💧 الري:</span> ${escapeHtml(st.irrigation_guidance)}
+                            </div>
+                            <div class="bg-white rounded-xl p-2.5 border border-slate-200/80 text-xs text-slate-700 font-semibold">
+                                <span class="text-green-700 font-extrabold">🌿 التسميد:</span> ${escapeHtml(st.fertilization_guidance)}
+                            </div>
+                        </div>
+                        <ul class="space-y-1 text-[11px] text-slate-600 font-bold border-t border-slate-200 pt-2">
+                            ${(st.key_actions || []).map((act) => `<li>• ${escapeHtml(act)}</li>`).join("")}
+                        </ul>
+                    </div>
+                `).join("");
+            } else {
+                calSec.classList.add("hidden");
+            }
+
+            // 5. NASA POWER 30-day & Climatology
+            document.getElementById("res-nasa-period").textContent = `${climate.period_start || ""} → ${climate.period_end || ""}`;
+            document.getElementById("res-temp-30").textContent = summary.average_temperature_c != null ? `${summary.average_temperature_c}°C` : "—";
+            document.getElementById("res-rain-30").textContent = summary.total_rainfall_mm != null ? `${summary.total_rainfall_mm} mm` : "—";
+            document.getElementById("res-rh-30").textContent = summary.average_relative_humidity_percent != null ? `${summary.average_relative_humidity_percent}%` : "—";
+            document.getElementById("res-wind-30").textContent = summary.average_wind_speed_m_s != null ? `${summary.average_wind_speed_m_s} m/s` : "—";
+
+            const dq = summary.data_quality || {};
+            const dqItems = [];
+            if (dq.temperature) dqItems.push(`صلاحية بيانات الحرارة: ${dq.temperature.valid_days}/${dq.temperature.total_days} يوم`);
+            if (dq.rainfall) dqItems.push(`الأمطار: ${dq.rainfall.valid_days}/${dq.rainfall.total_days} يوم`);
+            if (dq.humidity) dqItems.push(`الرطوبة: ${dq.humidity.valid_days}/${dq.humidity.total_days} يوم`);
+            document.getElementById("res-data-quality").innerHTML = dqItems.map((t) => `<span>• ${t}</span>`).join("");
+
+            const climBody = document.getElementById("res-climatology-body");
+            const climSource = document.getElementById("res-clim-source");
+            const pmClim = assessment.planting_month_climate;
+            if (pmClim) {
+                climSource.textContent = pmClim.source === "climatology" ? "متوسط سنوات ناسا" : "بيانات آخر 30 يوماً";
+                climBody.innerHTML = `
+                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
+                        <div class="text-xs text-slate-600 font-bold">متوسط الحرارة</div>
+                        <div class="font-mono-tech text-lg font-black text-orange-600 mt-1">${pmClim.temp != null ? pmClim.temp + "°C" : "—"}</div>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
+                        <div class="text-xs text-slate-600 font-bold">أمطار الشهر</div>
+                        <div class="font-mono-tech text-lg font-black text-sky-700 mt-1">${pmClim.rain_total != null ? pmClim.rain_total + " mm" : "—"}</div>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
+                        <div class="text-xs text-slate-600 font-bold">الرطوبة المتوقعة</div>
+                        <div class="font-mono-tech text-lg font-black text-green-700 mt-1">${pmClim.humidity != null ? pmClim.humidity + "%" : "—"}</div>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
+                        <div class="text-xs text-slate-600 font-bold">متوسط الرياح</div>
+                        <div class="font-mono-tech text-lg font-black text-sky-600 mt-1">${pmClim.wind != null ? pmClim.wind + " m/s" : "—"}</div>
+                    </div>
+                `;
+            } else {
+                climSource.textContent = "غير متاح";
+                climBody.innerHTML = '<div class="col-span-2 text-xs text-slate-500 bg-slate-50 rounded-2xl p-4 font-semibold">تعذر استرجاع متوسط مناخ شهر الزراعة من ناسا.</div>';
+            }
+
+            // 6. Checks, Irrigation, Alternatives
+            const checksList = document.getElementById("res-checks-list");
+            const checks = assessment.checks || [];
+            if (checks.length > 0) {
+                const statusStyles = {
+                    good: { cls: "bg-green-50 border-green-300 text-green-950", icon: "check-circle-2", iconCls: "text-green-600" },
+                    warning: { cls: "bg-amber-50 border-amber-300 text-amber-950", icon: "alert-triangle", iconCls: "text-amber-600" },
+                    bad: { cls: "bg-orange-50 border-orange-300 text-orange-950", icon: "x-circle", iconCls: "text-orange-600" },
+                    info: { cls: "bg-sky-50 border-sky-200 text-sky-950", icon: "info", iconCls: "text-sky-600" }
+                };
+                checksList.innerHTML = checks.map((c) => {
+                    const st = statusStyles[c.status] || statusStyles.info;
+                    return `
+                        <div class="rounded-2xl border p-3.5 flex items-start gap-3 font-semibold ${st.cls}">
+                            <i data-lucide="${st.icon}" class="w-4 h-4 shrink-0 mt-0.5 ${st.iconCls}"></i>
+                            <span class="text-xs md:text-sm leading-relaxed">${escapeHtml(c.message)}</span>
+                        </div>
+                    `;
+                }).join("");
+            } else {
+                checksList.innerHTML = '<div class="text-xs text-slate-600 bg-slate-50 rounded-2xl p-4 font-semibold">تم عرض أفضل المحاصيل المقترحة بناءً على ظروف أرضك وشهر الزراعة.</div>';
+            }
+
+            const irrBox = document.getElementById("res-irrigation-box");
+            if (assessment.irrigation_recommendation) {
+                irrBox.classList.remove("hidden");
+                document.getElementById("res-irrigation-text").textContent = assessment.irrigation_recommendation;
+            } else {
+                irrBox.classList.add("hidden");
+            }
+
+            const altBox = document.getElementById("res-alternatives-box");
+            const altList = document.getElementById("res-alternatives-list");
+            const alts = assessment.alternative_crops || [];
+            if (alts.length > 0) {
+                altBox.classList.remove("hidden");
+                altList.innerHTML = alts.map((alt) => `
+                    <div class="bg-green-50/60 border border-green-200 rounded-2xl p-3 flex items-center justify-between gap-3">
+                        <div>
+                            <div class="font-extrabold text-sm text-slate-900">${escapeHtml(alt.crop)} <span class="text-xs text-slate-500 font-semibold">(${escapeHtml(alt.crop_en)})</span></div>
+                            <div class="text-xs text-green-700 font-mono-tech font-bold mt-0.5">درجة الملاءمة: ${alt.score}/100</div>
+                        </div>
+                        <button type="button" onclick="reanalyzeWithAlternativeCrop('${escapeJsString(alt.crop)}')" class="no-print px-3 py-1.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs font-extrabold transition-all">
+                            فحص هذا المحصول
+                        </button>
+                    </div>
+                `).join("");
+            } else {
+                altBox.classList.add("hidden");
+            }
+
+            // 7. Open-Meteo Forecast
+            const forecastSec = document.getElementById("res-forecast-section");
+            const forecast = data.forecast;
+            if (forecast) {
+                forecastSec.classList.remove("hidden");
+                const alertsEl = document.getElementById("res-forecast-alerts");
+                alertsEl.innerHTML = (forecast.alerts || []).map((a) => {
+                    const isGood = a.startsWith("✔");
+                    return `
+                        <div class="rounded-2xl px-4 py-2.5 text-xs md:text-sm font-bold border ${isGood ? "bg-green-50 border-green-300 text-green-900" : "bg-orange-50 border-orange-300 text-orange-950"}">
+                            ${escapeHtml(a)}
+                        </div>
+                    `;
+                }).join("");
+
+                const daysEl = document.getElementById("res-forecast-days");
+                daysEl.innerHTML = (forecast.days || []).map((d) => `
+                    <div class="min-w-[118px] bg-slate-50 border border-slate-200 rounded-2xl p-3 text-center shrink-0 space-y-1.5">
+                        <div class="font-mono-tech text-[11px] text-sky-700 font-extrabold">${escapeHtml(d.date.slice(5))}</div>
+                        <div class="text-sm font-black text-slate-900 font-mono-tech">${d.temperature_max_c}° / <span class="text-slate-500">${d.temperature_min_c}°</span></div>
+                        <div class="text-[11px] text-sky-700 font-bold">☔ ${d.rain_mm} mm</div>
+                        <div class="text-[11px] text-slate-500 font-semibold">💨 ${d.wind_max_kmh != null ? d.wind_max_kmh + " km/h" : "—"}</div>
+                    </div>
+                `).join("");
+
+                const outlookBox = document.getElementById("res-outlook-box");
+                if (forecast.outlook && forecast.outlook.text) {
+                    outlookBox.classList.remove("hidden");
+                    document.getElementById("res-outlook-text").textContent = forecast.outlook.text;
+                } else {
+                    outlookBox.classList.add("hidden");
+                }
+            } else {
+                forecastSec.classList.add("hidden");
+            }
+
+            // 8. Risks & Tips
+            const risksList = document.getElementById("res-risks-list");
+            const risks = assessment.risks || [];
+            risksList.innerHTML = risks.length
+                ? risks.map((r) => `<li class="flex items-start gap-2 bg-orange-50/70 border border-orange-200 rounded-xl p-2.5"><span class="text-orange-600 font-black">•</span><span>${escapeHtml(r)}</span></li>`).join("")
+                : '<li class="text-xs text-slate-500">لا توجد مخاطر محددة مسجلة لهذا الاختيار.</li>';
+
+            const tipsList = document.getElementById("res-tips-list");
+            const tips = assessment.recommendations || [];
+            tipsList.innerHTML = tips.length
+                ? tips.map((t) => `<li class="flex items-start gap-2 bg-green-50/70 border border-green-200 rounded-xl p-2.5"><span class="text-green-600 font-black">✓</span><span>${escapeHtml(t)}</span></li>`).join("")
+                : '<li class="text-xs text-slate-500">لا توجد نصائح إضافية حالياً.</li>';
+
+            // 9. Inline Methodology Breakdown
+            const methInline = document.getElementById("res-methodology-inline");
+            const meth = data.methodology;
+            if (meth && meth.current_run_breakdown) {
+                methInline.classList.remove("hidden");
+                const bd = meth.current_run_breakdown;
+                document.getElementById("res-meth-formula").textContent =
+                    `(${bd.weighted_points} ÷ ${bd.evaluated_weight_sum}) × 100 = ${bd.final_score}/100`;
+                document.getElementById("res-meth-factors").innerHTML = (bd.factors || []).map((f) => `
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-xs">
+                        <div class="font-extrabold text-slate-800">${escapeHtml(f.factor)}</div>
+                        <div class="font-mono-tech text-[11px] text-slate-600 mt-1">وزن: ${f.weight} | نقاط: ${f.points_earned !== null ? f.points_earned : "مستبعد"}</div>
+                    </div>
+                `).join("");
+            } else {
+                methInline.classList.add("hidden");
+            }
+
+            // 10. Observations, Missing Info, Limitations
+            document.getElementById("res-observations-list").innerHTML = (assessment.observations || [])
+                .map((o) => `<li class="border-b border-slate-100 pb-1.5">${escapeHtml(o)}</li>`).join("");
+
+            const missing = assessment.missing_information || [];
+            document.getElementById("res-missing-list").innerHTML = missing.length
+                ? missing.map((m) => `<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span><span>${escapeHtml(m)}</span></li>`).join("")
+                : '<li class="text-green-700 font-bold">كافة البيانات الاختيارية مكتملة.</li>';
+
+            document.getElementById("res-limitations-list").innerHTML = (data.limitations || [])
+                .map((l) => `<li class="flex items-start gap-2"><span class="text-sky-600 font-black">•</span><span>${escapeHtml(l)}</span></li>`).join("");
+
+            lucide.createIcons();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        // ============================================================
+        // 9. TRANSPARENT METHODOLOGY MODAL ("إزاي بنحسب؟")
+        // ============================================================
+        async function openMethodologyModal() {
+            const modal = document.getElementById("methodology-modal");
+            const body = document.getElementById("modal-meth-body");
+            modal.classList.remove("hidden");
+
+            let meth = lastAnalysisResponse && lastAnalysisResponse.methodology;
+            if (!meth) {
+                try {
+                    const lang = document.getElementById("report-language").value || "ar";
+                    const res = await fetch(`${API_BASE}/api/methodology?language=${lang}`);
+                    if (res.ok) {
+                        const json = await res.json();
+                        meth = json.methodology;
+                    }
+                } catch {
+                    meth = null;
+                }
+            }
+
+            if (!meth) {
+                body.innerHTML = `
+                    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs font-bold text-amber-900">
+                        يعتمد النظام على دمج بيانات NASA POWER (آخر 30 يوماً + المتوسط المناخي التاريخي) مع توقعات Open-Meteo وجدول أوزان المحاصيل:
+                        Score = (Sum(Status_Value × Factor_Weight) / Sum(Evaluated_Weights)) × 100.
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById("modal-meth-title").textContent = meth.title || "منهجية الحساب في NASA Fallah";
+            const sm = meth.scoring_model || {};
+            const ew = meth.economics_and_water_formulas || {};
+
+            body.innerHTML = `
+                <div class="space-y-2">
+                    <h4 class="font-black text-slate-900 text-sm">1. مصادر البيانات الفعلية (مجانية 100%)</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        ${(meth.data_sources || []).map((ds) => `
+                            <div class="bg-sky-50/60 border border-sky-200 rounded-2xl p-3">
+                                <div class="font-extrabold text-xs text-sky-900">${escapeHtml(ds.name)}</div>
+                                <div class="text-xs text-slate-700 mt-1 leading-relaxed">${escapeHtml(ds.purpose)}</div>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-black text-slate-900 text-sm">2. معادلة حساب درجة الملاءمة والأوزان</h4>
+                    <div class="bg-slate-900 text-emerald-300 font-mono-tech text-xs p-3.5 rounded-2xl overflow-x-auto">
+                        ${escapeHtml(sm.equation || "")}
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        ${Object.entries(sm.factor_weights || {}).map(([k, v]) => `
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-2 flex justify-between items-center">
+                                <span class="font-bold text-slate-700">${escapeHtml(k)}</span>
+                                <span class="font-mono-tech font-black text-green-700">${escapeHtml(String(v))}</span>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-black text-slate-900 text-sm">3. معادلات العائد الاقتصادي وتوفير المياه</h4>
+                    <div class="bg-green-50/70 border border-green-200 rounded-2xl p-3.5 text-xs space-y-1.5 font-semibold text-slate-800">
+                        <div>• صافي الربح: <span class="font-mono-tech">${escapeHtml(ew.net_profit || "")}</span></div>
+                        <div>• نسبة العائد على الاستثمار (ROI): <span class="font-mono-tech">${escapeHtml(ew.roi_percent || "")}</span></div>
+                        <div>• وفر التنقيط: 35% مقارنة بالغمر | وفر الرش: 25% | وفر الأرز المتقطع (AWD): 15%</div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function closeMethodologyModal() {
+            document.getElementById("methodology-modal").classList.add("hidden");
+        }
+
+        // ============================================================
+        // 10. WHATSAPP SHARE, JSON EXPORT & UTILITIES
+        // ============================================================
+        function shareWhatsApp() {
+            if (!lastAnalysisResponse) return;
+            const d = lastAnalysisResponse;
+            const farm = d.farm || {};
+            const ass = d.assessment || {};
+            const ew = d.economics_and_water;
+            const timing = ass.planting_timing_alert;
+
+            const lines = [
+                `🌱 *تقرير NASA Fallah الزراعي*`,
+                `📍 المحافظة: ${farm.governorate || ""}`,
+                `🌾 المحصول: ${farm.crop || ""} (الشهر ${farm.planting_month || ""})`,
+                `📊 النتيجة: ${ass.crop_suitability_status || ""}`
+            ];
+
+            if (timing && timing.message) lines.push(`⏳ الموعد: ${timing.message}`);
+            if (ass.irrigation_recommendation) lines.push(`💧 الري: ${ass.irrigation_recommendation}`);
+            if (ew && ew.economics && ew.water_savings) {
+                lines.push(`💰 صافي الربح المتوقع للفدان: ${formatNum(ew.economics.net_profit_per_feddan_egp)} ج.م (ROI ${ew.economics.roi_percent}%)`);
+                lines.push(`🚿 توفير المياه: ${formatNum(ew.water_savings.saved_vs_flood_m3_per_feddan)} م³/فدان (${ew.water_savings.water_saved_percent_vs_flood}%)`);
+            }
+            if (d.crop_comparison && d.crop_comparison.summary) {
+                lines.push(`⚖️ المقارنة: ${d.crop_comparison.summary}`);
+            }
+
+            const text = encodeURIComponent(lines.join("\n"));
+            window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
+        }
+
+        function downloadReportJSON() {
+            if (!lastAnalysisResponse) return;
+            const blob = new Blob([JSON.stringify(lastAnalysisResponse, null, 2)], { type: "application/json;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `nasa-fallah-report-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function formatNum(val) {
+            if (val === null || val === undefined || Number.isNaN(Number(val))) return "—";
+            return Number(val).toLocaleString("en-US");
+        }
+
+        function showError(msg) {
+            document.getElementById("error-message").textContent = msg;
+            document.getElementById("error-banner").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function hideError() {
+            document.getElementById("error-banner").classList.add("hidden");
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function escapeJsString(str) {
+            return String(str).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        }
+
+        // ============================================================
+        // 11. BOOTSTRAP
+        // ============================================================
+        document.addEventListener("DOMContentLoaded", () => {
+            updateUtcClock();
+            setInterval(updateUtcClock, 1000);
+            applySeniorMode(localStorage.getItem(SENIOR_KEY) === "1");
+            initEgyptMap();
+            checkApiHealth();
+            loadOptions();
+            lucide.createIcons();
+        });
+
+        window.addEventListener("load", () => {
+            if (egyptMap) {
+                setTimeout(() => egyptMap.invalidateSize(), 200);
+            }
+        });
+    </script>
+</body>
+</html>
+
+

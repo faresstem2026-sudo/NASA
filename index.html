@@ -214,7 +214,7 @@
                 </div>
                 <div>
                     <h1 class="font-black text-lg md:text-xl text-slate-900 leading-tight">
-                        مستشار الفلاح الفضائي <span class="text-green-600">OrbitGudie EG</span>
+                        مستشار الفلاح الفضائي <span class="text-green-600">NASA Fallah</span>
                     </h1>
                     <p class="text-slate-500 text-xs font-semibold">أقمار ناسا (POWER/SMAP/SRTM) + تربة SoilGrids + توقعات الفاو ET0 + اقتصاديات حية</p>
                 </div>
@@ -732,7 +732,6 @@
 
             <!-- بطاقة القرار القابلة للطباعة -->
             <div id="printable-decision-card" class="space-y-6">
-                
 
                 <!-- 1. ملخص الملاءمة والدرجة + شارات مصادر البيانات الحية + تنبيه الموعد -->
                 <div class="agri-card rounded-3xl p-6 md:p-7 border-t-4 border-t-green-600 space-y-5">
@@ -1185,6 +1184,7 @@
                 </div>
 
             </div>
+
             <!-- قسم شات المرشد الزراعي الذكي AI -->
             <div id="ai-advisor-section" class="no-print agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-emerald-600 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
@@ -1363,6 +1363,12 @@
             standing_water: "",
             agricultural_problem: ""
         };
+
+        function safeRefreshIcons() {
+            if (typeof lucide !== "undefined" && typeof lucide.createIcons === "function") {
+                lucide.createIcons();
+            }
+        }
 
         // ============================================================
         // 2. CLOCK, SENIOR MODE & API HEALTH
@@ -1609,12 +1615,10 @@
                         hintEl.classList.remove("hidden");
                     }
 
-                    // Auto-fill soil fields ONLY if user hasn't manually overridden them
                     if (!soilManualEdited) {
                         applySoilGridsToInputs(sg);
                     }
 
-                    // Update Digital Twin soil & elevation summary
                     document.getElementById("twin-satellite-soil").innerHTML = `
                         <span>التربة (SoilGrids): ${sg.inferred_texture_ar || "--"} (طين ${sg.clay_pct ?? "--"}% / pH ${sg.ph ?? "--"})</span>
                         <span>الارتفاع (SRTM): ${elevM} م</span>
@@ -1625,7 +1629,7 @@
                 statusEl.textContent = "تعذر الاتصال السريع بـ SoilGrids؛ سيتم استخدام بيانات التربة عند التحليل.";
             }
             updateSoilSourceBadge();
-            lucide.createIcons();
+            safeRefreshIcons();
         }
 
         function applySoilGridsToInputs(sg) {
@@ -1780,7 +1784,7 @@
                 "مشكلة أخرى": "help-circle"
             });
 
-            lucide.createIcons();
+            safeRefreshIcons();
             syncDigitalTwin();
             updateSoilSourceBadge();
         }
@@ -1830,7 +1834,7 @@
                 `;
                 grid.appendChild(card);
             });
-            lucide.createIcons();
+            safeRefreshIcons();
         }
 
         function filterCrops(query) {
@@ -1850,7 +1854,7 @@
                 btn.onclick = () => {
                     formState[stateKey] = item;
                     renderChoiceGroup(containerId, items, stateKey, iconMap);
-                    lucide.createIcons();
+                    safeRefreshIcons();
                     onFormFieldChange();
                 };
                 btn.innerHTML = `
@@ -1913,7 +1917,8 @@
                 soilManualEdited = Boolean(saved.soilManualEdited);
 
                 const setVal = (id, val) => {
-                    if (val !== undefined && val !== null) document.getElementById(id).value = val;
+                    const el = document.getElementById(id);
+                    if (el && val !== undefined && val !== null) el.value = val;
                 };
 
                 if (saved.governorate) {
@@ -1932,7 +1937,6 @@
                 setVal("farmer-name", saved.farmer_name);
                 setVal("report-language", saved.language || "ar");
                 setVal("farm-area", saved.farm_area);
-                setVal("farm_area_unit", saved.farm_area_unit);
                 setVal("farm-area-unit", saved.farm_area_unit || "فدان");
                 setVal("soil-photo-url", saved.soil_photo_url);
                 setVal("crop-photo-url", saved.crop_photo_url);
@@ -2074,7 +2078,7 @@
             const btn = document.getElementById("gps-btn");
             btn.disabled = true;
             btn.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>جاري التحديد...</span>';
-            lucide.createIcons();
+            safeRefreshIcons();
 
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
@@ -2085,7 +2089,7 @@
                     placeMapMarker(lat, lon, true);
                     btn.disabled = false;
                     btn.innerHTML = '<i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-green-600"></i><span>تم التقاط GPS بنجاح</span>';
-                    lucide.createIcons();
+                    safeRefreshIcons();
                     onFormFieldChange();
                     const gov = document.getElementById("governorate-select").value;
                     fetchSoilAndElevation(lat, lon, gov);
@@ -2093,7 +2097,7 @@
                 () => {
                     btn.disabled = false;
                     btn.innerHTML = '<i data-lucide="navigation" class="w-3.5 h-3.5"></i><span>تحديد موقعي بالـ GPS</span>';
-                    lucide.createIcons();
+                    safeRefreshIcons();
                     showError("تعذر الوصول لإحداثيات GPS. يمكنك الضغط مباشرة على الخريطة أو اختيار المحافظة.");
                 },
                 { enableHighAccuracy: true, timeout: 10000 }
@@ -2529,7 +2533,6 @@
                     ? `المساحة: ${ew.area_feddan} فدان`
                     : "تقدير للفدان الواحد (1 فدان)";
 
-                // Populate editable live price/cost inputs with server's live defaults
                 document.getElementById("live-edit-cost").value = ec.cost_per_feddan_egp;
                 document.getElementById("live-edit-price").value = ec.price_per_ton_egp;
                 document.getElementById("live-edit-yield").value = ec.expected_yield_ton_per_feddan;
@@ -2824,7 +2827,7 @@
             document.getElementById("res-limitations-list").innerHTML = (data.limitations || [])
                 .map((l) => `<li class="flex items-start gap-2"><span class="text-sky-600 font-black">•</span><span>${escapeHtml(l)}</span></li>`).join("");
 
-            lucide.createIcons();
+            safeRefreshIcons();
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
@@ -2961,7 +2964,7 @@
                     </div>
                 </div>
             `;
-            lucide.createIcons();
+            safeRefreshIcons();
         }
 
         function closeMethodologyModal() {
@@ -3059,7 +3062,7 @@
             initEgyptMap();
             checkApiHealth();
             loadOptions();
-            lucide.createIcons();
+            safeRefreshIcons();
         });
 
         window.addEventListener("load", () => {
@@ -3067,8 +3070,149 @@
                 setTimeout(() => egyptMap.invalidateSize(), 200);
             }
         });
+
+        // ============================================================
+        // 12. AI AGRONOMIC ADVISOR CHAT (/api/ask-ai)
+        // ============================================================
+        function collectCurrentCardContext() {
+            if (!lastAnalysisResponse) return {};
+            const d = lastAnalysisResponse;
+            const farm = d.farm || {};
+            const ass = d.assessment || {};
+            const summary = (d.climate && d.climate.summary) || {};
+            const soil = d.soil_profile || {};
+            const elev = d.elevation || {};
+            const water = d.live_water_demand || {};
+            const econ = (d.economics_and_water && d.economics_and_water.economics) || {};
+            const forecast = d.forecast || {};
+
+            return {
+                governorate: farm.governorate,
+                crop: farm.crop,
+                planting_month: farm.planting_month,
+                irrigation_method: farm.irrigation_method,
+                water_source: farm.water_source,
+                agricultural_problem: farm.agricultural_problem,
+                suitability_status: ass.crop_suitability_status,
+                suitability_score: ass.suitability_score,
+                planting_timing_alert: ass.planting_timing_alert ? ass.planting_timing_alert.message : null,
+                soil_profile: {
+                    source: soil.source_label,
+                    effective_type: soil.effective_soil_type,
+                    clay_percent: soil.clay_percent,
+                    sand_percent: soil.sand_percent,
+                    ph: soil.ph,
+                    ec_ds_m: soil.ec_ds_m
+                },
+                elevation_m: elev.elevation_m,
+                nasa_30d_weather: {
+                    avg_temp_c: summary.average_temperature_c,
+                    total_rain_mm: summary.total_rainfall_mm,
+                    avg_humidity_percent: summary.average_relative_humidity_percent,
+                    smap_root_zone_wetness: summary.average_root_zone_soil_wetness,
+                    estimated_daily_et_mm: summary.estimated_daily_et_mm
+                },
+                live_water_m3_per_feddan: water.recommended_m3_per_feddan || null,
+                daily_avg_water_m3_per_feddan: water.daily_avg_m3_per_feddan || null,
+                economics_per_feddan_egp: {
+                    cost: econ.cost_per_feddan_egp,
+                    net_profit: econ.net_profit_per_feddan_egp,
+                    roi_percent: econ.roi_percent
+                },
+                forecast_alerts: forecast.alerts || [],
+                irrigation_recommendation: ass.irrigation_recommendation || null,
+                risks: ass.risks || []
+            };
+        }
+
+        function appendAiChatMessage(role, text, isError = false) {
+            const box = document.getElementById("ai-chat-messages");
+            const wrapper = document.createElement("div");
+
+            if (role === "user") {
+                wrapper.className = "flex items-start justify-end gap-2.5";
+                wrapper.innerHTML = `
+                    <div class="bg-green-600 text-white rounded-2xl rounded-tl-none px-4 py-2.5 text-xs md:text-sm font-bold leading-relaxed max-w-[85%] shadow-sm">
+                        ${escapeHtml(text)}
+                    </div>
+                    <span class="w-7 h-7 rounded-xl bg-slate-800 text-white flex items-center justify-center text-[11px] font-black shrink-0">أنت</span>
+                `;
+            } else {
+                const bubbleCls = isError
+                    ? "bg-orange-50 border-orange-300 text-orange-900"
+                    : "bg-white border-slate-200 text-slate-800";
+                wrapper.className = "flex items-start gap-2.5";
+                wrapper.innerHTML = `
+                    <span class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shrink-0">AI</span>
+                    <div class="border ${bubbleCls} rounded-2xl rounded-tr-none px-4 py-3 text-xs md:text-sm font-semibold leading-relaxed max-w-[90%] shadow-sm whitespace-pre-line">
+                        ${escapeHtml(text)}
+                    </div>
+                `;
+            }
+
+            box.appendChild(wrapper);
+            box.scrollTop = box.scrollHeight;
+            return wrapper;
+        }
+
+        function askAiQuick(text) {
+            document.getElementById("ai-question-input").value = text;
+            sendAiQuestion();
+        }
+
+        async function sendAiQuestion() {
+            const input = document.getElementById("ai-question-input");
+            const btn = document.getElementById("ai-send-btn");
+            const question = input.value.trim();
+
+            if (!question) return;
+            if (!lastAnalysisResponse) {
+                appendAiChatMessage("ai", "يرجى تحليل الأرض أولاً حتى يتمكن المرشد الذكي من الإجابة بناءً على بيانات أرضك.", true);
+                return;
+            }
+
+            appendAiChatMessage("user", question);
+            input.value = "";
+            input.disabled = true;
+            btn.disabled = true;
+            btn.innerHTML = '<span>جاري التفكير...</span>';
+
+            const typingNode = appendAiChatMessage("ai", "جاري تحليل سؤالك ومطابقته مع بيانات القمر الصناعي...");
+
+            try {
+                const lang = (lastAnalysisResponse.assessment && lastAnalysisResponse.assessment.language) || "ar";
+                const res = await fetch(`${API_BASE}/api/ask-ai`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        question,
+                        farm_context: collectCurrentCardContext(),
+                        language: lang
+                    })
+                });
+
+                const data = await res.json().catch(() => null);
+                typingNode.remove();
+
+                if (!res.ok) {
+                    const errMsg = (data && data.detail) || `حدث خطأ من السيرفر (كود ${res.status}).`;
+                    appendAiChatMessage("ai", typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg), true);
+                } else {
+                    appendAiChatMessage("ai", data.answer || "لم يتم استلام رد من النموذج.");
+                }
+            } catch (err) {
+                typingNode.remove();
+                appendAiChatMessage("ai", "تعذر الاتصال بالسيرفر حالياً. تأكد من تشغيل السيرفر والإنترنت.", true);
+                console.error("Ask AI Error:", err);
+            } finally {
+                input.disabled = false;
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i><span>إرسال</span>';
+                safeRefreshIcons();
+                input.focus();
+            }
+        }
     </script>
 </body>
 </html>
-
 

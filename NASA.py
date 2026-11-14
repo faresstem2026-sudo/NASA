@@ -5322,7 +5322,102 @@ def root():
 
     return HTMLResponse(content=html_content, status_code=200)
 
+# ============================================================
+# 26B. ASK AI AGRONOMIC ADVISOR (GEMINI API)
+# ============================================================
 
+class AskAIRequest(BaseModel):
+    question: str = Field(min_length=2, max_length=1000)
+    farm_context: dict = Field(default_factory=dict)
+    language: Optional[str] = "ar"
+
+
+@app.post("/api/ask-ai")
+def ask_ai_advisor(req: AskAIRequest):
+    import json
+
+    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        raise HTTPException(
+            status_code=503,
+            detail="مفتاح GEMINI_API_KEY غير مضبوط في متغيرات البيئة على السيرفر."
+        )
+
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
+    gemini_url = (
+        f"https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{model_name}:generateContent"
+    )
+
+    context_json = json.dumps(req.farm_context, ensure_ascii=False)
+    lang_instruction = (
+        "أجب باللهجة المصرية البسيطة الممزوجة بالعربية الفصحى السهلة الواضحة للفلاح."
+        if req.language != "en"
+        else "Answer in clear, simple, practical English for a farmer."
+    )
+
+    prompt = (
+        "أنت مرشد زراعي ذكي خبير في الزراعة المصرية وبيانات أقمار ناسا (NASA Fallah). "
+        f"{lang_instruction} "
+        "التزم بأن تكون إجابتك عملية ومباشرة ومختصرة (في حدود 4 إلى 6 أسطر أو نقاط واضحة) "
+        "ومبنية على بيانات الأرض التالية فقط دون اختلاق أرقام غير موجودة:\n\n"
+        f"بيانات الأرض والتحليل الحالي:\n{context_json}\n\n"
+        f"سؤال المزارع:\n{req.question.strip()}"
+    )
+
+    payload = {
+        "contents": [
+            {
+                "parts": [{"text": prompt}]
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.4,
+            "maxOutputTokens": 450,
+        },
+    }
+
+    try:
+        resp = requests.post(
+            gemini_url,
+            headers={
+                "Content-Type": "application/json",
+                "x-goog-api-key": api_key,
+            },
+            json=payload,
+            timeout=8,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+
+        candidates = data.get("candidates") or []
+        parts = (
+            candidates[0].get("content", {}).get("parts", [])
+            if candidates else []
+        )
+        answer = "".join(p.get("text", "") for p in parts).strip()
+
+        if not answer:
+            raise ValueError("Empty response from Gemini API")
+
+        return {
+            "success": True,
+            "model": model_name,
+            "answer": answer,
+        }
+
+    except requests.exceptions.Timeout:
+        logger.warning("Gemini API request timed out (8s).")
+        raise HTTPException(
+            status_code=504,
+            detail="استغرق المرشد الذكي وقتاً أطول من اللازم. حاول مرة أخرى بعد لحظات."
+        )
+    except (requests.exceptions.RequestException, ValueError, KeyError, IndexError) as error:
+        logger.warning("Gemini API error: %s", error)
+        raise HTTPException(
+            status_code=502,
+            detail="تعذر الحصول على رد من المرشد الذكي حالياً. تأكد من صلاحية المفتاح وحاول مجدداً."
+        )
 # ============================================================
 # 27. RUN SERVER
 # ============================================================

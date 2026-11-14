@@ -1,7 +1,7 @@
 
 
 # ============================================================
-# NASA FALLAH
+# Orbit Gudie EG 
 # Agricultural Decision Support System for Egypt
 # Backend: Python + FastAPI (Vercel Serverless Ready)
 # Data Sources:
@@ -57,7 +57,7 @@ APP_VERSION = "2.0.0"
 # ============================================================
 
 app = FastAPI(
-    title="NASA Fallah API",
+    title="OrbitGudie EG API",
     description="Agricultural Decision Support System for Egypt",
     version=APP_VERSION
 )
@@ -3952,8 +3952,8 @@ def build_methodology(lang, evaluation=None):
     methodology = {
         "title": L(
             lang,
-            "منهجية الحساب والتقييم في NASA Fallah",
-            "NASA Fallah Evaluation & Calculation Methodology"
+            "منهجية الحساب والتقييم في OrbitGudie EG",
+            "OrbitGudie EG Evaluation & Calculation Methodology"
         ),
         "data_sources": [
             {
@@ -5130,7 +5130,7 @@ def analyze_farm(farm: FarmData):
 
         "success": True,
 
-        "application": "NASA Fallah",
+        "application": "OrbitGudie EG",
 
         "version": APP_VERSION,
 
@@ -5238,7 +5238,7 @@ def compare_crops_endpoint(request: CompareRequest):
 
     return {
         "success": True,
-        "application": "NASA Fallah",
+        "application": "OrbitGudie EG",
         "version": APP_VERSION,
         "location": location,
         "elevation": elevation_data,
@@ -5272,7 +5272,7 @@ def get_methodology(language: str = Query(default="ar")):
 
     return {
         "success": True,
-        "application": "NASA Fallah",
+        "application": "OrbitGudie EG",
         "version": APP_VERSION,
         "methodology": build_methodology(language),
     }
@@ -5289,7 +5289,7 @@ def health_check():
 
         "status": "running",
 
-        "application": "NASA Fallah",
+        "application": "OrbitGudie EG",
 
         "version": APP_VERSION,
 
@@ -5309,8 +5309,8 @@ def root():
         return HTMLResponse(
             content=(
                 "<!DOCTYPE html><html lang='ar' dir='rtl'><head><meta charset='UTF-8'>"
-                "<title>NASA Fallah</title></head><body style='font-family:sans-serif;padding:2rem;'>"
-                "<h2>NASA Fallah API is running</h2>"
+                "<title>OrbitGudie EG</title></head><body style='font-family:sans-serif;padding:2rem;'>"
+                "<h2>OrbitGudie EG API is running</h2>"
                 "<p>ملف index.html غير موجود بجانب NASA.py. يرجى وضعه في نفس المجلد.</p>"
                 "</body></html>"
             ),

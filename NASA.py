@@ -5323,7 +5323,7 @@ def root():
     return HTMLResponse(content=html_content, status_code=200)
 
 # ============================================================
-# 26B. ASK AI AGRONOMIC ADVISOR (GEMINI API)
+# 26B. ASK AI AGRONOMIC ADVISOR (GEMINI API - AUTO .ENV & FALLBACK)
 # ============================================================
 
 class AskAIRequest(BaseModel):
@@ -5332,22 +5332,40 @@ class AskAIRequest(BaseModel):
     language: Optional[str] = "ar"
 
 
+def _load_gemini_api_key():
+    key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if key:
+        return key
+    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    if os.path.exists(env_path):
+        try:
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("GEMINI_API_KEY="):
+                        return line.split("=", 1)[1].strip().strip('"').strip("'")
+        except Exception:
+            pass
+    return ""
+
+
 @app.post("/api/ask-ai")
 def ask_ai_advisor(req: AskAIRequest):
     import json
 
-    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    api_key = _load_gemini_api_key()
     if not api_key:
         raise HTTPException(
             status_code=503,
-            detail="مفتاح GEMINI_API_KEY غير مضبوط في متغيرات البيئة على السيرفر."
+            detail="مفتاح GEMINI_API_KEY غير موجود! أضفه في Environment Variables على Vercel (ثم اعمل Redeploy) أو في ملف .env."
         )
 
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
-    gemini_url = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{model_name}:generateContent"
-    )
+    custom_model = os.environ.get("GEMINI_MODEL", "").strip()
+    candidate_models = [custom_model] if custom_model else [
+        "gemini-3.5-flash-lite",
+        "gemini-3.8-flash",
+        "gemini-2.5-flash",
+    ]
 
     context_json = json.dumps(req.farm_context, ensure_ascii=False)
     lang_instruction = (
@@ -5360,64 +5378,80 @@ def ask_ai_advisor(req: AskAIRequest):
         "أنت مرشد زراعي ذكي خبير في الزراعة المصرية وبيانات أقمار ناسا (NASA Fallah). "
         f"{lang_instruction} "
         "التزم بأن تكون إجابتك عملية ومباشرة ومختصرة (في حدود 4 إلى 6 أسطر أو نقاط واضحة) "
-        "ومبنية على بيانات الأرض التالية فقط دون اختلاق أرقام غير موجودة:\n\n"
+        "ومبنية على بيانات الأرض التالية فقط:\n\n"
         f"بيانات الأرض والتحليل الحالي:\n{context_json}\n\n"
         f"سؤال المزارع:\n{req.question.strip()}"
     )
 
     payload = {
-        "contents": [
-            {
-                "parts": [{"text": prompt}]
-            }
-        ],
+        "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "temperature": 0.4,
-            "maxOutputTokens": 450,
+            "maxOutputTokens": 1024,
         },
     }
 
-    try:
-        resp = requests.post(
-            gemini_url,
-            headers={
-                "Content-Type": "application/json",
-                "x-goog-api-key": api_key,
-            },
-            json=payload,
-            timeout=8,
-        )
-        resp.raise_for_status()
-        data = resp.json()
+    last_error_msg = "تعذر الاتصال بـ Gemini API."
 
-        candidates = data.get("candidates") or []
-        parts = (
-            candidates[0].get("content", {}).get("parts", [])
-            if candidates else []
+    for model_name in candidate_models:
+        gemini_url = (
+            f"https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{model_name}:generateContent"
         )
-        answer = "".join(p.get("text", "") for p in parts).strip()
+        try:
+            resp = requests.post(
+                gemini_url,
+                headers={
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": api_key,
+                },
+                json=payload,
+                timeout=8,
+            )
 
-        if not answer:
-            raise ValueError("Empty response from Gemini API")
+            if resp.status_code == 404:
+                last_error_msg = f"الموديل {model_name} غير متاح (404)."
+                continue
 
-        return {
-            "success": True,
-            "model": model_name,
-            "answer": answer,
-        }
+            if not resp.ok:
+                try:
+                    err_json = resp.json()
+                    google_msg = err_json.get("error", {}).get("message", resp.text)
+                except Exception:
+                    google_msg = resp.text[:200]
+                last_error_msg = f"خطأ Gemini ({resp.status_code}): {google_msg}"
+                logger.warning("Gemini API error (%s): %s", model_name, last_error_msg)
+                break
 
-    except requests.exceptions.Timeout:
-        logger.warning("Gemini API request timed out (8s).")
-        raise HTTPException(
-            status_code=504,
-            detail="استغرق المرشد الذكي وقتاً أطول من اللازم. حاول مرة أخرى بعد لحظات."
-        )
-    except (requests.exceptions.RequestException, ValueError, KeyError, IndexError) as error:
-        logger.warning("Gemini API error: %s", error)
-        raise HTTPException(
-            status_code=502,
-            detail="تعذر الحصول على رد من المرشد الذكي حالياً. تأكد من صلاحية المفتاح وحاول مجدداً."
-        )
+            data = resp.json()
+            candidates = data.get("candidates") or []
+            parts = candidates[0].get("content", {}).get("parts", []) if candidates else []
+
+            # استبعاد أجزاء التفكير الداخلية إن وجدت وأخذ النص الفعلي فقط
+            text_parts = [p.get("text", "") for p in parts if not p.get("thought") and p.get("text")]
+            if not text_parts:
+                text_parts = [p.get("text", "") for p in parts if p.get("text")]
+
+            answer = "".join(text_parts).strip()
+            if not answer:
+                finish_reason = candidates[0].get("finishReason") if candidates else "UNKNOWN"
+                last_error_msg = f"رد فارغ من {model_name} (finishReason: {finish_reason})"
+                continue
+
+            return {
+                "success": True,
+                "model": model_name,
+                "answer": answer,
+            }
+
+        except requests.exceptions.Timeout:
+            last_error_msg = "انتهت مهلة الاتصال بـ Gemini (8 ثوانٍ). حاول مرة أخرى."
+            break
+        except requests.exceptions.RequestException as error:
+            last_error_msg = f"فشل الاتصال الشبكي بـ Gemini: {error}"
+            break
+
+    raise HTTPException(status_code=502, detail=last_error_msg)
 # ============================================================
 # 27. RUN SERVER
 # ============================================================

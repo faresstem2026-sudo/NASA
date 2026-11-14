@@ -4522,24 +4522,16 @@ def health_check():
 # 26. ROOT ENDPOINT
 # ============================================================
 
-@app.get("/")
-def root():
+from fastapi.responses import HTMLResponse
 
-    return {
+@app.get("/", response_class=HTMLResponse)
+def serve_frontend():
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
 
-        "message": "Welcome to NASA Fallah API",
 
-        "application": "NASA Fallah",
-
-        "version": APP_VERSION,
-
-        "documentation": "/docs",
-
-        "health_check": "/api/health",
-
-        "methodology": "/api/methodology",
-
-    }
+        
+    
 
 
 # ============================================================

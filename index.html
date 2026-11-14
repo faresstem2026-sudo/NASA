@@ -732,6 +732,7 @@
 
             <!-- بطاقة القرار القابلة للطباعة -->
             <div id="printable-decision-card" class="space-y-6">
+                
 
                 <!-- 1. ملخص الملاءمة والدرجة + شارات مصادر البيانات الحية + تنبيه الموعد -->
                 <div class="agri-card rounded-3xl p-6 md:p-7 border-t-4 border-t-green-600 space-y-5">
@@ -1183,6 +1184,63 @@
                     </div>
                 </div>
 
+            </div>
+            <!-- قسم شات المرشد الزراعي الذكي AI -->
+            <div id="ai-advisor-section" class="no-print agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-emerald-600 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-sky-600 text-white flex items-center justify-center shadow-sm">
+                            <i data-lucide="bot" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-base md:text-lg text-slate-900">اسأل المرشد الذكي AI 🤖</h3>
+                            <p class="text-xs text-slate-500 font-semibold">اسأل أي سؤال عن أرضك وسيجيبك بناءً على بيانات ناسا والتربة والطقس المعروضة</p>
+                        </div>
+                    </div>
+                    <span class="font-mono-tech text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">Gemini AI • Context-Aware</span>
+                </div>
+
+                <!-- أسئلة سريعة مقترحة -->
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="askAiQuick('متى أروي أرضي وكم متر مكعب أحتاج هذه الأيام؟')" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 transition-all">
+                        💧 متى أروي وكم أحتاج؟
+                    </button>
+                    <button type="button" onclick="askAiQuick('ما أنسب برنامج تسميد لنوع تربتي ومحصولي الآن؟')" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-green-50 hover:bg-green-100 text-green-800 border border-green-200 transition-all">
+                        🌿 ما أنسب تسميد الآن؟
+                    </button>
+                    <button type="button" onclick="askAiQuick('هل يوجد خطر من الطقس أو الملوحة في الأيام القادمة وكيف أحمي المحصول؟')" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition-all">
+                        ⚠️ هل يوجد خطر قادم؟
+                    </button>
+                </div>
+
+                <!-- منطقة عرض المحادثة -->
+                <div id="ai-chat-messages" class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar bg-slate-50/80 border border-slate-200 rounded-2xl p-4">
+                    <div class="flex items-start gap-2.5">
+                        <span class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shrink-0">AI</span>
+                        <div class="bg-white border border-slate-200 rounded-2xl rounded-tr-none px-4 py-2.5 text-xs md:text-sm text-slate-700 font-semibold leading-relaxed shadow-sm">
+                            أهلاً بك يا هندسة! أنا جاهز للرد على أي استفسار بخصوص هذه الأرض والمحصول. اكتب سؤالك بالأسفل أو اختر سؤالاً سريعاً.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- مربع الإدخال وزر الإرسال -->
+                <form id="ai-chat-form" onsubmit="event.preventDefault(); sendAiQuestion();" class="flex flex-col sm:flex-row gap-2.5">
+                    <input
+                        id="ai-question-input"
+                        type="text"
+                        maxlength="500"
+                        placeholder="اكتب سؤالك هنا... مثال: هل أزرع الأسبوع ده ولا أستنى؟"
+                        class="custom-input flex-grow rounded-2xl px-4 py-3 text-sm font-semibold"
+                    />
+                    <button
+                        type="submit"
+                        id="ai-send-btn"
+                        class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-l from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-black text-sm shadow-md shadow-emerald-600/20 transition-all shrink-0"
+                    >
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>إرسال</span>
+                    </button>
+                </form>
             </div>
         </section>
     </main>

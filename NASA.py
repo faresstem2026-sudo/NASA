@@ -5306,7 +5306,7 @@ def get_methodology(language: str = Query(default="ar")):
 NDVI_URL = "https://modis.ornl.gov/rst/api/v1/MOD13Q1/subset"
 NDVI_BAND = "250m_16_days_NDVI"
 NDVI_CACHE_TTL = 12 * 3600
-NDVI_TIMEOUT = 7.0          # خادم ORNL أبطأ من باقي المصادر
+NDVI_TIMEOUT = 9.0          # خادم ORNL أبطأ من باقي المصادر
 NDVI_PERIODS = 10           # خادم ORNL يسمح بحد أقصى 10 فترات في الطلب الواحد (نحو 5 شهور)
 
 
@@ -5333,7 +5333,7 @@ def get_ndvi_series(latitude, longitude, lang="ar"):
     if cached is not None:
         return cached
 
-    end_date = date.today() - timedelta(days=16)
+    end_date = date.today() - timedelta(days=32)  # آخر مركّبات MODIS بتتأخر أسابيع
     start_date = end_date - timedelta(days=16 * (NDVI_PERIODS - 1))
 
     params = {
@@ -5347,16 +5347,30 @@ def get_ndvi_series(latitude, longitude, lang="ar"):
     }
 
     session = _get_http_session()
+    last_error = "unknown"
 
     try:
-        response = session.get(
-            NDVI_URL,
-            params=params,
-            headers={"Accept": "application/json"},
-            timeout=NDVI_TIMEOUT,
-        )
-        response.raise_for_status()
-        payload = response.json()
+        payload = None
+        for attempt in range(2):  # محاولتان لأن خادم ORNL بطيء أحياناً
+            try:
+                response = session.get(
+                    NDVI_URL,
+                    params=params,
+                    headers={"Accept": "application/json"},
+                    timeout=NDVI_TIMEOUT,
+                )
+                if response.status_code != 200:
+                    last_error = f"HTTP {response.status_code}: {response.text[:200]}"
+                    logger.warning("MODIS NDVI %s", last_error)
+                    continue
+                payload = response.json()
+                break
+            except requests.exceptions.RequestException as req_err:
+                last_error = f"{type(req_err).__name__}: {req_err}"
+                logger.warning("MODIS NDVI attempt %s failed: %s", attempt + 1, last_error)
+
+        if payload is None:
+            raise ValueError(last_error)
 
         scale = _safe_float(payload.get("scale")) or 0.0001
         points = []
@@ -5399,6 +5413,7 @@ def get_ndvi_series(latitude, longitude, lang="ar"):
         ValueError, KeyError, TypeError, AttributeError
     ) as error:
         logger.warning("MODIS NDVI request failed (%s)", error)
+        error_text = str(error)[:300]
         # لا نخترع أرقاماً: نرجع حالة "غير متاح" بصراحة
         return {
             "available": False,
@@ -5410,6 +5425,7 @@ def get_ndvi_series(latitude, longitude, lang="ar"):
             "average_ndvi": None,
             "series": [],
             "is_fallback": True,
+            "error": error_text,
         }
 
 
@@ -5426,6 +5442,7 @@ def get_ndvi_endpoint(
         "longitude": longitude,
         "ndvi": get_ndvi_series(latitude, longitude, lang),
     }
+
 
 # ============================================================
 # 25. HEALTH CHECK ENDPOINT
@@ -5629,4 +5646,3 @@ if __name__ == "__main__":
         reload=True
 
     )
-

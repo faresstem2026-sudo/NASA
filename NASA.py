@@ -590,44 +590,134 @@ def evaluate_soil_health(sequence: List[str]) -> SoilHealthEvaluation:
     erosion = "منخفض: الغطاء النباتي المستمر يقلل من التعرية." if len(sequence) >= 3 else "مرتفع: فترات بدون غطاء تعرض التربة للتآكل."
     return SoilHealthEvaluation(nitrogen_impact=n_impact, organic_matter_impact=om_impact, erosion_risk=erosion)
 
-def evaluate_pest_and_fallow(sequence: List[str]) -> PestAndFallowManagement:
+def evaluate_pest_and_fallow(
+    sequence: List[str],
+    fallow_days_override: Optional[int] = None
+) -> PestAndFallowManagement:
+
     families = [CROP_FAMILIES.get(c, "غير معروف") for c in sequence]
+
     pest_broken = True
+
     for i in range(len(families) - 1):
-        if families[i] == families[i+1]:
+        if families[i] == families[i + 1]:
             pest_broken = False
             break
-    fallow_days = 45 if len(sequence) == 2 else 20
-    exp = "تنوع العائلات يمنع تراكم مسببات الأمراض." if pest_broken else "زراعة نفس العائلة تباعاً يضاعف خطر الآفات كالنيماتودا."
-    return PestAndFallowManagement(fallow_period_days=fallow_days, pest_cycle_broken=pest_broken, explanation=exp)
-def generate_rotation_strategies(previous_crop: str, target_crop: str) -> List[RotationStrategy]:
+
+    fallow_days = (
+        fallow_days_override
+        if fallow_days_override is not None
+        else (45 if len(sequence) == 2 else 20)
+    )
+
+    exp = (
+        "تنوع العائلات يمنع تراكم مسببات الأمراض."
+        if pest_broken
+        else "زراعة نفس العائلة تباعاً يضاعف خطر الآفات كالنيماتودا."
+    )
+
+    if fallow_days_override is not None:
+        exp += (
+            f" (فترة الحقل الفاضي محسوبة من NDVI "
+            f"لقمر MODIS: {fallow_days_override} يوماً)"
+        )
+
+    return PestAndFallowManagement(
+        fallow_period_days=fallow_days,
+        pest_cycle_broken=pest_broken,
+        explanation=exp
+    )
+def calculate_fallow_days_from_ndvi(ndvi_data):
+    if not ndvi_data or not ndvi_data.get("available"):
+        return None
+
+    series = ndvi_data.get("series", [])
+    if not series:
+        return None
+
+    low_ndvi_count = 0
+
+    for point in reversed(series):
+        value = point.get("ndvi")
+
+        if value is None or value >= 0.2:
+            break
+
+        low_ndvi_count += 1
+
+    return low_ndvi_count * 16
+   def generate_rotation_strategies(
+    previous_crop: str,
+    target_crop: str,
+    fallow_days_override: Optional[int] = None
+) -> List[RotationStrategy]:
+
     strategies = []
+
     has_prev = previous_crop and previous_crop != "غير معروف"
 
     seq_1 = ([previous_crop] if has_prev else []) + [target_crop]
+
     strategies.append(RotationStrategy(
-        strategy_name="التدوير الحالي للمزارع", strategy_type="Current", sequence=seq_1,
-        reasoning="هذا هو النمط بناءً على اختيارات المزارع.", evidence="البيانات المدخلة.",
-        benefits=["سهولة التطبيق لتوفر خبرة المزارع."], gaps=["قد يفتقر إلى التنوع البيولوجي."], risks=["تراكم الآفات."],
-        soil_health=evaluate_soil_health(seq_1), pest_management=evaluate_pest_and_fallow(seq_1)
+        strategy_name="التدوير الحالي للمزارع",
+        strategy_type="Current",
+        sequence=seq_1,
+        reasoning="هذا هو النمط بناءً على اختيارات المزارع.",
+        evidence="البيانات المدخلة.",
+        benefits=["سهولة التطبيق لتوفر خبرة المزارع."],
+        gaps=["قد يفتقر إلى التنوع البيولوجي."],
+        risks=["تراكم الآفات."],
+        soil_health=evaluate_soil_health(seq_1),
+        pest_management=evaluate_pest_and_fallow(
+            seq_1, fallow_days_override=fallow_days_override
+        )
     ))
 
-    seq_2 = ([previous_crop] if has_prev else []) + [target_crop, "البرسيم" if target_crop != "البرسيم" else "القمح"]
+    seq_2 = ([previous_crop] if has_prev else []) + [
+        target_crop,
+        "البرسيم" if target_crop != "البرسيم" else "القمح"
+    ]
+
     strategies.append(RotationStrategy(
-        strategy_name="الدورة المحسنة (صحة التربة)", strategy_type="Eco-Friendly", sequence=seq_2,
-        reasoning="إدخال بقوليات لتعويض النيتروجين وتحسين الخواص.", evidence="الدراسات تؤكد زيادة الإنتاجية.",
-        benefits=["تثبيت النيتروجين الطبيعي."], gaps=["عائد المحصول الثالث قد يكون أقل."], risks=["تقلبات الأسعار."],
-        soil_health=evaluate_soil_health(seq_2), pest_management=evaluate_pest_and_fallow(seq_2)
+        strategy_name="الدورة المحسنة (صحة التربة)",
+        strategy_type="Eco-Friendly",
+        sequence=seq_2,
+        reasoning="إدخال بقوليات لتعويض النيتروجين وتحسين الخواص.",
+        evidence="الدراسات تؤكد زيادة الإنتاجية.",
+        benefits=["تثبيت النيتروجين الطبيعي."],
+        gaps=["عائد المحصول الثالث قد يكون أقل."],
+        risks=["تقلبات الأسعار."],
+        soil_health=evaluate_soil_health(seq_2),
+        pest_management=evaluate_pest_and_fallow(
+            seq_2, fallow_days_override=fallow_days_override
+        )
     ))
 
-    break_crop = "القطن" if target_crop in ["الطماطم", "البطاطس"] else "البطاطس"
-    seq_3 = ([previous_crop] if has_prev else []) + [break_crop, target_crop]
+    break_crop = (
+        "القطن"
+        if target_crop in ["الطماطم", "البطاطس"]
+        else "البطاطس"
+    )
+
+    seq_3 = ([previous_crop] if has_prev else []) + [
+        break_crop, target_crop
+    ]
+
     strategies.append(RotationStrategy(
-        strategy_name="استراتيجية كسر الآفات والعائد المرتفع", strategy_type="High-Yield", sequence=seq_3,
-        reasoning="تغيير جذري للعائلة لكسر الأمراض.", evidence="توصيات البحوث الزراعية.",
-        benefits=["القضاء على الآفات المتوطنة.", "عائد مادي جيد."], gaps=["استهلاك مائي أعلى."], risks=["تكلفة مبدئية عالية."],
-        soil_health=evaluate_soil_health(seq_3), pest_management=evaluate_pest_and_fallow(seq_3)
+        strategy_name="استراتيجية كسر الآفات والعائد المرتفع",
+        strategy_type="High-Yield",
+        sequence=seq_3,
+        reasoning="تغيير جذري للعائلة لكسر الأمراض.",
+        evidence="توصيات البحوث الزراعية.",
+        benefits=["القضاء على الآفات المتوطنة.", "عائد مادي جيد."],
+        gaps=["استهلاك مائي أعلى."],
+        risks=["تكلفة مبدئية عالية."],
+        soil_health=evaluate_soil_health(seq_3),
+        pest_management=evaluate_pest_and_fallow(
+            seq_3, fallow_days_override=fallow_days_override
+        )
     ))
+
     return strategies
 # ============================================================
 # 9. VALIDATE FARM DATA
@@ -5202,15 +5292,38 @@ def analyze_farm(farm: FarmData):
                     top_recommended, farm.compare_crop, farm, ctx, lang,
                     forecast_days=forecast_days, market_indicators=market_indicators
                 )
-                # Step 5D-2: Crop Rotation Strategies
+                    # Step 5D-2: Crop Rotation Strategies
+
     target_crop_for_rot = (
         farm.crop
         if farm.crop != "مش متأكد"
-        else (assessment["alternative_crops"][0]["crop"] if assessment.get("alternative_crops") else "القمح")
+        else (
+            assessment["alternative_crops"][0]["crop"]
+            if assessment.get("alternative_crops")
+            else "القمح"
+        )
     )
+
+    # Fetch real MODIS NDVI data for the selected farm coordinates
+    ndvi_data = get_ndvi_series(
+        latitude,
+        longitude,
+        lang
+    )
+
+    # Estimate low vegetation cover duration from NDVI
+    fallow_days = calculate_fallow_days_from_ndvi(
+        ndvi_data
+    )
+
+    # Generate crop rotation strategies using NDVI data
     rotation_strategies = [
         model_to_dict(s)
-        for s in generate_rotation_strategies(farm.previous_crop or "غير معروف", target_crop_for_rot)
+        for s in generate_rotation_strategies(
+            farm.previous_crop or "غير معروف",
+            target_crop_for_rot,
+            fallow_days_override=fallow_days
+        )
     ]
 
     # Step 5E: Transparent methodology

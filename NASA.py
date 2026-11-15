@@ -600,27 +600,28 @@ def evaluate_pest_and_fallow(sequence: List[str]) -> PestAndFallowManagement:
     fallow_days = 45 if len(sequence) == 2 else 20
     exp = "تنوع العائلات يمنع تراكم مسببات الأمراض." if pest_broken else "زراعة نفس العائلة تباعاً يضاعف خطر الآفات كالنيماتودا."
     return PestAndFallowManagement(fallow_period_days=fallow_days, pest_cycle_broken=pest_broken, explanation=exp)
-
 def generate_rotation_strategies(previous_crop: str, target_crop: str) -> List[RotationStrategy]:
     strategies = []
-    
-    seq_1 = [previous_crop, target_crop]
+    has_prev = previous_crop and previous_crop != "غير معروف"
+
+    seq_1 = ([previous_crop] if has_prev else []) + [target_crop]
     strategies.append(RotationStrategy(
         strategy_name="التدوير الحالي للمزارع", strategy_type="Current", sequence=seq_1,
         reasoning="هذا هو النمط بناءً على اختيارات المزارع.", evidence="البيانات المدخلة.",
         benefits=["سهولة التطبيق لتوفر خبرة المزارع."], gaps=["قد يفتقر إلى التنوع البيولوجي."], risks=["تراكم الآفات."],
         soil_health=evaluate_soil_health(seq_1), pest_management=evaluate_pest_and_fallow(seq_1)
     ))
-    
-    seq_2 = [previous_crop, target_crop, "برسيم" if target_crop != "برسيم" else "قمح"]
+
+    seq_2 = ([previous_crop] if has_prev else []) + [target_crop, "البرسيم" if target_crop != "البرسيم" else "القمح"]
     strategies.append(RotationStrategy(
         strategy_name="الدورة المحسنة (صحة التربة)", strategy_type="Eco-Friendly", sequence=seq_2,
         reasoning="إدخال بقوليات لتعويض النيتروجين وتحسين الخواص.", evidence="الدراسات تؤكد زيادة الإنتاجية.",
         benefits=["تثبيت النيتروجين الطبيعي."], gaps=["عائد المحصول الثالث قد يكون أقل."], risks=["تقلبات الأسعار."],
         soil_health=evaluate_soil_health(seq_2), pest_management=evaluate_pest_and_fallow(seq_2)
     ))
-    
-    seq_3 = [previous_crop, "قطن" if target_crop in ["طماطم", "بطاطس"] else "بطاطس", target_crop]
+
+    break_crop = "القطن" if target_crop in ["الطماطم", "البطاطس"] else "البطاطس"
+    seq_3 = ([previous_crop] if has_prev else []) + [break_crop, target_crop]
     strategies.append(RotationStrategy(
         strategy_name="استراتيجية كسر الآفات والعائد المرتفع", strategy_type="High-Yield", sequence=seq_3,
         reasoning="تغيير جذري للعائلة لكسر الأمراض.", evidence="توصيات البحوث الزراعية.",
@@ -5085,7 +5086,7 @@ def get_soil_endpoint(
     sg = get_soilgrids_data(latitude, longitude, governorate=governorate)
     elev = get_elevation_srtm(latitude, longitude, governorate=governorate)
     inferred_texture = _classify_soil_texture_from_percentages(sg.get("clay_pct"), sg.get("sand_pct"))
-    rotation_strategies = generate_rotation_strategies(farm.previous_crop, farm.crop)
+   
     return {
         "success": True,
         "latitude": latitude,
@@ -5094,12 +5095,11 @@ def get_soil_endpoint(
             **sg,
             "inferred_texture_ar": inferred_texture,
             "inferred_texture_en": LABELS_EN.get(inferred_texture, inferred_texture),
-            "rotation_strategies": [strategy.dict() for strategy in rotation_strategies],
-        },
-        "elevation": elev,
+            
+       
+    },
+ "elevation": elev,
     }
-
-
 @app.post("/api/analyze")
 def analyze_farm(farm: FarmData):
 

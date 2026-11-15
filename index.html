@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
 
-  <style>
+ <style>
         :root {
             color-scheme: light;
         }
@@ -30,20 +30,24 @@
         }
         html.senior-mode .text-slate-500,
         html.senior-mode .text-slate-600 {
-            color: #1e293b !important;
+            color: #1b2e22 !important;
         }
         html.senior-mode .agri-card,
         html.senior-mode .choice-card {
             border-width: 2px !important;
         }
 
-        /* الخلفية العامة: تدرج مطفي هادئ جداً (أزرق هادئ -> أخضر هادئ -> أصفر كريمي هادئ) */
+        /* الخلفية العامة: منظر طبيعي للريف (سماء صافية -> غيط أخضر -> أرض قمح دافئة) */
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #dfece7;
-            color: #1e293b;
+            background-color: #c8dfc9;
+            color: #1b2e22;
             overflow-x: hidden;
-            background-image: linear-gradient(160deg, #dce9f3 0%, #dfede5 52%, #f0ebd6 100%);
+            background-image:
+                radial-gradient(circle at 12% 14%, rgba(56, 145, 209, 0.22), transparent 42%),
+                radial-gradient(circle at 88% 35%, rgba(45, 138, 86, 0.22), transparent 45%),
+                radial-gradient(circle at 50% 95%, rgba(212, 169, 68, 0.28), transparent 48%),
+                linear-gradient(180deg, #bdd9ec 0%, #c6e0cb 46%, #e7dab3 100%);
             background-attachment: fixed;
         }
 
@@ -51,42 +55,47 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
+        /* خطوط ناعمة تشبه خطوط الغيط والمصاطب الزراعية الهادئة */
         .bg-agri-grid {
-            background-size: 40px 40px;
+            background-size: 100% 34px;
             background-image:
-                linear-gradient(to right, rgba(30, 64, 175, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(21, 128, 61, 0.03) 1px, transparent 1px);
+                linear-gradient(to bottom, rgba(34, 84, 54, 0.045) 1px, transparent 1px);
         }
 
-        /* الشريط العلوي والهيدر والفوتر بألوان هادئة */
+        /* الشريط العلوي: أخضر نخيل هادي مع لمسة نيلية وذهبية */
         body > div.no-print {
-            background-color: #e2edf5 !important;
-            border-bottom: 1px solid #bfd3e3 !important;
+            background: linear-gradient(90deg, #1f4b36 0%, #275a42 58%, #214e63 100%) !important;
+            border-bottom: 2px solid #c9a959 !important;
+        }
+        body > div.no-print > div > div:first-child {
+            color: #fef3c7 !important;
         }
 
+        /* الهيدر الرئيسي: لون القمح الدافئ الممزوج بخضرة ناعمة وسماء */
         header.no-print {
-            background-color: rgba(226, 238, 247, 0.94) !important;
-            border-bottom: 1.5px solid #b5cde0 !important;
+            background: linear-gradient(90deg, rgba(242, 234, 208, 0.96) 0%, rgba(224, 239, 226, 0.96) 55%, rgba(217, 234, 245, 0.96) 100%) !important;
+            border-bottom: 2px solid #7aa885 !important;
         }
 
+        /* الفوتر: تدرج زرع وقمح دافئ */
         footer.no-print {
-            background-color: #e4ede5 !important;
-            border-top: 1px solid #c1d4c4 !important;
-            color: #334155 !important;
+            background: linear-gradient(90deg, #c7dec9 0%, #e4d8b4 50%, #c5dce8 100%) !important;
+            border-top: 2px solid #7ea988 !important;
+            color: #1b2e22 !important;
         }
 
-        /* الإطار الافتراضي للكروت */
+        /* الإطار العام للكروت بظل ريفي ناعم */
         .agri-card {
-            background-color: #e7f1eb;
-            border: 1px solid #c3d9cc;
-            box-shadow: 0 8px 24px -12px rgba(15, 23, 42, 0.08);
+            background-color: #e4efe5;
+            border: 1.5px solid #9ec2a6;
+            box-shadow: 0 12px 28px -12px rgba(27, 46, 34, 0.16), 0 2px 6px -1px rgba(27, 46, 34, 0.06);
         }
 
         /* =========================================================
-           توزيع الألوان الهادئة (أزرق هادئ • أخضر هادئ • أصفر هادئ)
+           توزيع ألوان الجو الزراعي الفلاحي (أخضر الغيط • أصفر القمح • أزرق النيل)
            ========================================================= */
 
-        /* 1) الأقسام الخضراء الهادئة (الزرع، الملاءمة، التقويم، التوصيات، المرشد AI) */
+        /* 1) كروت الغيط والزرع (نموذج الزراعة، بطاقة الملاءمة، التقويم، التوصيات، المرشد AI) */
         #wizard-view > div.agri-card,
         #printable-decision-card > div:nth-child(1),
         #res-calendar-section,
@@ -94,11 +103,12 @@
         #res-alternatives-box,
         #printable-decision-card > div:nth-child(10) > div:last-child,
         #ai-advisor-section {
-            background-color: #e4f0e8 !important;
-            border-color: #b7d3c2 !important;
+            background: linear-gradient(165deg, #dfede1 0%, #d5e8d8 100%) !important;
+            border-color: #8bb896 !important;
         }
 
-        /* 2) الأقسام الزرقاء الهادئة (ناسا، المياه، الارتفاع، الطقس، جدول الـ16 يوم) */
+        /* 2) كروت مياه النيل والسماء (ملخص الأرض، الارتفاع، المياه، الطقس، جدول الـ16 يوم) */
+        #wizard-view > aside.agri-card,
         #loading-view,
         #res-elevation-card,
         #res-economics-section > div:last-child,
@@ -107,13 +117,12 @@
         #res-irrigation-box,
         #res-forecast-section,
         #printable-decision-card > div:nth-child(12) > div:nth-child(1) {
-            background-color: #e3eef6 !important;
-            border-color: #b6cee0 !important;
+            background: linear-gradient(165deg, #dceaf4 0%, #d1e4f0 100%) !important;
+            border-color: #8eb5cf !important;
         }
 
-        /* 3) الأقسام الصفراء الهادئة (الدليل، ملخص الأرض، التربة، الأرباح، المقارنة، الملاحظات) */
+        /* 3) كروت السنابل والقمح والحصاد (الدليل السريع، التربة، الأرباح، المقارنة، التنبيهات) */
         #hero-guide,
-        #wizard-view > aside.agri-card,
         #res-soil-hybrid-card,
         #res-comparison-section,
         #res-economics-section > div:first-child,
@@ -122,85 +131,85 @@
         #res-methodology-inline,
         #printable-decision-card > div:nth-child(12) > div:nth-child(2),
         #printable-decision-card > div:nth-child(12) > div:nth-child(3) {
-            background-color: #f4efe0 !important;
-            border-color: #dcd3b4 !important;
+            background: linear-gradient(165deg, #f3ebd2 0%, #ebe0be 100%) !important;
+            border-color: #cbb87e !important;
         }
 
         /* نافذة المنهجية وصندوق الشات */
         #methodology-modal > div {
-            background-color: #ebf2ee !important;
-            border: 1.5px solid #b7d3c2 !important;
+            background: linear-gradient(165deg, #e7efe5 0%, #f2ead2 100%) !important;
+            border: 2px solid #8bb896 !important;
         }
         #ai-chat-messages {
-            background-color: rgba(235, 245, 239, 0.78) !important;
-            border-color: #bdd6c7 !important;
+            background-color: rgba(242, 236, 217, 0.72) !important;
+            border-color: #b7cfb9 !important;
         }
 
-        /* الخلفيات الفرعية داخل الكروت بدرجة ناعمة غير مزعجة */
+        /* الخلفيات الداخلية بدرجة قمح كريمي دافئة بدلاً من الأبيض البارد */
         .bg-white,
         .bg-white\/90,
         .bg-white\/80 {
-            background-color: rgba(244, 249, 246, 0.75) !important;
+            background-color: rgba(247, 243, 229, 0.85) !important;
         }
 
         .bg-slate-50,
         .bg-slate-50\/80,
         .bg-slate-100 {
-            background-color: rgba(232, 241, 237, 0.65) !important;
+            background-color: rgba(241, 236, 218, 0.78) !important;
         }
 
-        /* تهدئة الخلفيات الملوّنة الفرعية */
+        /* تلطيف الصناديق الداخلية بألوان زراعية دافئة */
         .bg-green-50, .bg-green-50\/70, .bg-green-50\/60,
         .bg-emerald-50, .bg-emerald-50\/70 {
-            background-color: rgba(218, 238, 226, 0.72) !important;
+            background-color: rgba(206, 232, 212, 0.82) !important;
         }
         .bg-sky-50, .bg-sky-50\/70, .bg-sky-50\/80, .bg-sky-50\/60,
         .bg-cyan-50, .bg-cyan-50\/70, .bg-indigo-50, .bg-indigo-50\/70 {
-            background-color: rgba(217, 234, 246, 0.72) !important;
+            background-color: rgba(206, 229, 245, 0.82) !important;
         }
         .bg-amber-50, .bg-amber-50\/70, .bg-orange-50, .bg-orange-50\/70 {
-            background-color: rgba(244, 237, 212, 0.78) !important;
+            background-color: rgba(243, 232, 196, 0.86) !important;
         }
 
-        /* حقول الإدخال */
+        /* حقول الإدخال بلون قمح فاتح مريح */
         .custom-select, .custom-input, .custom-textarea {
-            background: #f1f6f3;
-            border: 1.5px solid #b8cec1;
-            color: #1e293b;
+            background: #f5f0df;
+            border: 1.5px solid #a8bc9f;
+            color: #1b2e22;
             transition: all 0.2s ease;
         }
         .custom-select:focus, .custom-input:focus, .custom-textarea:focus {
             outline: none;
-            background: #f6faf7;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+            background: #faf6e8;
+            border-color: #2d6a4f;
+            box-shadow: 0 0 0 3.5px rgba(45, 106, 79, 0.16);
         }
 
-        /* أزرار الاختيارات */
+        /* أزرار الاختيارات: بلون سنابل القمح وتتحول لأخضر الغيط عند الاختيار */
         .choice-card {
-            background: #edf4ef;
-            border: 1.5px solid #c2d7ca;
-            color: #1e293b;
+            background: #f3ecd6;
+            border: 1.5px solid #c9be97;
+            color: #233829;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             user-select: none;
         }
         .choice-card:hover {
-            border-color: #60a5fa;
-            background: #e1eef7;
+            border-color: #3b82b6;
+            background: #dcebf5;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px -4px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 5px 14px -5px rgba(34, 84, 54, 0.18);
         }
         .choice-card.selected {
-            background: linear-gradient(135deg, #d7ecdf 0%, #d8e9f5 100%);
-            border-color: #229954;
-            box-shadow: 0 0 0 2.5px rgba(34, 153, 84, 0.18);
-            color: #14532d;
+            background: linear-gradient(135deg, #c6e4ce 0%, #cbe2f0 100%);
+            border-color: #2d6a4f;
+            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.18);
+            color: #133822;
         }
         .choice-card.selected .icon-box {
-            background: #16a34a !important;
-            color: #ffffff !important;
-            border-color: #15803d !important;
+            background: #2d6a4f !important;
+            color: #fef3c7 !important;
+            border-color: #1b4332 !important;
         }
 
         .step-container {
@@ -227,7 +236,7 @@
             height: 310px;
             width: 100%;
             border-radius: 1rem;
-            border: 1.5px solid #a9c5b5;
+            border: 2px solid #7aa885;
             z-index: 1;
             background-color: #0b132b;
         }
@@ -237,15 +246,15 @@
             width: 7px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #dce8e2;
+            background: #d9d3bc;
             border-radius: 999px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #8eb39e;
+            background: #6c9a78;
             border-radius: 999px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #4d8b6b;
+            background: #2d6a4f;
         }
 
         @media print {

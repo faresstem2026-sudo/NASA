@@ -21,7 +21,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
 from statistics import mean
-from typing import Optional
+from typing import Optional, List
 import logging
 import math
 import os
@@ -563,12 +563,12 @@ class PestAndFallowManagement(BaseModel):
 class RotationStrategy(BaseModel):
     strategy_name: str
     strategy_type: str
-    sequence: list[str]
+    sequence: List[str]
     reasoning: str 
     evidence: str
-    benefits: list[str]
-    gaps: list[str]
-    risks: list[str]
+    benefits: List[str]
+    gaps: List[str]
+    risks: List[str]
     soil_health: SoilHealthEvaluation
     pest_management: PestAndFallowManagement
 
@@ -583,14 +583,14 @@ CROP_FAMILIES = {
     "الزيتون": "زيتونية", "الفراولة": "وردية",
 }
 
-def evaluate_soil_health(sequence: list[str]) -> SoilHealthEvaluation:
+def evaluate_soil_health(sequence: List[str]) -> SoilHealthEvaluation:
     families = [CROP_FAMILIES.get(c, "غير معروف") for c in sequence]
     n_impact = "إيجابي جداً: المحاصيل البقولية تثبت النيتروجين الجوي في التربة." if "بقولية" in families else "سلبي: استنزاف مستمر للنيتروجين، يتطلب تسميداً كيميائياً مكثفاً."
     om_impact = "جيد: بقايا الجذور والسيقان تزيد من المادة العضوية." if "نجيلية" in families else "متوسط: الاعتماد على الكومبوست."
     erosion = "منخفض: الغطاء النباتي المستمر يقلل من التعرية." if len(sequence) >= 3 else "مرتفع: فترات بدون غطاء تعرض التربة للتآكل."
     return SoilHealthEvaluation(nitrogen_impact=n_impact, organic_matter_impact=om_impact, erosion_risk=erosion)
 
-def evaluate_pest_and_fallow(sequence: list[str]) -> PestAndFallowManagement:
+def evaluate_pest_and_fallow(sequence: List[str]) -> PestAndFallowManagement:
     families = [CROP_FAMILIES.get(c, "غير معروف") for c in sequence]
     pest_broken = True
     for i in range(len(families) - 1):
@@ -601,7 +601,7 @@ def evaluate_pest_and_fallow(sequence: list[str]) -> PestAndFallowManagement:
     exp = "تنوع العائلات يمنع تراكم مسببات الأمراض." if pest_broken else "زراعة نفس العائلة تباعاً يضاعف خطر الآفات كالنيماتودا."
     return PestAndFallowManagement(fallow_period_days=fallow_days, pest_cycle_broken=pest_broken, explanation=exp)
 
-def generate_rotation_strategies(previous_crop: str, target_crop: str) -> list[RotationStrategy]:
+def generate_rotation_strategies(previous_crop: str, target_crop: str) -> List[RotationStrategy]:
     strategies = []
     
     seq_1 = [previous_crop, target_crop]
@@ -5085,7 +5085,7 @@ def get_soil_endpoint(
     sg = get_soilgrids_data(latitude, longitude, governorate=governorate)
     elev = get_elevation_srtm(latitude, longitude, governorate=governorate)
     inferred_texture = _classify_soil_texture_from_percentages(sg.get("clay_pct"), sg.get("sand_pct"))
-rotation_strategies = generate_rotation_strategies(farm.previous_crop, farm.crop)
+    rotation_strategies = generate_rotation_strategies(farm.previous_crop, farm.crop)
     return {
         "success": True,
         "latitude": latitude,

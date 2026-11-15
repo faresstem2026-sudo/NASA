@@ -5297,6 +5297,135 @@ def get_methodology(language: str = Query(default="ar")):
         "methodology": build_methodology(lang),
     }
 
+# ============================================================
+# 13G. NDVI VEGETATION INDEX (NASA MODIS MOD13Q1 via ORNL DAAC)
+# الصق هذا الجزء في NASA.py قبل القسم "25. HEALTH CHECK ENDPOINT"
+# لا يحتاج أي مكتبات جديدة ولا مفتاح API.
+# ============================================================
+
+NDVI_URL = "https://modis.ornl.gov/rst/api/v1/MOD13Q1/subset"
+NDVI_BAND = "250m_16_days_NDVI"
+NDVI_CACHE_TTL = 12 * 3600
+NDVI_TIMEOUT = 7.0          # خادم ORNL أبطأ من باقي المصادر
+NDVI_PERIODS = 12           # 12 مركّب كل 16 يوم = نحو 6 شهور
+
+
+def _modis_date(d):
+    return f"A{d.year}{d.timetuple().tm_yday:03d}"
+
+
+def _ndvi_label(value, lang):
+    if value is None:
+        return "unknown", L(lang, "غير متاح", "Unavailable")
+    if value >= 0.6:
+        return "excellent", L(lang, "ممتازة", "Excellent")
+    if value >= 0.4:
+        return "good", L(lang, "جيدة", "Good")
+    if value >= 0.2:
+        return "moderate", L(lang, "متوسطة", "Moderate")
+    return "poor", L(lang, "ضعيفة", "Poor")
+
+
+def get_ndvi_series(latitude, longitude, lang="ar"):
+
+    cache_key = ("ndvi_modis", *_coord_cache_key(latitude, longitude))
+    cached = _DATA_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    end_date = date.today() - timedelta(days=16)
+    start_date = end_date - timedelta(days=16 * NDVI_PERIODS)
+
+    params = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "band": NDVI_BAND,
+        "startDate": _modis_date(start_date),
+        "endDate": _modis_date(end_date),
+        "kmAboveBelow": 0,
+        "kmLeftRight": 0,
+    }
+
+    session = _get_http_session()
+
+    try:
+        response = session.get(
+            NDVI_URL,
+            params=params,
+            headers={"Accept": "application/json"},
+            timeout=NDVI_TIMEOUT,
+        )
+        response.raise_for_status()
+        payload = response.json()
+
+        scale = _safe_float(payload.get("scale")) or 0.0001
+        points = []
+
+        for item in payload.get("subset", []):
+            values = item.get("data") or []
+            raw = _safe_float(values[0]) if values else None
+            # القيم الأقل من -2000 هي قيم "لا بيانات" في MODIS
+            if raw is None or raw <= -2000:
+                continue
+            ndvi = round(max(-0.2, min(1.0, raw * scale)), 3)
+            points.append({
+                "date": str(item.get("calendar_date")),
+                "ndvi": ndvi,
+            })
+
+        if not points:
+            raise ValueError("No valid NDVI points")
+
+        points.sort(key=lambda p: p["date"])
+        latest = points[-1]["ndvi"]
+        status_code, status_text = _ndvi_label(latest, lang)
+
+        result = {
+            "available": True,
+            "source": "NASA MODIS MOD13Q1 (250m, 16-day composite) via ORNL DAAC",
+            "latest_ndvi": latest,
+            "latest_date": points[-1]["date"],
+            "status": status_code,
+            "status_text": status_text,
+            "average_ndvi": round(mean(p["ndvi"] for p in points), 3),
+            "series": points,
+            "is_fallback": False,
+        }
+        _DATA_CACHE.set(cache_key, result, NDVI_CACHE_TTL)
+        return result
+
+    except (
+        requests.exceptions.RequestException,
+        ValueError, KeyError, TypeError, AttributeError
+    ) as error:
+        logger.warning("MODIS NDVI request failed (%s)", error)
+        # لا نخترع أرقاماً: نرجع حالة "غير متاح" بصراحة
+        return {
+            "available": False,
+            "source": "NASA MODIS MOD13Q1 via ORNL DAAC",
+            "latest_ndvi": None,
+            "latest_date": None,
+            "status": "unknown",
+            "status_text": L(lang, "غير متاح حالياً", "Currently unavailable"),
+            "average_ndvi": None,
+            "series": [],
+            "is_fallback": True,
+        }
+
+
+@app.get("/api/ndvi")
+def get_ndvi_endpoint(
+    latitude: float = Query(..., ge=-90, le=90),
+    longitude: float = Query(..., ge=-180, le=180),
+    language: str = Query(default="ar"),
+):
+    lang = normalize_backend_lang(language)
+    return {
+        "success": True,
+        "latitude": latitude,
+        "longitude": longitude,
+        "ndvi": get_ndvi_series(latitude, longitude, lang),
+    }
 
 # ============================================================
 # 25. HEALTH CHECK ENDPOINT

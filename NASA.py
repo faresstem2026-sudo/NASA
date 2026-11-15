@@ -3443,7 +3443,7 @@ def compare_crop_rotation_strategies(request: RotationRequest):
     soilgrids_data = _safe_call(get_soilgrids_data, lat, lon, request.governorate, request.soil_type) or _soilgrids_fallback_by_region(request.governorate, request.soil_type)
     elev_data = _safe_call(get_elevation_srtm, lat, lon, request.governorate) or {}
 
-    inferred_tex = _classify_soil_texture_from_percentages(_safe_float(lab.get("clay_pct")) or soilgrids_data.get("clay_pct"), _safe_float(lab.get("sand_pct")) or soilgrids_data.get("sand_pct"))
+    
    
         _safe_float(lab.get("sand_pct")) or soilgrids_data.get("sand_pct"),
     )

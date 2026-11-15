@@ -2710,7 +2710,7 @@
                 const n = data.ndvi || {};
                 if (!n.available) {
                     stEl.textContent = n.status_text || "غير متاح حالياً";
-                    noteEl.textContent = "تعذّر جلب قراءة NDVI من خادم ناسا في هذه اللحظة. لم نعرض أي رقم تقديري. جرّب مرة أخرى بعد قليل.";
+                    noteEl.textContent = "تعذّر جلب قراءة NDVI من خادم ناسا في هذه اللحظة. لم نعرض أي رقم تقديري. جرّب مرة أخرى بعد قليل." + (n.error ? " (سبب تقني: " + n.error + ")" : "");
                     return;
                 }
                 valEl.textContent = Number(n.latest_ndvi).toFixed(2);

@@ -5646,3 +5646,303 @@ if __name__ == "__main__":
         reload=True
 
     )
+
+
+# ============================================================
+# 28. CROP ROTATION DECISION SUPPORT (CHALLENGE-ALIGNED MODULE)
+# ============================================================
+# This module is deliberately rule-based and transparent. It does NOT claim
+# to predict yield or diagnose soil nutrients from satellite imagery.
+# Soil N, organic matter and EC are used only when supplied by the farmer
+# from a laboratory report. Missing measurements remain explicitly unknown.
+
+from pydantic import conlist
+
+
+class RotationRequest(BaseModel):
+    governorate: str = Field(min_length=1)
+    current_crop: str = Field(min_length=1)
+    previous_crops: list[str] = Field(default_factory=list, max_length=6)
+    planting_month: int = Field(ge=1, le=12)
+    irrigation_method: str = Field(min_length=1)
+    water_source: str = Field(min_length=1)
+    soil_type: str = Field(min_length=1)
+    soil_lab_results: dict = Field(default_factory=dict)
+    known_pest_or_disease: Optional[str] = None
+    field_area_feddan: Optional[float] = Field(default=None, gt=0)
+    language: Optional[str] = "ar"
+
+
+_ROTATION_GROUPS = {
+    "cereal": {"القمح", "الأرز", "الذرة"},
+    "legume": {"الفول البلدي", "الفاصوليا", "العدس", "الحمص", "الفول السوداني"},
+    "root_tuber": {"البطاطس", "البصل", "الثوم", "بنجر السكر"},
+    "oil_fiber": {"القطن", "عباد الشمس", "السمسم"},
+    "vegetable": {"الطماطم", "الفراولة"},
+    "perennial_or_forage": {"قصب السكر", "البرسيم", "العنب", "المانجو", "الموالح", "الموز", "الزيتون"},
+}
+
+_ROTATION_GROUP_LABELS = {
+    "cereal": ("حبوب", "Cereal"),
+    "legume": ("بقوليات", "Legume"),
+    "root_tuber": ("جذور ودرنات", "Root/tuber"),
+    "oil_fiber": ("محاصيل زيتية/ألياف", "Oilseed/fiber"),
+    "vegetable": ("خضراوات", "Vegetable"),
+    "perennial_or_forage": ("معمر أو علفي", "Perennial/forage"),
+    "unknown": ("غير مصنف في قواعد التدوير", "Unclassified in rotation rules"),
+}
+
+
+def _rotation_group(crop_name):
+    for group, crops in _ROTATION_GROUPS.items():
+        if crop_name in crops:
+            return group
+    return "unknown"
+
+
+def _rotation_label(group, lang):
+    pair = _ROTATION_GROUP_LABELS.get(group, _ROTATION_GROUP_LABELS["unknown"])
+    return pair[1] if str(lang).lower().startswith("en") else pair[0]
+
+
+def _rotation_crop_exists(crop_name):
+    return crop_name in CROPS and crop_name != "مش متأكد"
+
+
+def _rotation_candidate_pool(current_group):
+    # Three distinct crop groups are preferred where agronomically possible.
+    ordered_groups = ["legume", "cereal", "root_tuber", "oil_fiber", "vegetable", "perennial_or_forage"]
+    return {
+        group: sorted(crops)
+        for group, crops in _ROTATION_GROUPS.items()
+        if group != current_group
+    }
+
+
+def _rotation_strategy_candidates(current_crop, previous_crops, irrigation_method, soil_ec, lang):
+    current_group = _rotation_group(current_crop)
+    used_groups = {_rotation_group(c) for c in previous_crops if _rotation_crop_exists(c)}
+    used_groups.add(current_group)
+
+    def pick(group, fallback):
+        options = sorted(_ROTATION_GROUPS.get(group, set()) - set(previous_crops) - {current_crop})
+        return options[0] if options else fallback
+
+    # Ensure the first successor is from a different group than the current crop.
+    def pick_break(preferred_group, fallback_group):
+        chosen_group = preferred_group if preferred_group != current_group else fallback_group
+        options = sorted(_ROTATION_GROUPS.get(chosen_group, set()) - set(previous_crops) - {current_crop})
+        if options:
+            return options[0], chosen_group
+        for alternative_group in ("legume", "cereal", "root_tuber", "oil_fiber", "vegetable"):
+            if alternative_group != current_group:
+                options = sorted(_ROTATION_GROUPS[alternative_group] - set(previous_crops) - {current_crop})
+                if options:
+                    return options[0], alternative_group
+        return "القمح", "cereal"
+
+    legume, legume_group = pick_break("legume", "cereal")
+    cereal, cereal_group = pick_break("cereal", "root_tuber")
+    root, root_group = pick_break("root_tuber", "oil_fiber")
+    oil, oil_group = pick_break("oil_fiber", "vegetable")
+    veg, veg_group = pick_break("vegetable", "root_tuber")
+
+    # Each option is a different sequence logic, not a yield ranking.
+    strategies = [
+        {
+            "id": "legume_break",
+            "name_ar": "تناوب الحبوب مع البقوليات",
+            "name_en": "Cereal–legume break",
+            "sequence": [current_crop, legume, (cereal if cereal_group != legume_group else root)],
+            "logic_ar": "إدخال محصول بقولي بين محاصيل الحبوب أو بعدها ينوّع المجموعات النباتية، وقد يساهم في تحسين إمداد النيتروجين عند وجود تثبيت حيوي فعال وبكتيريا عقدية مناسبة.",
+            "logic_en": "Insert a legume between cereal phases to diversify crop families; effective biological nitrogen fixation may contribute nitrogen when compatible nodulation is present.",
+            "risks_ar": ["تثبيت النيتروجين ليس مضمونًا؛ يعتمد على نوع البقول والتلقيح والعقد والظروف." , "يلزم التأكد من عدم وجود آفات أو أمراض مشتركة مع المحصول السابق."],
+            "risks_en": ["Nitrogen fixation is not guaranteed; it depends on the legume, inoculation, nodulation and field conditions.", "Check for pests and diseases shared with the preceding crop."],
+            "fallow": "لا تُفرض فترة بور تلقائيًا؛ تُحدد حسب حالة الأرض والآفات والمياه والجدول المحلي.",
+            "fallow_en": "No fixed fallow period is imposed automatically; decide from field condition, pest pressure, water and the local calendar.",
+        },
+        {
+            "id": "root_leaf_diversification",
+            "name_ar": "تناوب مجموعات مختلفة الجذور والاحتياجات",
+            "name_en": "Root-depth and crop-group diversification",
+            "sequence": [current_crop, root, legume],
+            "logic_ar": "ينقل الحقل بين مجموعات مختلفة من المحاصيل واحتياجاتها، ويقلل تكرار نفس المجموعة؛ يجب ضبط الاختيار حسب الصنف وميعاد الزراعة والتربة.",
+            "logic_en": "Moves the field through different crop groups and resource demands, reducing repeated use of one group; cultivar, planting window and soil suitability still need checking.",
+            "risks_ar": ["بعض محاصيل الجذور والدرنات قد تزيد مخاطر أمراض التربة إذا تكررت دون فاصل مناسب.", "اختلاف عمق الجذور لا يمكن تأكيده بدقة دون تحديد الصنف وظروف التربة."],
+            "risks_en": ["Some root and tuber crops can increase soil-borne disease risks if repeated without a suitable break.", "Root-depth differences cannot be confirmed precisely without cultivar and soil details."],
+            "fallow": "تُدرس فترة بور قصيرة فقط إذا أوصى الفحص الحقلي بذلك؛ لا تُعد بديلًا عن دورة بمحصول كاسر.",
+            "fallow_en": "Consider a short fallow only if field inspection supports it; it is not a substitute for a suitable break crop.",
+        },
+        {
+            "id": "water_and_risk_aware",
+            "name_ar": "تناوب يراعي المياه والمخاطر الحقلية",
+            "name_en": "Water- and risk-aware rotation",
+            "sequence": [current_crop, oil, veg],
+            "logic_ar": "يقدم بديلًا من مجموعة مختلفة مع مراجعة طريقة الري ومصدر المياه ومشكلة المزرعة؛ لا يعني أن المحصولين المقترحين مناسبان تلقائيًا للمحافظة أو الموسم.",
+            "logic_en": "Offers a different crop-group sequence while explicitly reviewing irrigation, water source and the reported field problem; the crops are not automatically suitable for the governorate or season.",
+            "risks_ar": ["قد لا يناسب المحصول البديل قيود المياه أو التربة أو نافذة الزراعة.", "يلزم التحقق من الآفات والأمراض الخاصة بالمحصول ومن قيود التسويق والتعاقد."],
+            "risks_en": ["The alternative may not fit water, soil or planting-window constraints.", "Verify crop-specific pests, diseases, market access and contract restrictions."],
+            "fallow": "لا يُقترح ترك الأرض دون محصول إلا عند وجود سبب موثق مثل ضغط آفة/مرض أو قيود مائية أو تجهيز التربة.",
+            "fallow_en": "Do not leave land without a crop unless there is a documented reason such as pest/disease pressure, water constraints or soil preparation.",
+        },
+    ]
+
+    # Replace a repeated crop in the sequence with another member of the same group
+    # where possible, while preserving distinct strategy structures.
+    for strategy in strategies:
+        if len(set(strategy["sequence"])) < 3:
+            strategy["sequence"][2] = pick("oil_fiber", "عباد الشمس")
+
+        groups = [_rotation_group(c) for c in strategy["sequence"]]
+        repeated = len(groups) != len(set(groups))
+        strategy["diversity_note"] = (
+            "توجد مجموعة نباتية مكررة في التسلسل؛ راجع بديلًا من مجموعة مختلفة."
+            if repeated else "التسلسل يتضمن مجموعات نباتية مختلفة وفق التصنيف الإرشادي."
+        )
+        strategy["repeated_group_flag"] = repeated
+
+        # transparent heuristic flags; no fabricated numerical agronomic score
+        if soil_ec is not None and soil_ec >= 4:
+            strategy["soil_salinity_flag"] = "high_ec_requires_local_crop_tolerance_check"
+        elif soil_ec is not None:
+            strategy["soil_salinity_flag"] = "ec_provided_check_crop_tolerance"
+        else:
+            strategy["soil_salinity_flag"] = "unknown_lab_ec_not_provided"
+
+    return strategies
+
+
+@app.post("/api/rotation/compare")
+def compare_crop_rotation_strategies(request: RotationRequest):
+    """Compare three transparent crop-rotation templates using farmer inputs."""
+    lang = (request.language or "ar").strip().lower()
+    is_en = lang.startswith("en")
+
+    if request.governorate not in GOVERNORATES:
+        raise HTTPException(status_code=422, detail="Please select a valid Egyptian governorate.")
+    if not _rotation_crop_exists(request.current_crop):
+        raise HTTPException(status_code=422, detail="Please select a valid current crop.")
+    if request.planting_month < 1 or request.planting_month > 12:
+        raise HTTPException(status_code=422, detail="Planting month must be between 1 and 12.")
+    if request.irrigation_method not in IRRIGATION_METHODS:
+        raise HTTPException(status_code=422, detail="Invalid irrigation method.")
+    if request.water_source not in WATER_SOURCES:
+        raise HTTPException(status_code=422, detail="Invalid water source.")
+    if request.soil_type not in SOIL_TYPES:
+        raise HTTPException(status_code=422, detail="Invalid soil type.")
+    invalid_history = [c for c in request.previous_crops if not _rotation_crop_exists(c)]
+    if invalid_history:
+        raise HTTPException(status_code=422, detail={"message": "Invalid crop in previous_crops.", "invalid_crops": invalid_history})
+
+    lab = request.soil_lab_results or {}
+    soil_n = _safe_float(lab.get("nitrogen_ppm"))
+    organic_matter = _safe_float(lab.get("organic_matter_percent"))
+    soil_ec = _safe_float(lab.get("ec_ds_m"))
+    if soil_n is not None and soil_n < 0:
+        raise HTTPException(status_code=422, detail="nitrogen_ppm cannot be negative.")
+    if organic_matter is not None and organic_matter < 0:
+        raise HTTPException(status_code=422, detail="organic_matter_percent cannot be negative.")
+    if soil_ec is not None and soil_ec < 0:
+        raise HTTPException(status_code=422, detail="ec_ds_m cannot be negative.")
+
+    strategies = _rotation_strategy_candidates(
+        request.current_crop, request.previous_crops, request.irrigation_method, soil_ec, lang
+    )
+
+    # Report known crop-history pressure without diagnosing a pathogen.
+    current_group = _rotation_group(request.current_crop)
+    recent_groups = [_rotation_group(c) for c in request.previous_crops[-3:]]
+    repeated_current_group = sum(1 for g in recent_groups if g == current_group) > 0
+
+    soil_health = {
+        "nitrogen": {
+            "value": soil_n,
+            "unit": "ppm",
+            "source": "farmer_supplied_laboratory_result" if soil_n is not None else "not_provided",
+            "interpretation": "تُفسر النتيجة وفق طريقة المعمل والمحصول ومرحلة النمو؛ لا يوجد حد واحد يصلح لكل الحالات." if not is_en else "Interpret against the lab method, crop and growth stage; there is no universal threshold for all cases.",
+        },
+        "organic_matter": {
+            "value": organic_matter,
+            "unit": "%",
+            "source": "farmer_supplied_laboratory_result" if organic_matter is not None else "not_provided",
+            "interpretation": "مؤشر معملي مهم لبناء التربة واحتفاظها بالماء والعناصر؛ لا يتم استنتاجه من NDVI أو الطقس." if not is_en else "A lab indicator relevant to soil structure and water/nutrient retention; it is not inferred from NDVI or weather.",
+        },
+        "salinity_ec": {
+            "value": soil_ec,
+            "unit": "dS/m",
+            "source": "farmer_supplied_laboratory_result" if soil_ec is not None else "not_provided",
+            "interpretation": "يجب تفسير EC حسب نوع المستخلص وطريقة القياس والمحصول؛ اطلب تحليلًا معمليًا عند غياب القيمة." if not is_en else "Interpret EC using the extraction and measurement method and crop tolerance; obtain a lab test if missing.",
+        },
+    }
+
+    history_warning = (
+        "تكرار مجموعة المحصول الحالي في السجل الحديث يستدعي مراجعة دورة كسر مناسبة ومتابعة أمراض التربة."
+        if repeated_current_group else
+        "لا يظهر تكرار لمجموعة المحصول الحالي في المحاصيل السابقة المُدخلة؛ السجل يظل محدودًا بما أدخله المستخدم."
+    )
+    if is_en:
+        history_warning = (
+            "The current crop group appears in the recent entered history; review a suitable break crop and monitor soil-borne diseases."
+            if repeated_current_group else
+            "No repeat of the current crop group appears in the entered history; the record is limited to user-provided entries."
+        )
+
+    return {
+        "success": True,
+        "module": "crop_rotation_decision_support",
+        "governorate": request.governorate,
+        "current_crop": request.current_crop,
+        "previous_crops": request.previous_crops,
+        "current_crop_group": _rotation_label(current_group, lang),
+        "history_assessment": history_warning,
+        "strategies_count": 3,
+        "strategies": [
+            {
+                "id": s["id"],
+                "name": s["name_en"] if is_en else s["name_ar"],
+                "sequence": s["sequence"],
+                "crop_groups": [_rotation_label(_rotation_group(c), lang) for c in s["sequence"]],
+                "rationale": s["logic_en"] if is_en else s["logic_ar"],
+                "risks": s["risks_en"] if is_en else s["risks_ar"],
+                "fallow_guidance": s["fallow_en"] if is_en else s["fallow"],
+                "repeated_group_flag": s["repeated_group_flag"],
+                "diversity_note": s["diversity_note"],
+                "soil_salinity_flag": s["soil_salinity_flag"],
+            }
+            for s in strategies
+        ],
+        "soil_health": soil_health,
+        "pest_disease_cycle": {
+            "farmer_reported_issue": request.known_pest_or_disease,
+            "status": "manual_issue_recorded" if request.known_pest_or_disease else "no_specific_issue_provided",
+            "guidance": (
+                "لا يمكن تأكيد كسر دورة آفة أو مرض دون تحديد الكائن المسبب والمحاصيل العائلة وفحص حقلي؛ لا تزرع محصولًا عائلًا بديلًا قبل مراجعة الإرشاد الزراعي."
+                if not is_en else
+                "A pest or disease break cannot be confirmed without identifying the organism, host crops and field inspection; verify the next crop with local extension guidance."
+            ),
+        },
+        "fallow_period": {
+            "recommendation": "لا توجد مدة بور ثابتة موصى بها آليًا. تُحدد فقط بناءً على تشخيص الآفة/المرض، حالة التربة، المياه، والجدول المحلي.",
+            "status": "requires_field_and_local_extension_assessment",
+        },
+        "decision_support_limits": [
+            "الاستراتيجيات الثلاث قوالب أولية قائمة على مجموعات المحاصيل وليست توصية زراعية نهائية أو ترتيبًا حسب الربحية.",
+            "لا يتم احتساب إنتاجية أو ربح أو احتياج سمادي من دون بيانات موثوقة ومدخلات إضافية.",
+            "النيتروجين والمادة العضوية والملوحة لا تُعرض كقياسات فضائية؛ القيم هنا من التحليل المعملي الذي يدخله المستخدم فقط.",
+            "يجب التحقق من مواعيد الزراعة والأصناف والقيود المحلية والتسويق مع الإرشاد الزراعي قبل التنفيذ.",
+        ] if not is_en else [
+            "The three strategies are preliminary crop-group templates, not final agronomic advice or profitability rankings.",
+            "Yield, profit and fertilizer needs are not calculated without reliable data and additional inputs.",
+            "Nitrogen, organic matter and salinity are not presented as satellite measurements; values come only from user-entered lab results.",
+            "Verify planting windows, cultivars, local restrictions and market access with agricultural extension before implementation.",
+        ],
+        "input_data_provenance": {
+            "crop_history": "farmer_supplied",
+            "soil_nitrogen": "farmer_supplied_lab_only",
+            "soil_organic_matter": "farmer_supplied_lab_only",
+            "soil_salinity": "farmer_supplied_lab_only",
+            "strategy_method": "transparent_rule_based_crop_group_templates",
+            "nasa_data_used_for_rotation_scoring": False,
+        },
+    }
+

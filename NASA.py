@@ -5399,7 +5399,7 @@ def get_methodology(language: str = Query(default="ar")):
 NDVI_URL = "https://modis.ornl.gov/rst/api/v1/MOD13Q1/subset"
 NDVI_BAND = "250m_16_days_NDVI"
 NDVI_CACHE_TTL = 12 * 3600
-NDVI_TIMEOUT = 9.0          # خادم ORNL أبطأ من باقي المصادر
+NDVI_TIMEOUT = 15.0          # خادم ORNL أبطأ من باقي المصادر
 NDVI_PERIODS = 10           # خادم ORNL يسمح بحد أقصى 10 فترات في الطلب الواحد (نحو 5 شهور)
 
 

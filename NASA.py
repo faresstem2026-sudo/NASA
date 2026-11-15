@@ -710,10 +710,50 @@ def validate_farm_data(farm):
 @app.get("/api/options")
 def get_options():
 
+    problems_en = {
+        "نقص المياه": "Water shortage",
+        "ملوحة التربة": "Soil salinity",
+        "اصفرار النباتات": "Leaf yellowing",
+        "الآفات والحشرات": "Pests and insects",
+        "الأمراض النباتية": "Plant diseases",
+        "ضعف نمو المحصول": "Weak crop growth",
+        "لا توجد مشكلة": "No problem",
+        "مشكلة أخرى": "Other problem",
+    }
+
+    standing_en = {
+        "نعم": "Yes",
+        "لا": "No",
+        "أحيانًا": "Sometimes",
+    }
+
+    soil_en = {
+        "رملية": "Sandy",
+        "طينية": "Clay",
+        "طميية": "Loam",
+        "لا أعرف": "I don't know",
+    }
+
+    irrigation_en = {
+        "الغمر": "Flood irrigation",
+        "التنقيط": "Drip irrigation",
+        "الرش": "Sprinkler irrigation",
+        "أخرى": "Other",
+    }
+
+    water_en = {
+        "مياه النيل أو الترع": "Nile or canal water",
+        "مياه الآبار": "Well water",
+        "مياه معالجة": "Treated water",
+        "مصدر آخر": "Other source",
+    }
+
+    crops_en = {crop: prof["en"] for crop, prof in CROP_PROFILES.items()}
+    crops_en["مش متأكد"] = "Not sure"
+
     return {
 
         "required_questions": [
-
             "governorate",
             "crop",
             "planting_month",
@@ -722,7 +762,6 @@ def get_options():
             "soil_type",
             "standing_water",
             "agricultural_problem",
-
         ],
 
         "governorates": list(GOVERNORATES.keys()),
@@ -730,14 +769,12 @@ def get_options():
         "crops": CROPS,
 
         "months": [
-
             {
                 "number": index + 1,
-                "name": month
+                "name": month,
+                "name_en": MONTHS_EN[index],
             }
-
             for index, month in enumerate(MONTHS)
-
         ],
 
         "irrigation_methods": IRRIGATION_METHODS,
@@ -750,8 +787,17 @@ def get_options():
 
         "agricultural_problems": AGRICULTURAL_PROBLEMS,
 
-        "optional_information": [
+        "labels_en": {
+            "governorates": GOVERNORATE_EN,
+            "crops": crops_en,
+            "irrigation_methods": irrigation_en,
+            "water_sources": water_en,
+            "soil_types": soil_en,
+            "standing_water": standing_en,
+            "agricultural_problems": problems_en,
+        },
 
+        "optional_information": [
             "compare_crop",
             "farmer_name",
             "farm_area",
@@ -763,7 +809,6 @@ def get_options():
             "custom_price_per_ton",
             "custom_yield_ton_per_feddan",
             "additional_notes",
-
         ],
 
     }

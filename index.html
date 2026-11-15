@@ -16,27 +16,28 @@
 
     <style>
         /* ============================================================
-           N.A.D.A — ثيم كحلي "مرصد الأرض" بست ألوان فقط
-           الأساس: كحلي  |  أخضر = نمو ونصائح  |  أزرق سماوي = مياه ورطوبة
+           N.A.D.A — ثيم كحلي "مرصد الأرض" (درجات أفتح مع الحفاظ على الألوان الستة)
+           الأساس: كحلي فاتح مريح  |  أخضر = نمو ونصائح  |  أزرق سماوي = مياه ورطوبة
            أصفر عنبري = حرارة وتنبيه  |  طيني = تربة وتضاريس  |  أحمر = مخاطر
            ============================================================ */
         :root {
             color-scheme: dark;
-            --bg: #0A1A2B;
-            --bar: #08141F;
-            --surface: #0F2236;
-            --surface-2: #14304A;
-            --line: rgba(255, 255, 255, 0.09);
-            --line-strong: rgba(255, 255, 255, 0.16);
-            --text: #E8EEF5;
-            --text-soft: #C3D0DE;
-            --muted: #8FA6BD;
+            --bg: #132B44;
+            --bar: #0F2338;
+            --surface: #193654;
+            --surface-2: #204469;
+            --input-bg: #11273E;
+            --line: rgba(255, 255, 255, 0.13);
+            --line-strong: rgba(255, 255, 255, 0.22);
+            --text: #F1F6FB;
+            --text-soft: #D5E2EE;
+            --muted: #A4BAD0;
 
-            --green: #4CAF50;  --green-t: #86D98B;  --green-bg: rgba(76, 175, 80, 0.13);  --green-bd: rgba(76, 175, 80, 0.38);  --green-solid: #2E7D32;
-            --water: #38BDF8;  --water-t: #7DD3FC;  --water-bg: rgba(56, 189, 248, 0.11); --water-bd: rgba(56, 189, 248, 0.38); --water-solid: #0B79B0;
-            --heat:  #F59E0B;  --heat-t:  #FBBF24;  --heat-bg:  rgba(245, 158, 11, 0.12); --heat-bd:  rgba(245, 158, 11, 0.40);
-            --clay:  #B8845A;  --clay-t:  #DDAE82;  --clay-bg:  rgba(184, 132, 90, 0.15); --clay-bd:  rgba(184, 132, 90, 0.42);  --clay-solid: #8A5E3C;
-            --risk:  #DC4C3C;  --risk-t:  #F59388;  --risk-bg:  rgba(220, 76, 60, 0.13);  --risk-bd:  rgba(220, 76, 60, 0.42);   --risk-solid: #B83A2C;
+            --green: #58C45C;  --green-t: #9EE8A2;  --green-bg: rgba(88, 196, 92, 0.16);   --green-bd: rgba(88, 196, 92, 0.44);   --green-solid: #388E3C;
+            --water: #4CC9FF;  --water-t: #93DFFD;  --water-bg: rgba(76, 201, 255, 0.14);  --water-bd: rgba(76, 201, 255, 0.44);  --water-solid: #118AC4;
+            --heat:  #FBB024;  --heat-t:  #FCD34D;  --heat-bg:  rgba(251, 176, 36, 0.15);  --heat-bd:  rgba(251, 176, 36, 0.45);
+            --clay:  #CA956B;  --clay-t:  #E8BD96;  --clay-bg:  rgba(202, 149, 107, 0.18); --clay-bd:  rgba(202, 149, 107, 0.46); --clay-solid: #9C6C47;
+            --risk:  #E85D4E;  --risk-t:  #FAA89F;  --risk-bg:  rgba(232, 93, 78, 0.16);   --risk-bd:  rgba(232, 93, 78, 0.46);   --risk-solid: #C94638;
         }
 
         html { font-size: 16px; scroll-behavior: smooth; }
@@ -61,7 +62,7 @@
         .bg-agri-grid {
             background-color: var(--bg) !important;
             background-size: 36px 36px;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px) !important;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px) !important;
         }
 
         /* ---------- الشريط الجانبي (يظهر على الشاشات الكبيرة) ---------- */
@@ -71,6 +72,7 @@
             background: var(--bar);
             border-inline-end: 1px solid var(--line);
             display: none; flex-direction: column; padding: 18px 12px; gap: 6px;
+            overflow-y: auto;
         }
         @media (min-width: 1100px) {
             #side-nav { display: flex; }
@@ -96,7 +98,7 @@
             border-bottom: 1px solid var(--line) !important;
         }
         header.no-print {
-            background-color: rgba(10, 26, 43, 0.92) !important;
+            background-color: rgba(19, 43, 68, 0.92) !important;
             background-image: none !important;
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--line) !important;
@@ -109,18 +111,19 @@
             color: var(--muted) !important;
         }
 
-        /* ---------- الكروت: مسطّحة بحدود رفيعة بدون توهج ---------- */
+        /* ---------- الكروت: مسطّحة بحدود رفيعة وظل لطيف ---------- */
         .agri-card {
             background-color: var(--surface) !important;
             background-image: none !important;
             border: 1px solid var(--line) !important;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28) !important;
+            box-shadow: 0 6px 22px rgba(6, 15, 26, 0.24) !important;
             color: var(--text) !important;
         }
 
         /* ---------- الخلفيات الداخلية ---------- */
         .bg-white, .bg-white\/90, .bg-white\/80 { background-color: var(--surface-2) !important; }
-        .bg-slate-50, .bg-slate-50\/80, .bg-slate-100 { background-color: rgba(255, 255, 255, 0.045) !important; }
+        .bg-slate-50, .bg-slate-50\/80 { background-color: rgba(255, 255, 255, 0.065) !important; }
+        .bg-slate-100 { background-color: rgba(255, 255, 255, 0.09) !important; }
 
         .bg-green-50, .bg-green-50\/70, .bg-green-50\/60, .bg-green-100 { background-color: var(--green-bg) !important; }
         .bg-sky-50, .bg-sky-50\/70, .bg-sky-50\/80, .bg-sky-50\/60, .bg-sky-100 { background-color: var(--water-bg) !important; }
@@ -137,9 +140,9 @@
         .bg-orange-600 { background-color: var(--risk-solid) !important; }
         .bg-indigo-600 { background-color: var(--clay-solid) !important; }
         .bg-slate-900, .bg-slate-800 { background-color: var(--surface-2) !important; border: 1px solid var(--line-strong); }
-        .hover\:bg-green-700:hover, .hover\:bg-green-600:hover { background-color: #388E3C !important; }
-        .hover\:bg-slate-800:hover, .hover\:bg-slate-100:hover { background-color: #1B3C5C !important; }
-        .bg-slate-900\/50 { background-color: rgba(3, 10, 18, 0.72) !important; }
+        .hover\:bg-green-700:hover, .hover\:bg-green-600:hover { background-color: #43A047 !important; }
+        .hover\:bg-slate-800:hover, .hover\:bg-slate-100:hover, .hover\:bg-slate-200:hover { background-color: #285480 !important; }
+        .bg-slate-900\/50 { background-color: rgba(7, 18, 30, 0.72) !important; }
 
         #methodology-modal > div {
             background-color: var(--surface) !important;
@@ -181,7 +184,7 @@
         /* شرائط الألوان العلوية/الجانبية للكروت */
         .border-t-green-500, .border-t-green-600, .border-r-green-600 { border-top-color: var(--green) !important; border-right-color: var(--green); }
         .border-t-sky-500, .border-t-sky-600, .border-r-sky-600 { border-top-color: var(--water) !important; border-right-color: var(--water); }
-        .border-t-amber-500 { border-top-color: var(--heat) !important; }
+        .border-t-amber-500, .border-t-amber-400 { border-top-color: var(--heat) !important; }
         .border-t-orange-500, .border-t-orange-600 { border-top-color: var(--risk) !important; }
         .border-t-indigo-500 { border-top-color: var(--clay) !important; }
         .border-r-green-600 { border-right-color: var(--green) !important; }
@@ -189,7 +192,7 @@
 
         /* ---------- حقول الإدخال ---------- */
         .custom-select, .custom-input, .custom-textarea {
-            background-color: var(--bar) !important;
+            background-color: var(--input-bg) !important;
             border: 1.5px solid var(--line-strong) !important;
             color: #ffffff !important;
             transition: all 0.2s ease;
@@ -198,7 +201,7 @@
         .custom-select:focus, .custom-input:focus, .custom-textarea:focus {
             outline: none;
             border-color: var(--green) !important;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.22) !important;
+            box-shadow: 0 0 0 3px rgba(88, 196, 92, 0.24) !important;
         }
 
         /* ---------- بطاقات الاختيار ---------- */
@@ -210,11 +213,11 @@
             cursor: pointer;
             user-select: none;
         }
-        .choice-card:hover { border-color: var(--green) !important; background-color: #19395A !important; transform: translateY(-2px); }
+        .choice-card:hover { border-color: var(--green) !important; background-color: #27517C !important; transform: translateY(-2px); }
         .choice-card.selected {
             background-color: var(--green-bg) !important;
             border-color: var(--green) !important;
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.25) !important;
+            box-shadow: 0 0 0 2px rgba(88, 196, 92, 0.28) !important;
             color: #ffffff !important;
         }
         .choice-card.selected .icon-box {
@@ -224,7 +227,7 @@
         }
 
         /* مسار الحلقة الدائرية */
-        svg circle:first-child { stroke: rgba(255, 255, 255, 0.10) !important; }
+        svg circle:first-child { stroke: rgba(255, 255, 255, 0.14) !important; }
 
         /* الخريطة */
         .leaflet-popup-content-wrapper, .leaflet-popup-tip { background-color: var(--surface) !important; color: #ffffff !important; border: 1px solid var(--line-strong); }
@@ -232,7 +235,7 @@
         .leaflet-control-layers label { color: var(--text); font-size: 12px; font-weight: 700; }
 
         /* ---------- NDVI ---------- */
-        .ndvi-scale { height: 8px; border-radius: 999px; background: linear-gradient(90deg, #DC4C3C 0%, #F59E0B 35%, #86D98B 65%, #2E7D32 100%); position: relative; }
+        .ndvi-scale { height: 8px; border-radius: 999px; background: linear-gradient(90deg, #E85D4E 0%, #FBB024 35%, #9EE8A2 65%, #388E3C 100%); position: relative; }
         .ndvi-scale-marker { position: absolute; top: -5px; width: 4px; height: 18px; background: #fff; border-radius: 2px; transform: translateX(-50%); box-shadow: 0 0 0 2px var(--surface); transition: left .6s; }
 
         /* إخفاء شريط جوجل للترجمة */
@@ -251,7 +254,7 @@
 
         .custom-scrollbar::-webkit-scrollbar { height: 7px; width: 7px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: var(--bar); border-radius: 999px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2A4560; border-radius: 999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #345779; border-radius: 999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--green); }
 
         @media print {
@@ -281,6 +284,7 @@
         <button type="button" class="side-link" data-nav="res-soil-hybrid-card" onclick="navTo('res-soil-hybrid-card')"><i data-lucide="layers"></i><span>التربة والتضاريس</span></button>
         <button type="button" class="side-link" data-nav="res-temp-30" onclick="navTo('res-temp-30')"><i data-lucide="thermometer"></i><span>طقس وقياسات ناسا</span></button>
         <button type="button" class="side-link" data-nav="res-forecast-section" onclick="navTo('res-forecast-section')"><i data-lucide="cloud-sun"></i><span>توقعات 16 يوم</span></button>
+        <button type="button" class="side-link" data-nav="res-rotation-section" onclick="navTo('res-rotation-section')"><i data-lucide="repeat"></i><span>الدورة الزراعية</span></button>
         <button type="button" class="side-link" data-nav="res-risks-list" onclick="navTo('res-risks-list')"><i data-lucide="alert-triangle"></i><span>المخاطر والنصائح</span></button>
         <button type="button" class="side-link" data-nav="ai-advisor-section" onclick="navTo('ai-advisor-section')"><i data-lucide="bot"></i><span>المرشد الذكي</span></button>
         <div class="side-foot">بيانات حية: NASA POWER • MODIS • SMAP • SRTM<br>التقدير إرشادي ولا يغني عن الفحص الميداني.</div>
@@ -368,7 +372,7 @@
                     <h1 class="font-black text-lg md:text-xl text-slate-900 leading-tight">
                         منصة ندى الذكية <span class="notranslate text-green-600" translate="no">N.A.D.A</span>
                     </h1>
-                    <p class="text-slate-500 text-xs font-semibold">أقمار ناسا (POWER/SMAP/SRTM/MODIS) + تربة SoilGrids + توقعات الفاو ET0 + اقتصاديات حية</p>
+                    <p class="text-slate-500 text-xs font-semibold">أقمار ناسا (POWER/SMAP/SRTM/MODIS) + تربة SoilGrids + توقعات الفاو ET0 + الدورة الزراعية</p>
                 </div>
             </div>
 
@@ -412,8 +416,8 @@
                 <div class="flex items-start gap-3 bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200/70">
                     <div class="notranslate w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shrink-0" translate="no">3</div>
                     <div>
-                        <h3 class="font-extrabold text-sm text-slate-900">تسعير ديناميكي وجدول ري 16 يوماً</h3>
-                        <p class="text-xs text-slate-600 mt-0.5">ربط بسعر الصرف اللحظي مع حرية تعديل الأسعار يدوياً وتقويم زراعي حتى الحصاد</p>
+                        <h3 class="font-extrabold text-sm text-slate-900">تدوير المحاصيل والتسعير الديناميكي</h3>
+                        <p class="text-xs text-slate-600 mt-0.5">مقارنة 3 خطط للتدوير الزراعي وربط بسعر الصرف اللحظي وجدول ري 16 يوماً حتى الحصاد</p>
                     </div>
                 </div>
             </div>
@@ -637,12 +641,12 @@
                         </div>
                     </div>
 
-                    <!-- الخطوة 3: التوثيق الاختياري والتربة الهجينة والأسعار المخصصة والانطلاق -->
+                    <!-- الخطوة 3: التوثيق الاختياري والتربة الهجينة والدورة الزراعية والانطلاق -->
                     <div id="step-3" class="step-container space-y-6">
                         <div class="flex items-center justify-between border-b border-slate-200 pb-4">
                             <div>
                                 <span class="text-xs font-extrabold text-green-700 uppercase">الخطوة 3 من 3</span>
-                                <h2 class="text-xl font-black text-slate-900 mt-0.5">نظام التربة الهجين، الأسعار والمساحة (اختيارية)</h2>
+                                <h2 class="text-xl font-black text-slate-900 mt-0.5">التربة الهجينة، الدورة الزراعية والأسعار (اختيارية)</h2>
                             </div>
                             <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">اختياري بالكامل</span>
                         </div>
@@ -706,7 +710,7 @@
                                 تُملأ حقول الطين والرمل وpH تلقائياً من <strong>ISRIC SoilGrids</strong> حسب موقعك. إذا أدخلت أو عدّلت أي قيمة من تحليلك المعملي يدوياً، يعطيها النظام الأولوية القصوى تلقائياً.
                             </p>
 
-                            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
                                 <div>
                                     <label for="soil-clay" class="block text-[11px] font-bold text-slate-600 mb-1">نسبة الطين %</label>
                                     <input id="soil-clay" type="number" step="0.1" min="0" max="100" placeholder="%" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onManualSoilInput()">
@@ -720,21 +724,58 @@
                                     <input id="soil-ph" type="number" step="0.1" min="3" max="11" placeholder="7.5" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onManualSoilInput()">
                                 </div>
                                 <div>
-                                    <label for="soil-ec" class="block text-[11px] font-bold text-slate-600 mb-1">ملوحة التربة EC</label>
-                                    <input id="soil-ec" type="number" step="0.1" min="0" placeholder="1.8" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onManualSoilInput()">
+                                    <label for="soil-ec" class="block text-[11px] font-bold text-slate-600 mb-1">ملوحة EC</label>
+                                    <input id="soil-ec" type="number" step="0.1" min="0" placeholder="dS/m" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onManualSoilInput()">
                                 </div>
                                 <div>
                                     <label for="soil-n" class="block text-[11px] font-bold text-slate-600 mb-1">نيتروجين N</label>
                                     <input id="soil-n" type="number" step="1" min="0" placeholder="ppm" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onManualSoilInput()">
                                 </div>
                                 <div>
-                                    <label for="water-ec" class="block text-[11px] font-bold text-slate-600 mb-1">ملوحة المياه EC</label>
+                                    <label for="soil-om" class="block text-[11px] font-bold text-slate-600 mb-1">مادة عضوية %</label>
+                                    <input id="soil-om" type="number" step="0.1" min="0" max="100" placeholder="%" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onManualSoilInput()">
+                                </div>
+                                <div>
+                                    <label for="water-ec" class="block text-[11px] font-bold text-slate-600 mb-1">ملوحة المياه</label>
                                     <input id="water-ec" type="number" step="0.1" min="0" placeholder="0.9" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onFormFieldChange()">
                                 </div>
                                 <div>
                                     <label for="water-ph" class="block text-[11px] font-bold text-slate-600 mb-1">pH المياه</label>
                                     <input id="water-ph" type="number" step="0.1" min="3" max="11" placeholder="7.2" class="custom-input w-full rounded-xl px-3 py-2 text-xs font-mono-tech" oninput="onFormFieldChange()">
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- سجل المحاصيل السابقة والآفات (لوحدة دعم قرار الدورة الزراعية /api/rotation/compare) -->
+                        <div class="rounded-2xl bg-green-50/70 border border-green-200 p-4 space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div class="flex items-center gap-2 text-xs font-extrabold text-green-900">
+                                    <i data-lucide="repeat" class="w-4 h-4 text-green-600"></i>
+                                    <span>سجل المحاصيل السابقة وخطة التدوير الزراعي (اختياري — حتى 6 مواسم)</span>
+                                </div>
+                                <span id="prev-crops-count-badge" class="notranslate font-mono-tech text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white border border-green-300 text-green-800" translate="no">0 / 6</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end">
+                                <div class="sm:col-span-6">
+                                    <label for="previous-crops-select" class="block text-[11px] font-bold text-slate-700 mb-1">أضف محصولاً سابقاً (من الأقدم إلى الأحدث)</label>
+                                    <div class="flex gap-2">
+                                        <select id="previous-crops-select" class="custom-select flex-grow rounded-xl px-3 py-2 text-xs font-bold">
+                                            <option value="">-- اختر محصولاً سابقاً --</option>
+                                        </select>
+                                        <button type="button" onclick="addPreviousCropFromSelect()" class="px-3.5 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs font-extrabold shrink-0">
+                                            + إضافة
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="sm:col-span-6">
+                                    <label for="known-pest-disease" class="block text-[11px] font-bold text-slate-700 mb-1">آفة أو مرض معروف بالحقل (اختياري)</label>
+                                    <input id="known-pest-disease" type="text" placeholder="مثال: الهالوك، نيماتودا، عفن جذور..." class="custom-input w-full rounded-xl px-3 py-2 text-xs" oninput="onFormFieldChange()">
+                                </div>
+                            </div>
+
+                            <div id="previous-crops-tags" class="flex flex-wrap gap-2 min-h-[28px] items-center">
+                                <span class="text-[11px] text-slate-500 font-semibold">لم تُضف محاصيل سابقة بعد (اختياري).</span>
                             </div>
                         </div>
 
@@ -834,6 +875,10 @@
                         <span class="text-slate-500 font-bold">الصرف والمشكلة:</span>
                         <span id="twin-drain-prob" class="font-extrabold text-orange-700">-- / --</span>
                     </div>
+                    <div class="flex justify-between items-center bg-green-50/70 px-3.5 py-2.5 rounded-xl border border-green-200/80">
+                        <span class="text-green-800 font-bold">المحاصيل السابقة:</span>
+                        <span id="twin-prev-crops" class="font-extrabold text-green-900 truncate max-w-[160px]">لا يوجد</span>
+                    </div>
                 </div>
 
                 <!-- شريط اكتمال الأسئلة الـ 8 -->
@@ -867,7 +912,7 @@
                 <div class="bg-sky-50 rounded-2xl p-3 border border-sky-200">NASA POWER & SMAP</div>
                 <div class="bg-green-50 rounded-2xl p-3 border border-green-200">SoilGrids & SRTM</div>
                 <div class="bg-amber-50 rounded-2xl p-3 border border-amber-200">Open-Meteo FAO ET0</div>
-                <div class="bg-green-50 rounded-2xl p-3 border border-green-200">Live FX & ROI</div>
+                <div class="bg-green-50 rounded-2xl p-3 border border-green-200">Rotation & Live FX</div>
             </div>
         </section>
 
@@ -913,7 +958,7 @@
                         <div class="relative w-36 h-36 shrink-0 flex items-center justify-center">
                             <svg class="w-36 h-36 -rotate-90" viewBox="0 0 120 120">
                                 <circle cx="60" cy="60" r="52" stroke="#e2e8f0" stroke-width="10" fill="none" />
-                                <circle id="score-ring" cx="60" cy="60" r="52" stroke="#4CAF50" stroke-width="10" stroke-linecap="round" fill="none" stroke-dasharray="326.73" stroke-dashoffset="326.73" class="transition-all duration-700" />
+                                <circle id="score-ring" cx="60" cy="60" r="52" stroke="#58C45C" stroke-width="10" stroke-linecap="round" fill="none" stroke-dasharray="326.73" stroke-dashoffset="326.73" class="transition-all duration-700" />
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
                                 <span id="res-score-value" class="notranslate font-mono-tech text-3xl font-black text-slate-900" translate="no">--</span>
@@ -1026,29 +1071,42 @@
                     </div>
                 </div>
 
-                <!-- 2. مقارنة محصولين جنباً إلى جنب (إن وُجدت) -->
+                <!-- 2. مقارنة محصولين جنباً إلى جنب (يدعم /api/compare المباشر أيضاً) -->
                 <div id="res-comparison-section" class="hidden agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-amber-500 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <h3 class="font-black text-base md:text-lg text-slate-900 flex items-center gap-2">
                             <i data-lucide="git-compare" class="w-5 h-5 text-amber-600"></i>
                             <span>مقارنة المحصولين جنباً إلى جنب</span>
                         </h3>
-                        <span id="res-comparison-winner-pill" class="px-3.5 py-1 rounded-full text-xs font-black bg-green-100 text-green-800 border border-green-300"></span>
+                        <span id="res-comparison-winner-pill" class="hidden px-3.5 py-1 rounded-full text-xs font-black bg-green-100 text-green-800 border border-green-300"></span>
                     </div>
 
-                    <p id="res-comparison-summary" class="text-sm font-bold text-slate-700 bg-amber-50/70 border border-amber-200 rounded-2xl p-3.5"></p>
+                    <!-- شريط اختيار سريع للمقارنة عبر /api/compare -->
+                    <div id="quick-compare-bar" class="no-print rounded-2xl bg-amber-50/70 border border-amber-200 p-3 flex flex-wrap items-center gap-2.5">
+                        <span class="text-xs font-extrabold text-amber-900">قارن محصولك الحالي مع محصول آخر:</span>
+                        <select id="quick-compare-select" class="custom-select rounded-xl px-3 py-1.5 text-xs font-bold flex-grow max-w-xs">
+                            <option value="">-- اختر محصولاً للمقارنة --</option>
+                        </select>
+                        <button type="button" id="quick-compare-btn" onclick="runQuickCompare()" class="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-green-600 text-slate-900 hover:text-white text-xs font-black transition-all">
+                            مقارنة فورية
+                        </button>
+                    </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-xs md:text-sm text-right border-collapse">
-                            <thead>
-                                <tr class="bg-slate-100 text-slate-800">
-                                    <th class="p-3 rounded-r-xl font-black">وجه المقارنة</th>
-                                    <th id="cmp-col-1" class="p-3 font-black text-green-800">المحصول الأول</th>
-                                    <th id="cmp-col-2" class="p-3 rounded-l-xl font-black text-sky-800">المحصول الثاني</th>
-                                </tr>
-                            </thead>
-                            <tbody id="res-comparison-tbody" class="divide-y divide-slate-200"></tbody>
-                        </table>
+                    <div id="res-comparison-content" class="hidden space-y-4">
+                        <p id="res-comparison-summary" class="text-sm font-bold text-slate-700 bg-amber-50/70 border border-amber-200 rounded-2xl p-3.5"></p>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs md:text-sm text-right border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-800">
+                                        <th class="p-3 rounded-r-xl font-black">وجه المقارنة</th>
+                                        <th id="cmp-col-1" class="p-3 font-black text-green-800">المحصول الأول</th>
+                                        <th id="cmp-col-2" class="p-3 rounded-l-xl font-black text-sky-800">المحصول الثاني</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="res-comparison-tbody" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -1190,6 +1248,71 @@
                     </div>
 
                     <div id="res-calendar-timeline" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+
+                <!-- 4B. وحدة دعم قرار الدورة الزراعية (/api/rotation/compare) -->
+                <div id="res-rotation-section" class="agri-card rounded-3xl p-5 md:p-6 space-y-5 border-t-4 border-t-indigo-500">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h3 class="font-black text-base md:text-lg text-slate-900 flex items-center gap-2">
+                                <i data-lucide="repeat" class="w-5 h-5 text-indigo-600"></i>
+                                <span>مخطط الدورة الزراعية وتدوير المحاصيل (3 استراتيجيات شفافة)</span>
+                            </h3>
+                            <p class="text-xs text-slate-600 font-semibold mt-0.5">قوالب إرشادية قائمة على المجموعات النباتية وتاريخ الأرض ونتائج التحليل المعملي فقط</p>
+                        </div>
+                        <span id="res-rotation-group-badge" class="text-xs font-black px-3 py-1 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200">--</span>
+                    </div>
+
+                    <!-- شريط تحديث سريع لمحصول الدورة أو الآفة -->
+                    <div class="no-print bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex flex-wrap items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <label for="rotation-crop-override" class="text-xs font-extrabold text-slate-700 shrink-0">المحصول الأساسي للدورة:</label>
+                            <select id="rotation-crop-override" class="custom-select rounded-xl px-3 py-1.5 text-xs font-bold"></select>
+                        </div>
+                        <button type="button" onclick="loadRotationStrategies()" class="px-4 py-1.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs font-black transition-all">
+                            تحديث خطة التدوير
+                        </button>
+                        <span id="res-rotation-status-msg" class="text-xs font-bold text-slate-500"></span>
+                    </div>
+
+                    <div id="res-rotation-body" class="space-y-5 hidden">
+                        <!-- تقييم سجل المحاصيل -->
+                        <div id="res-rotation-history-box" class="rounded-2xl bg-sky-50/70 border border-sky-200 p-3.5 text-xs md:text-sm font-bold text-sky-900"></div>
+
+                        <!-- الاستراتيجيات الثلاث -->
+                        <div id="res-rotation-strategies" class="grid grid-cols-1 lg:grid-cols-3 gap-4"></div>
+
+                        <!-- صحة التربة المعملية + دورة الآفات + فترة البور -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                            <div class="lg:col-span-7 bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                                <div class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                                    <i data-lucide="flask-conical" class="w-4 h-4 text-sky-600"></i>
+                                    <span>مؤشرات صحة التربة (من التحليل المعملي المُدخَل يدوياً فقط)</span>
+                                </div>
+                                <div id="res-rotation-soil-health" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs"></div>
+                            </div>
+
+                            <div class="lg:col-span-5 space-y-3">
+                                <div class="bg-orange-50/70 border border-orange-200 rounded-2xl p-4 space-y-1.5">
+                                    <div class="text-xs font-black text-orange-800">دورة الآفات والأمراض:</div>
+                                    <p id="res-rotation-pest-guidance" class="text-xs text-slate-700 font-semibold leading-relaxed"></p>
+                                </div>
+                                <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 space-y-1.5">
+                                    <div class="text-xs font-black text-amber-800">فترة البور (الراحة):</div>
+                                    <p id="res-rotation-fallow" class="text-xs text-slate-700 font-semibold leading-relaxed"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- حدود دعم القرار ومصدر البيانات -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <span class="text-xs font-black text-slate-800">حدود وشفافية وحدة التدوير الزراعي:</span>
+                                <span id="res-rotation-provenance" class="notranslate font-mono-tech text-[10.5px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200" translate="no"></span>
+                            </div>
+                            <ul id="res-rotation-limits" class="space-y-1 text-xs text-slate-600 font-semibold"></ul>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 5. قياسات NASA POWER و SMAP (آخر 30 يوماً + مناخ شهر الزراعة) -->
@@ -1549,6 +1672,7 @@
 
         let appOptions = { ...FALLBACK_OPTIONS };
         let lastAnalysisResponse = null;
+        let lastRotationResponse = null;
         let egyptMap = null;
         let mapMarker = null;
 
@@ -1565,7 +1689,8 @@
             water_source: "",
             soil_type: "",
             standing_water: "",
-            agricultural_problem: ""
+            agricultural_problem: "",
+            previous_crops: []
         };
 
         function safeRefreshIcons() {
@@ -1781,7 +1906,7 @@
                 }
             ).addTo(egyptMap);
 
-            // طبقة NDVI حقيقية من NASA GIBS (MODIS Terra، مركّب 8 أيام) تُفعَّل من زر الطبقات
+            // طبقة NDVI حقيقية من NASA GIBS (MODIS Terra، مركّب 8 أيام)
             if (L.control && L.control.layers) {
                 const ndviLayer = L.tileLayer(
                     "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_NDVI_8Day/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png",
@@ -1983,6 +2108,7 @@
             soilManualEdited = false;
             document.getElementById("soil-ec").value = "";
             document.getElementById("soil-n").value = "";
+            document.getElementById("soil-om").value = "";
             if (lastSoilGridsPayload) {
                 applySoilGridsToInputs(lastSoilGridsPayload);
             } else {
@@ -2006,11 +2132,12 @@
             const badge = document.getElementById("soil-source-badge");
             if (!badge) return;
 
-            const hasEcOrN =
+            const hasLabExtra =
                 document.getElementById("soil-ec").value.trim() !== "" ||
-                document.getElementById("soil-n").value.trim() !== "";
+                document.getElementById("soil-n").value.trim() !== "" ||
+                document.getElementById("soil-om").value.trim() !== "";
 
-            if (soilManualEdited || hasEcOrN) {
+            if (soilManualEdited || hasLabExtra) {
                 badge.textContent = "تحليل معملي يدوي (أولوية قصوى)";
                 badge.className = "px-2.5 py-1 rounded-full text-[11px] font-black bg-green-100 border border-green-400 text-green-900";
             } else if (lastSoilGridsPayload) {
@@ -2056,6 +2183,8 @@
             }
 
             renderCompareDropdown();
+            renderPreviousCropsDropdown();
+            renderPreviousCropsTags();
             filterCrops(document.getElementById("crop-search").value);
 
             const monthsGrid = document.getElementById("months-grid");
@@ -2133,6 +2262,63 @@
             } else {
                 sel.value = "";
             }
+        }
+
+        function renderPreviousCropsDropdown() {
+            const sel = document.getElementById("previous-crops-select");
+            if (!sel) return;
+            sel.innerHTML = '<option value="">-- اختر محصولاً سابقاً --</option>';
+            appOptions.crops
+                .filter((c) => c !== "مش متأكد")
+                .forEach((c) => {
+                    const opt = document.createElement("option");
+                    opt.value = c;
+                    opt.textContent = c;
+                    sel.appendChild(opt);
+                });
+        }
+
+        function addPreviousCropFromSelect() {
+            const sel = document.getElementById("previous-crops-select");
+            const crop = sel.value;
+            if (!crop) return;
+            if (!Array.isArray(formState.previous_crops)) formState.previous_crops = [];
+            if (formState.previous_crops.length >= 6) {
+                showError("الحد الأقصى للمحاصيل السابقة هو 6 مواسم.");
+                return;
+            }
+            formState.previous_crops.push(crop);
+            sel.value = "";
+            renderPreviousCropsTags();
+            onFormFieldChange();
+        }
+
+        function removePreviousCropAt(index) {
+            if (!Array.isArray(formState.previous_crops)) return;
+            formState.previous_crops.splice(index, 1);
+            renderPreviousCropsTags();
+            onFormFieldChange();
+        }
+
+        function renderPreviousCropsTags() {
+            const container = document.getElementById("previous-crops-tags");
+            const countBadge = document.getElementById("prev-crops-count-badge");
+            const list = Array.isArray(formState.previous_crops) ? formState.previous_crops : [];
+            if (countBadge) countBadge.textContent = `${list.length} / 6`;
+            if (!container) return;
+
+            if (!list.length) {
+                container.innerHTML = '<span class="text-[11px] text-slate-500 font-semibold">لم تُضف محاصيل سابقة بعد (اختياري).</span>';
+                return;
+            }
+
+            container.innerHTML = list.map((c, idx) => `
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-green-300 text-green-900 text-xs font-extrabold">
+                    <span class="notranslate text-[10px] text-slate-500 font-mono-tech" translate="no">${idx + 1}.</span>
+                    <span>${escapeHtml(c)}</span>
+                    <button type="button" onclick="removePreviousCropAt(${idx})" class="text-orange-600 hover:text-orange-800 font-black px-0.5" title="حذف">×</button>
+                </span>
+            `).join("");
         }
 
         function renderCropsGrid(cropsList) {
@@ -2225,8 +2411,10 @@
                     soil_ph: document.getElementById("soil-ph").value,
                     soil_ec: document.getElementById("soil-ec").value,
                     soil_n: document.getElementById("soil-n").value,
+                    soil_om: document.getElementById("soil-om").value,
                     water_ec: document.getElementById("water-ec").value,
                     water_ph: document.getElementById("water-ph").value,
+                    known_pest_disease: document.getElementById("known-pest-disease").value,
                     custom_cost_feddan: document.getElementById("custom-cost-feddan").value,
                     custom_price_ton: document.getElementById("custom-price-ton").value,
                     custom_yield_ton: document.getElementById("custom-yield-ton").value,
@@ -2243,7 +2431,10 @@
                 const raw = localStorage.getItem(STORAGE_KEY);
                 if (!raw) return;
                 const saved = JSON.parse(raw);
-                if (saved.formState) Object.assign(formState, saved.formState);
+                if (saved.formState) {
+                    Object.assign(formState, saved.formState);
+                    if (!Array.isArray(formState.previous_crops)) formState.previous_crops = [];
+                }
                 soilManualEdited = Boolean(saved.soilManualEdited);
 
                 const setVal = (id, val) => {
@@ -2274,8 +2465,10 @@
                 setVal("soil-ph", saved.soil_ph);
                 setVal("soil-ec", saved.soil_ec);
                 setVal("soil-n", saved.soil_n);
+                setVal("soil-om", saved.soil_om);
                 setVal("water-ec", saved.water_ec);
                 setVal("water-ph", saved.water_ph);
+                setVal("known-pest-disease", saved.known_pest_disease);
                 setVal("custom-cost-feddan", saved.custom_cost_feddan);
                 setVal("custom-price-ton", saved.custom_price_ton);
                 setVal("custom-yield-ton", saved.custom_yield_ton);
@@ -2310,16 +2503,20 @@
             lastSoilGridsPayload = null;
             lastElevationPayload = null;
             Object.keys(formState).forEach((k) => {
-                formState[k] = k === "planting_month" ? null : "";
+                if (k === "planting_month") formState[k] = null;
+                else if (k === "previous_crops") formState[k] = [];
+                else formState[k] = "";
             });
             [
                 "governorate-select", "compare-crop-select", "latitude-input", "longitude-input",
                 "farmer-name", "farm-area", "soil-photo-url", "crop-photo-url",
-                "soil-clay", "soil-sand", "soil-ph", "soil-ec", "soil-n",
-                "water-ec", "water-ph", "custom-cost-feddan", "custom-price-ton", "custom-yield-ton",
-                "additional-notes", "crop-search"
+                "soil-clay", "soil-sand", "soil-ph", "soil-ec", "soil-n", "soil-om",
+                "water-ec", "water-ph", "known-pest-disease",
+                "custom-cost-feddan", "custom-price-ton", "custom-yield-ton",
+                "additional-notes", "crop-search", "previous-crops-select"
             ].forEach((id) => {
-                document.getElementById(id).value = "";
+                const el = document.getElementById(id);
+                if (el) el.value = "";
             });
             document.getElementById("farm-area-unit").value = "فدان";
             document.getElementById("map-soilgrids-live-bar").classList.add("hidden");
@@ -2462,6 +2659,10 @@
             document.getElementById("twin-soil-irr").textContent = `${formState.soil_type || "--"} / ${formState.irrigation_method || "--"}`;
             document.getElementById("twin-drain-prob").textContent = `${formState.standing_water || "--"} / ${formState.agricultural_problem || "--"}`;
 
+            const prevList = Array.isArray(formState.previous_crops) ? formState.previous_crops : [];
+            const prevEl = document.getElementById("twin-prev-crops");
+            if (prevEl) prevEl.textContent = prevList.length ? prevList.join(" ← ") : "لا يوجد";
+
             const answeredCount = [
                 gov,
                 formState.crop,
@@ -2520,8 +2721,10 @@
             const soilLab = {};
             const soilEc = document.getElementById("soil-ec").value.trim();
             const soilN = document.getElementById("soil-n").value.trim();
+            const soilOm = document.getElementById("soil-om").value.trim();
             if (soilEc !== "") soilLab.ec = Number(soilEc);
             if (soilN !== "") soilLab.nitrogen_ppm = Number(soilN);
+            if (soilOm !== "") soilLab.organic_matter_percent = Number(soilOm);
 
             if (soilManualEdited) {
                 const soilClay = document.getElementById("soil-clay").value.trim();
@@ -2636,7 +2839,7 @@
                 "سحب رطوبة الجذور SMAP والبخر-نتح EVPTRNS والإشعاع من NASA POWER...",
                 "جلب قوام التربة والحموضة من ISRIC SoilGrids وارتفاع الأرض من SRTM...",
                 "دمج توقعات الـ 16 يوماً ومعادلة الفاو ET0 لبناء جدول الري المستقبلي...",
-                "تحديث التكلفة والعائد بسعر الصرف اللحظي وحساب احتياج الفدان المائي..."
+                "تحديث التكلفة والعائد بسعر الصرف اللحظي وبناء خطط الدورة الزراعية..."
             ];
             let i = 0;
             const phaseEl = document.getElementById("loading-phase");
@@ -2657,7 +2860,6 @@
         // ============================================================
         // NDVI من NASA MODIS (عبر /api/ndvi) + التنقل الجانبي
         // ============================================================
-        const NDVI_COLORS = { excellent: "#86D98B", good: "#86D98B", moderate: "#FBBF24", poor: "#F59388", unknown: "#8FA6BD" };
         const NDVI_CLASSES = {
             excellent: "bg-green-50 border-green-200 text-green-800",
             good: "bg-green-50 border-green-200 text-green-800",
@@ -2677,10 +2879,10 @@
             const area = `M${xs(0)},${H - padY} L${pts.join(" L")} L${xs(series.length - 1)},${H - padY} Z`;
             box.innerHTML = `
                 <svg viewBox="0 0 ${W} ${H}" class="w-full h-24" role="img" aria-label="NDVI">
-                    <line x1="${padX}" x2="${W - padX}" y1="${ys(0.4)}" y2="${ys(0.4)}" stroke="rgba(255,255,255,0.12)" stroke-dasharray="4 4"/>
-                    <path d="${area}" fill="rgba(76,175,80,0.16)" stroke="none"/>
-                    <polyline points="${pts.join(" ")}" fill="none" stroke="#4CAF50" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-                    <circle cx="${xs(series.length - 1)}" cy="${ys(last.ndvi)}" r="4.5" fill="#4CAF50" stroke="#0F2236" stroke-width="2"/>
+                    <line x1="${padX}" x2="${W - padX}" y1="${ys(0.4)}" y2="${ys(0.4)}" stroke="rgba(255,255,255,0.16)" stroke-dasharray="4 4"/>
+                    <path d="${area}" fill="rgba(88,196,92,0.18)" stroke="none"/>
+                    <polyline points="${pts.join(" ")}" fill="none" stroke="#58C45C" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                    <circle cx="${xs(series.length - 1)}" cy="${ys(last.ndvi)}" r="4.5" fill="#58C45C" stroke="#193654" stroke-width="2"/>
                 </svg>
                 <div class="flex justify-between text-[10.5px] font-bold text-slate-500 notranslate" translate="no"><span>${series[0].date}</span><span>${last.date}</span></div>`;
         }
@@ -2760,6 +2962,243 @@
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
+        function renderComparisonData(cmp) {
+            const cmpContent = document.getElementById("res-comparison-content");
+            const winnerPill = document.getElementById("res-comparison-winner-pill");
+
+            if (!cmp || !cmp.primary || !cmp.secondary) {
+                cmpContent.classList.add("hidden");
+                winnerPill.classList.add("hidden");
+                return;
+            }
+
+            cmpContent.classList.remove("hidden");
+            winnerPill.classList.remove("hidden");
+
+            const p1 = cmp.primary;
+            const p2 = cmp.secondary;
+            document.getElementById("cmp-col-1").textContent = `${p1.crop} (${p1.crop_en})`;
+            document.getElementById("cmp-col-2").textContent = `${p2.crop} (${p2.crop_en})`;
+            document.getElementById("res-comparison-summary").textContent = cmp.summary || "";
+            winnerPill.textContent =
+                cmp.winner === "tie"
+                    ? "تعادل بين المحصولين"
+                    : `الأفضل: ${cmp.winner_crop}`;
+
+            const rows = [
+                ["درجة الملاءمة", `${p1.suitability_score}/100 (${p1.suitability_label})`, `${p2.suitability_score}/100 (${p2.suitability_label})`],
+                ["مستوى الطلب المائي", p1.water_demand_level, p2.water_demand_level],
+                ["نظام الري المقترح", p1.recommended_irrigation || "—", p2.recommended_irrigation || "—"],
+                ["الاستهلاك المائي الحي المتوقع", `${formatNum(p1.water_m3_per_feddan)} م³/فدان`, `${formatNum(p2.water_m3_per_feddan)} م³/فدان`],
+                ["توفير المياه مقارنة بالغمر", `${formatNum(p1.water_saved_vs_flood_m3)} م³/فدان`, `${formatNum(p2.water_saved_vs_flood_m3)} م³/فدان`],
+                ["صافي الربح التقديري / فدان", `${formatNum(p1.net_profit_per_feddan_egp)} ج.م`, `${formatNum(p2.net_profit_per_feddan_egp)} ج.م`],
+                ["العائد على الاستثمار ROI", `${p1.roi_percent}%`, `${p2.roi_percent}%`],
+                ["عدد المخاطر المسجلة", `${p1.risks_count} مخاطر`, `${p2.risks_count} مخاطر`]
+            ];
+
+            document.getElementById("res-comparison-tbody").innerHTML = rows.map(([label, v1, v2]) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-extrabold text-slate-700">${escapeHtml(label)}</td>
+                    <td class="p-3 font-bold text-slate-900">${escapeHtml(v1)}</td>
+                    <td class="p-3 font-bold text-slate-900">${escapeHtml(v2)}</td>
+                </tr>
+            `).join("");
+        }
+
+        async function runQuickCompare() {
+            if (!lastAnalysisResponse) return;
+            const farm = lastAnalysisResponse.farm || {};
+            const secondCrop = document.getElementById("quick-compare-select").value;
+            if (!secondCrop || farm.crop === "مش متأكد" || secondCrop === farm.crop) return;
+
+            const btn = document.getElementById("quick-compare-btn");
+            btn.disabled = true;
+            btn.textContent = "جاري المقارنة...";
+
+            try {
+                const payload = buildPayload();
+                payload.compare_crop = secondCrop;
+                const res = await fetch(`${API_BASE}/api/compare`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json().catch(() => null);
+                if (!res.ok || !data || !data.comparison) {
+                    throw new Error((data && data.detail) || "تعذر إجراء المقارنة.");
+                }
+                lastAnalysisResponse.crop_comparison = data.comparison;
+                renderComparisonData(data.comparison);
+            } catch (err) {
+                showError(err.message || "تعذر إجراء المقارنة الفورية.");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "مقارنة فورية";
+            }
+        }
+
+        // ============================================================
+        // 8A. CROP ROTATION DECISION SUPPORT (/api/rotation/compare)
+        // ============================================================
+        function populateRotationCropSelect(farm, alts) {
+            const sel = document.getElementById("rotation-crop-override");
+            if (!sel) return;
+            const validCrops = appOptions.crops.filter((c) => c !== "مش متأكد");
+            sel.innerHTML = validCrops.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+            if (farm.crop && farm.crop !== "مش متأكد") {
+                sel.value = farm.crop;
+            } else if (Array.isArray(alts) && alts.length > 0) {
+                sel.value = alts[0].crop;
+            }
+        }
+
+        async function loadRotationStrategies() {
+            if (!lastAnalysisResponse) return;
+            const farm = lastAnalysisResponse.farm || {};
+            const sel = document.getElementById("rotation-crop-override");
+            const chosenCrop = sel ? sel.value : farm.crop;
+            const statusMsg = document.getElementById("res-rotation-status-msg");
+            const bodyEl = document.getElementById("res-rotation-body");
+
+            if (!chosenCrop || chosenCrop === "مش متأكد") {
+                statusMsg.textContent = "اختر محصولاً أعلاه لعرض خطط الدورة الزراعية.";
+                bodyEl.classList.add("hidden");
+                return;
+            }
+
+            statusMsg.textContent = "جاري بناء 3 خطط للتدوير الزراعي...";
+
+            const soilLab = {};
+            const soilN = document.getElementById("soil-n").value.trim();
+            const soilOm = document.getElementById("soil-om").value.trim();
+            const soilEc = document.getElementById("soil-ec").value.trim();
+            if (soilN !== "") soilLab.nitrogen_ppm = Number(soilN);
+            if (soilOm !== "") soilLab.organic_matter_percent = Number(soilOm);
+            if (soilEc !== "") soilLab.ec_ds_m = Number(soilEc);
+
+            let areaFeddan = null;
+            const areaRaw = document.getElementById("farm-area").value.trim();
+            if (areaRaw !== "" && Number(areaRaw) > 0) {
+                const unit = document.getElementById("farm-area-unit").value;
+                areaFeddan = unit === "هكتار" ? Number((Number(areaRaw) * 2.38095).toFixed(3)) : Number(areaRaw);
+            }
+
+            const pestRaw = document.getElementById("known-pest-disease").value.trim();
+            const reqBody = {
+                governorate: farm.governorate,
+                current_crop: chosenCrop,
+                previous_crops: Array.isArray(formState.previous_crops) ? formState.previous_crops : [],
+                planting_month: farm.planting_month,
+                irrigation_method: farm.irrigation_method,
+                water_source: farm.water_source,
+                soil_type: farm.soil_type,
+                soil_lab_results: soilLab,
+                known_pest_or_disease: pestRaw || null,
+                field_area_feddan: areaFeddan,
+                language: activeWorldLang || "ar"
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/api/rotation/compare`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(reqBody)
+                });
+                const data = await res.json().catch(() => null);
+                if (!res.ok || !data || !data.success) {
+                    throw new Error((data && (data.detail?.message || data.detail)) || "تعذر تحميل خطط التدوير.");
+                }
+                lastRotationResponse = data;
+                renderRotationResults(data);
+                statusMsg.textContent = "";
+            } catch (err) {
+                statusMsg.textContent = err.message || "تعذر تحميل خطط التدوير.";
+                bodyEl.classList.add("hidden");
+            }
+        }
+
+        function renderRotationResults(rot) {
+            const bodyEl = document.getElementById("res-rotation-body");
+            bodyEl.classList.remove("hidden");
+
+            document.getElementById("res-rotation-group-badge").textContent =
+                `مجموعة ${rot.current_crop}: ${rot.current_crop_group || "--"}`;
+
+            document.getElementById("res-rotation-history-box").textContent = rot.history_assessment || "";
+
+            const strategiesEl = document.getElementById("res-rotation-strategies");
+            strategiesEl.innerHTML = (rot.strategies || []).map((st, idx) => {
+                const seqHtml = (st.sequence || []).map((cropItem, i) => `
+                    <div class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-center flex-1 min-w-[78px]">
+                        <div class="text-xs font-black text-slate-900">${escapeHtml(cropItem)}</div>
+                        <div class="text-[10px] font-bold text-indigo-700 mt-0.5">${escapeHtml((st.crop_groups || [])[i] || "")}</div>
+                    </div>
+                `).join('<span class="text-green-600 font-black self-center">←</span>');
+
+                return `
+                    <div class="rounded-2xl bg-slate-50 border ${st.repeated_group_flag ? "border-amber-300" : "border-slate-200"} p-4 flex flex-col justify-between gap-3">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-indigo-600 text-white">خطة ${idx + 1}</span>
+                                <span class="text-[10.5px] font-bold ${st.repeated_group_flag ? "text-amber-700" : "text-green-700"}">
+                                    ${escapeHtml(st.diversity_note || "")}
+                                </span>
+                            </div>
+                            <h4 class="font-black text-sm text-slate-900">${escapeHtml(st.name || "")}</h4>
+
+                            <div class="flex items-stretch gap-1.5">${seqHtml}</div>
+
+                            <p class="text-xs text-slate-700 font-semibold leading-relaxed">${escapeHtml(st.rationale || "")}</p>
+
+                            <ul class="space-y-1 text-[11px] text-orange-800 font-bold bg-orange-50/70 border border-orange-200 rounded-xl p-2.5">
+                                ${(st.risks || []).map((r) => `<li>• ${escapeHtml(r)}</li>`).join("")}
+                            </ul>
+                        </div>
+
+                        <div class="text-[11px] text-slate-600 font-semibold border-t border-slate-200 pt-2">
+                            <span class="font-extrabold text-amber-800">فترة الراحة:</span> ${escapeHtml(st.fallow_guidance || "")}
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            const sh = rot.soil_health || {};
+            const soilCards = [
+                { title: "النيتروجين (N)", obj: sh.nitrogen },
+                { title: "المادة العضوية (OM)", obj: sh.organic_matter },
+                { title: "ملوحة التربة (EC)", obj: sh.salinity_ec }
+            ];
+            document.getElementById("res-rotation-soil-health").innerHTML = soilCards.map(({ title, obj }) => {
+                const o = obj || {};
+                const hasVal = o.value !== null && o.value !== undefined;
+                return `
+                    <div class="bg-white border border-slate-200 rounded-xl p-3 space-y-1">
+                        <div class="text-[11px] font-extrabold text-slate-700">${escapeHtml(title)}</div>
+                        <div class="notranslate font-mono-tech text-sm font-black ${hasVal ? "text-green-700" : "text-amber-700"}" translate="no">
+                            ${hasVal ? `${o.value} ${o.unit || ""}` : "غير مُدخَل"}
+                        </div>
+                        <div class="text-[10.5px] text-slate-500 font-semibold leading-snug">${escapeHtml(o.interpretation || "")}</div>
+                    </div>
+                `;
+            }).join("");
+
+            const pest = rot.pest_disease_cycle || {};
+            document.getElementById("res-rotation-pest-guidance").textContent =
+                (pest.farmer_reported_issue ? `المُبلَغ عنه (${pest.farmer_reported_issue}): ` : "") + (pest.guidance || "");
+
+            const fallow = rot.fallow_period || {};
+            document.getElementById("res-rotation-fallow").textContent = fallow.recommendation || "";
+
+            const prov = rot.input_data_provenance || {};
+            document.getElementById("res-rotation-provenance").textContent =
+                `NASA used for rotation score: ${prov.nasa_data_used_for_rotation_scoring ? "YES" : "NO (Lab & History Only)"}`;
+
+            document.getElementById("res-rotation-limits").innerHTML = (rot.decision_support_limits || [])
+                .map((l) => `<li>• ${escapeHtml(l)}</li>`).join("");
+
+            safeRefreshIcons();
+        }
+
         function renderResults(data) {
             hideLoadingView();
             document.getElementById("results-view").classList.remove("hidden");
@@ -2795,22 +3234,22 @@
                 suitable: {
                     text: lang === "ar" ? "مناسب للزراعة" : "Suitable",
                     cls: "bg-green-100 text-green-800 border-green-300",
-                    stroke: "#4CAF50"
+                    stroke: "#58C45C"
                 },
                 suitable_with_conditions: {
                     text: lang === "ar" ? "مناسب بشروط" : "Suitable with conditions",
                     cls: "bg-amber-100 text-amber-900 border-amber-300",
-                    stroke: "#F59E0B"
+                    stroke: "#FBB024"
                 },
                 not_suitable: {
                     text: lang === "ar" ? "غير مناسب حالياً" : "Not suitable",
                     cls: "bg-orange-100 text-orange-900 border-orange-300",
-                    stroke: "#DC4C3C"
+                    stroke: "#E85D4E"
                 },
                 not_evaluated: {
                     text: lang === "ar" ? "اقتراح محاصيل مناسبة" : "Crop suggestions",
                     cls: "bg-sky-100 text-sky-900 border-sky-300",
-                    stroke: "#38BDF8"
+                    stroke: "#4CC9FF"
                 }
             };
 
@@ -2830,817 +3269,3 @@
                 confBadge.textContent = confLabels[assessment.suitability_confidence] || assessment.suitability_confidence;
                 confBadge.classList.remove("hidden");
             } else {
-                confBadge.classList.add("hidden");
-            }
-
-            document.getElementById("res-assessment-type").textContent = assessment.assessment_type || "تقييم أولي إرشادي";
-            document.getElementById("res-status-text").textContent = assessment.crop_suitability_status || "";
-
-            const metaPills = document.getElementById("res-meta-pills");
-            const pills = [
-                `📍 ${farm.governorate || ""} (${Number(location.latitude).toFixed(3)}, ${Number(location.longitude).toFixed(3)})`,
-                `🌱 ${farm.crop || ""}`,
-                `📅 الشهر: ${farm.planting_month || ""}`,
-                `💧 ${farm.irrigation_method || ""}`,
-                `🧱 التربة: ${soilProfile.effective_soil_type || farm.soil_type || ""}`
-            ];
-            if (farm.farmer_name) pills.unshift(`👤 ${farm.farmer_name}`);
-            if (farm.farm_area) pills.push(`📐 ${farm.farm_area} ${farm.farm_area_unit || ""}`);
-            metaPills.innerHTML = pills.map((p) => `<span class="bg-slate-100 border border-slate-200 px-3 py-1 rounded-xl">${escapeHtml(p)}</span>`).join("");
-
-            const nasaStatusLabel = summary.data_quality && summary.data_quality.nasa_live_status === "live" ? "حي" : "احتياطي";
-            const sourceBadges = [
-                { text: `رطوبة التربة: قمر ناسا SMAP (${nasaStatusLabel})`, cls: "bg-green-50 text-green-800 border-green-200" },
-                { text: `البخر والنتح والإشعاع: NASA POWER (${nasaStatusLabel})`, cls: "bg-sky-50 text-sky-800 border-sky-200" },
-                { text: `ارتفاع الأرض: ${elevation.source || "NASA SRTM"}`, cls: "bg-indigo-50 text-indigo-800 border-indigo-200" },
-                { text: `التربة: ${soilProfile.source_label || "ISRIC SoilGrids"}`, cls: soilProfile.manual_lab_override_applied ? "bg-green-100 text-green-900 border-green-300" : "bg-sky-50 text-sky-800 border-sky-200" },
-                { text: "التوقعات: معادلة الفاو Open-Meteo ET0", cls: "bg-sky-50 text-sky-900 border-sky-200" },
-                { text: `التكلفة: سعر الصرف اللحظي (${market.usd_egp_rate || "--"} ج.م/$)`, cls: "bg-amber-50 text-amber-900 border-amber-200" }
-            ];
-            document.getElementById("res-data-sources-badges").innerHTML = sourceBadges
-                .map((b) => `<span class="px-3 py-1 rounded-full border ${b.cls}">${escapeHtml(b.text)}</span>`)
-                .join("");
-
-            const timingBox = document.getElementById("res-timing-alert-box");
-            const timing = assessment.planting_timing_alert;
-            if (timing && timing.message) {
-                timingBox.classList.remove("hidden");
-                if (timing.status === "on_time") {
-                    timingBox.className = "rounded-2xl p-3.5 text-xs md:text-sm font-bold flex items-start gap-2.5 text-right border bg-green-50 border-green-300 text-green-900";
-                    timingBox.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5 text-green-600 shrink-0 mt-0.5"></i><span>${escapeHtml(timing.message)}</span>`;
-                } else {
-                    timingBox.className = "rounded-2xl p-3.5 text-xs md:text-sm font-bold flex items-start gap-2.5 text-right border bg-orange-50 border-orange-300 text-orange-950";
-                    timingBox.innerHTML = `<i data-lucide="clock" class="w-5 h-5 text-orange-600 shrink-0 mt-0.5"></i><span>${escapeHtml(timing.message)}</span>`;
-                }
-            } else {
-                timingBox.classList.add("hidden");
-            }
-
-            const unjudgedBox = document.getElementById("res-unjudged-box");
-            if (Array.isArray(assessment.unjudged_factors) && assessment.unjudged_factors.length > 0) {
-                const factorNames = { temperature: "الحرارة", soil: "نوع التربة", irrigation: "طريقة الري" };
-                const names = assessment.unjudged_factors.map((f) => factorNames[f] || f).join("، ");
-                unjudgedBox.textContent = `ملاحظة: الدرجة أولية لأن العوامل التالية لم تُقيَّم بالكامل: ${names}.`;
-                unjudgedBox.classList.remove("hidden");
-            } else {
-                unjudgedBox.classList.add("hidden");
-            }
-
-            // 1B. SRTM Elevation & Hybrid Soil Profile Cards
-            document.getElementById("res-elev-source-badge").textContent = elevation.source || "NASA SRTM";
-            document.getElementById("res-elev-meters").textContent = elevation.elevation_m != null ? elevation.elevation_m : "—";
-            document.getElementById("res-elev-note").textContent = lang === "ar"
-                ? (elevation.flood_vs_drip_note_ar || "")
-                : (elevation.flood_vs_drip_note_en || "");
-
-            const soilBadgeEl = document.getElementById("res-soil-source-badge");
-            soilBadgeEl.textContent = soilProfile.source_label || "SoilGrids";
-            soilBadgeEl.className = soilProfile.manual_lab_override_applied
-                ? "text-[11px] font-black px-3 py-1 rounded-full border bg-green-100 text-green-900 border-green-400"
-                : "text-[11px] font-black px-3 py-1 rounded-full border bg-sky-100 text-sky-900 border-sky-300";
-
-            document.getElementById("res-soil-clay").textContent = soilProfile.clay_percent != null ? `${soilProfile.clay_percent}%` : "—";
-            document.getElementById("res-soil-sand").textContent = soilProfile.sand_percent != null ? `${soilProfile.sand_percent}%` : "—";
-            document.getElementById("res-soil-silt").textContent = soilProfile.silt_percent != null ? `${soilProfile.silt_percent}%` : "—";
-            document.getElementById("res-soil-ph").textContent = soilProfile.ph != null ? soilProfile.ph : "—";
-
-            const extraSoilParts = [];
-            if (soilProfile.inferred_texture_from_data) extraSoilParts.push(`القوام المستنتج من النسب: ${soilProfile.inferred_texture_from_data}`);
-            if (soilProfile.ec_ds_m != null) extraSoilParts.push(`ملوحة التربة (يدوي): ${soilProfile.ec_ds_m} dS/m`);
-            if (soilProfile.nitrogen_ppm != null) extraSoilParts.push(`النيتروجين: ${soilProfile.nitrogen_ppm} ppm`);
-            document.getElementById("res-soil-extra").textContent = extraSoilParts.join(" • ");
-
-            // 2. Side-by-Side Comparison
-            const cmpSec = document.getElementById("res-comparison-section");
-            const cmp = data.crop_comparison;
-            if (cmp && cmp.primary && cmp.secondary) {
-                cmpSec.classList.remove("hidden");
-                const p1 = cmp.primary;
-                const p2 = cmp.secondary;
-                document.getElementById("cmp-col-1").textContent = `${p1.crop} (${p1.crop_en})`;
-                document.getElementById("cmp-col-2").textContent = `${p2.crop} (${p2.crop_en})`;
-                document.getElementById("res-comparison-summary").textContent = cmp.summary || "";
-                document.getElementById("res-comparison-winner-pill").textContent =
-                    cmp.winner === "tie"
-                        ? "تعادل بين المحصولين"
-                        : `الأفضل: ${cmp.winner_crop}`;
-
-                const rows = [
-                    ["درجة الملاءمة", `${p1.suitability_score}/100 (${p1.suitability_label})`, `${p2.suitability_score}/100 (${p2.suitability_label})`],
-                    ["مستوى الطلب المائي", p1.water_demand_level, p2.water_demand_level],
-                    ["نظام الري المقترح", p1.recommended_irrigation || "—", p2.recommended_irrigation || "—"],
-                    ["الاستهلاك المائي الحي المتوقع", `${formatNum(p1.water_m3_per_feddan)} م³/فدان`, `${formatNum(p2.water_m3_per_feddan)} م³/فدان`],
-                    ["توفير المياه مقارنة بالغمر", `${formatNum(p1.water_saved_vs_flood_m3)} م³/فدان`, `${formatNum(p2.water_saved_vs_flood_m3)} م³/فدان`],
-                    ["صافي الربح التقديري / فدان", `${formatNum(p1.net_profit_per_feddan_egp)} ج.م`, `${formatNum(p2.net_profit_per_feddan_egp)} ج.م`],
-                    ["العائد على الاستثمار ROI", `${p1.roi_percent}%`, `${p2.roi_percent}%`],
-                    ["عدد المخاطر المسجلة", `${p1.risks_count} مخاطر`, `${p2.risks_count} مخاطر`]
-                ];
-
-                document.getElementById("res-comparison-tbody").innerHTML = rows.map(([label, v1, v2]) => `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-extrabold text-slate-700">${escapeHtml(label)}</td>
-                        <td class="p-3 font-bold text-slate-900">${escapeHtml(v1)}</td>
-                        <td class="p-3 font-bold text-slate-900">${escapeHtml(v2)}</td>
-                    </tr>
-                `).join("");
-            } else {
-                cmpSec.classList.add("hidden");
-            }
-
-            // 3. Dynamic ROI & Live Water Savings
-            const econSec = document.getElementById("res-economics-section");
-            const ew = data.economics_and_water;
-            if (ew && ew.economics && ew.water_savings) {
-                econSec.classList.remove("hidden");
-                const ec = ew.economics;
-                const ws = ew.water_savings;
-
-                document.getElementById("res-fx-badge").textContent = `USD/EGP ${market.usd_egp_rate || "--"}`;
-                document.getElementById("res-econ-area-badge").textContent = ew.is_area_user_specified
-                    ? `المساحة: ${ew.area_feddan} فدان`
-                    : "تقدير للفدان الواحد (1 فدان)";
-
-                document.getElementById("live-edit-cost").value = ec.cost_per_feddan_egp;
-                document.getElementById("live-edit-price").value = ec.price_per_ton_egp;
-                document.getElementById("live-edit-yield").value = ec.expected_yield_ton_per_feddan;
-
-                renderEconomicsNumbers(ec.cost_per_feddan_egp, ec.price_per_ton_egp, ec.expected_yield_ton_per_feddan, ew.area_feddan, ew.is_area_user_specified);
-                document.getElementById("res-econ-disclaimer").textContent = ew.disclaimer || "";
-
-                document.getElementById("res-live-water-basis").textContent =
-                    liveWater && liveWater.calculation_basis
-                        ? `${liveWater.calculation_basis} (ET0 مدمج = ${liveWater.blended_et0_mm_day} مم/يوم • Kc = ${liveWater.kc})`
-                        : "حساب الاحتياج المائي حسب المحصول ونظام الري";
-
-                const floodM3 = ws.traditional_flood_m3_per_feddan;
-                const recM3 = ws.recommended_method_m3_per_feddan;
-                const ratioPct = floodM3 > 0 ? Math.max(10, Math.round((recM3 / floodM3) * 100)) : 100;
-
-                document.getElementById("res-water-save-pct").textContent = `توفير ${ws.water_saved_percent_vs_flood}%`;
-                document.getElementById("res-water-flood").textContent = `${formatNum(floodM3)} م³/فدان`;
-                document.getElementById("res-water-rec-label").textContent = `بعد (${ws.recommended_method})`;
-                document.getElementById("res-water-rec").textContent = `${formatNum(recM3)} م³/فدان`;
-                document.getElementById("res-water-rec-bar").style.width = `${ratioPct}%`;
-                document.getElementById("res-water-saved-feddan").textContent = `${formatNum(ws.saved_vs_flood_m3_per_feddan)} م³`;
-                document.getElementById("res-water-saved-total").textContent = `${formatNum(ws.total_water_saved_vs_flood_m3)} م³`;
-            } else {
-                econSec.classList.add("hidden");
-            }
-
-            // 3B. 16-Day Operational Irrigation & Fertilization Schedule (FAO ET0 + SMAP)
-            const schedSec = document.getElementById("res-schedule-16d-section");
-            if (schedule16d && Array.isArray(schedule16d.days) && schedule16d.days.length > 0) {
-                schedSec.classList.remove("hidden");
-                document.getElementById("res-schedule-16d-subtitle").textContent =
-                    `معامل المحصول Kc = ${schedule16d.crop_kc_used} • إجمالي البخر-نتح للـ 16 يوماً = ${schedule16d.total_16d_et0_mm} مم`;
-                document.getElementById("res-schedule-16d-total").textContent =
-                    `إجمالي مياه الـ 16 يوماً: ${formatNum(schedule16d.total_16d_recommended_water_m3_per_feddan)} م³/فدان`;
-
-                document.getElementById("res-schedule-16d-list").innerHTML = schedule16d.days.map((d) => {
-                    const cardCls = d.irrigate
-                        ? "bg-sky-50 border-sky-300"
-                        : (d.action_code === "skip_rain" ? "bg-indigo-50 border-indigo-200" : "bg-slate-50 border-slate-200");
-                    const badgeCls = d.irrigate
-                        ? "bg-sky-600 text-white"
-                        : (d.action_code === "skip_rain" ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-700");
-
-                    return `
-                        <div class="min-w-[185px] max-w-[205px] rounded-2xl border p-3.5 shrink-0 space-y-2 ${cardCls}">
-                            <div class="flex items-center justify-between gap-1">
-                                <span class="notranslate font-mono-tech text-xs font-black text-slate-800" translate="no">${escapeHtml(d.date.slice(5))}</span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${badgeCls}">يوم ${d.day_index}</span>
-                            </div>
-                            <div class="font-mono-tech text-[11px] font-bold text-slate-600 flex justify-between">
-                                <span>ET0: ${d.et0_fao_mm} مم</span>
-                                <span>☔ ${d.rain_mm} مم</span>
-                            </div>
-                            <div class="text-xs font-black text-sky-900 bg-white/90 rounded-xl p-2 border border-slate-200/80">
-                                ${escapeHtml(d.irrigation_action)}
-                            </div>
-                            <div class="text-[11px] font-bold text-green-800 leading-snug">
-                                🌿 ${escapeHtml(d.fertilization_and_spray_window)}
-                            </div>
-                        </div>
-                    `;
-                }).join("");
-            } else {
-                schedSec.classList.add("hidden");
-            }
-
-            // 4. Interactive Crop Calendar
-            const calSec = document.getElementById("res-calendar-section");
-            const cal = data.crop_calendar;
-            if (cal && Array.isArray(cal.stages) && cal.stages.length > 0) {
-                calSec.classList.remove("hidden");
-                document.getElementById("res-calendar-subtitle").textContent =
-                    `من زراعة ${cal.planting_month_name} (${cal.reference_planting_date}) حتى الحصاد المتوقع (${cal.estimated_harvest_date})`;
-                document.getElementById("res-calendar-duration").textContent = `مدة الموسم ≈ ${cal.total_duration_days} يوماً`;
-
-                document.getElementById("res-calendar-timeline").innerHTML = cal.stages.map((st) => `
-                    <div class="rounded-2xl p-4 border ${st.critical ? "bg-orange-50/70 border-orange-300" : "bg-slate-50 border-slate-200"} flex flex-col justify-between gap-3">
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black ${st.critical ? "bg-orange-600 text-white" : "bg-green-600 text-white"}">
-                                    المرحلة ${st.stage_number} ${st.critical ? "• حرجة" : ""}
-                                </span>
-                                <span class="font-mono-tech text-[11px] font-bold text-slate-600">يوم ${st.start_day}–${st.end_day}</span>
-                            </div>
-                            <h4 class="font-black text-sm text-slate-900">${escapeHtml(st.stage_name)}</h4>
-                            <div class="notranslate text-[11px] font-mono-tech font-bold text-sky-700" translate="no">${escapeHtml(st.estimated_start_date)} → ${escapeHtml(st.estimated_end_date)}</div>
-                            <div class="bg-white rounded-xl p-2.5 border border-slate-200/80 text-xs text-slate-700 font-semibold">
-                                <span class="text-sky-700 font-extrabold">💧 الري:</span> ${escapeHtml(st.irrigation_guidance)}
-                            </div>
-                            <div class="bg-white rounded-xl p-2.5 border border-slate-200/80 text-xs text-slate-700 font-semibold">
-                                <span class="text-green-700 font-extrabold">🌿 التسميد:</span> ${escapeHtml(st.fertilization_guidance)}
-                            </div>
-                        </div>
-                        <ul class="space-y-1 text-[11px] text-slate-600 font-bold border-t border-slate-200 pt-2">
-                            ${(st.key_actions || []).map((act) => `<li>• ${escapeHtml(act)}</li>`).join("")}
-                        </ul>
-                    </div>
-                `).join("");
-            } else {
-                calSec.classList.add("hidden");
-            }
-
-            // 5. NASA POWER & SMAP 30-day & Climatology
-            document.getElementById("res-nasa-period").textContent = `${climate.period_start || ""} → ${climate.period_end || ""}`;
-            document.getElementById("res-temp-30").textContent = summary.average_temperature_c != null ? `${summary.average_temperature_c}°C` : "—";
-            document.getElementById("res-rain-30").textContent = summary.total_rainfall_mm != null ? `${summary.total_rainfall_mm} mm` : "—";
-            document.getElementById("res-rh-30").textContent = summary.average_relative_humidity_percent != null ? `${summary.average_relative_humidity_percent}%` : "—";
-            document.getElementById("res-wind-30").textContent = summary.average_wind_speed_m_s != null ? `${summary.average_wind_speed_m_s} m/s` : "—";
-
-            document.getElementById("res-gwet-root").textContent =
-                summary.average_root_zone_soil_wetness != null
-                    ? `${Math.round(summary.average_root_zone_soil_wetness * 100)}%`
-                    : "—";
-            document.getElementById("res-gwet-top").textContent =
-                summary.average_surface_soil_wetness != null
-                    ? `${Math.round(summary.average_surface_soil_wetness * 100)}%`
-                    : "—";
-            document.getElementById("res-solar-30").textContent =
-                summary.average_solar_radiation_mj_m2_day != null
-                    ? `${summary.average_solar_radiation_mj_m2_day} MJ`
-                    : "—";
-            document.getElementById("res-et-30").textContent =
-                summary.estimated_daily_et_mm != null
-                    ? `${summary.estimated_daily_et_mm} mm/d`
-                    : "—";
-
-            const dq = summary.data_quality || {};
-            const dqItems = [];
-            if (dq.temperature) dqItems.push(`صلاحية بيانات الحرارة: ${dq.temperature.valid_days}/${dq.temperature.total_days} يوم`);
-            if (dq.rainfall) dqItems.push(`الأمطار: ${dq.rainfall.valid_days}/${dq.rainfall.total_days} يوم`);
-            if (dq.soil_wetness_smap) dqItems.push(`SMAP الجذور: ${dq.soil_wetness_smap.valid_days}/${dq.soil_wetness_smap.total_days} يوم`);
-            document.getElementById("res-data-quality").innerHTML = dqItems.map((t) => `<span>• ${t}</span>`).join("");
-
-            const climBody = document.getElementById("res-climatology-body");
-            const climSource = document.getElementById("res-clim-source");
-            const pmClim = assessment.planting_month_climate;
-            if (pmClim) {
-                climSource.textContent = pmClim.source === "climatology" ? "متوسط سنوات ناسا" : "بيانات آخر 30 يوماً";
-                climBody.innerHTML = `
-                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
-                        <div class="text-xs text-slate-600 font-bold">متوسط الحرارة</div>
-                        <div class="notranslate font-mono-tech text-lg font-black text-amber-600 mt-1" translate="no">${pmClim.temp != null ? pmClim.temp + "°C" : "—"}</div>
-                    </div>
-                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
-                        <div class="text-xs text-slate-600 font-bold">أمطار الشهر</div>
-                        <div class="notranslate font-mono-tech text-lg font-black text-sky-700 mt-1" translate="no">${pmClim.rain_total != null ? pmClim.rain_total + " mm" : "—"}</div>
-                    </div>
-                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
-                        <div class="text-xs text-slate-600 font-bold">الرطوبة المتوقعة</div>
-                        <div class="notranslate font-mono-tech text-lg font-black text-green-700 mt-1" translate="no">${pmClim.humidity != null ? pmClim.humidity + "%" : "—"}</div>
-                    </div>
-                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
-                        <div class="text-xs text-slate-600 font-bold">متوسط الرياح</div>
-                        <div class="notranslate font-mono-tech text-lg font-black text-sky-600 mt-1" translate="no">${pmClim.wind != null ? pmClim.wind + " m/s" : "—"}</div>
-                    </div>
-                `;
-            } else {
-                climSource.textContent = "غير متاح";
-                climBody.innerHTML = '<div class="col-span-2 text-xs text-slate-500 bg-slate-50 rounded-2xl p-4 font-semibold">تعذر استرجاع متوسط مناخ شهر الزراعة من ناسا.</div>';
-            }
-
-            // 6. Checks, Irrigation, Alternatives
-            const checksList = document.getElementById("res-checks-list");
-            const checks = assessment.checks || [];
-            if (checks.length > 0) {
-                const statusStyles = {
-                    good: { cls: "bg-green-50 border-green-300 text-green-950", icon: "check-circle-2", iconCls: "text-green-600" },
-                    warning: { cls: "bg-amber-50 border-amber-300 text-amber-950", icon: "alert-triangle", iconCls: "text-amber-600" },
-                    bad: { cls: "bg-orange-50 border-orange-300 text-orange-950", icon: "x-circle", iconCls: "text-orange-600" },
-                    info: { cls: "bg-sky-50 border-sky-200 text-sky-950", icon: "info", iconCls: "text-sky-600" }
-                };
-                checksList.innerHTML = checks.map((c) => {
-                    const st = statusStyles[c.status] || statusStyles.info;
-                    return `
-                        <div class="rounded-2xl border p-3.5 flex items-start gap-3 font-semibold ${st.cls}">
-                            <i data-lucide="${st.icon}" class="w-4 h-4 shrink-0 mt-0.5 ${st.iconCls}"></i>
-                            <span class="text-xs md:text-sm leading-relaxed">${escapeHtml(c.message)}</span>
-                        </div>
-                    `;
-                }).join("");
-            } else {
-                checksList.innerHTML = '<div class="text-xs text-slate-600 bg-slate-50 rounded-2xl p-4 font-semibold">تم عرض أفضل المحاصيل المقترحة بناءً على ظروف أرضك وشهر الزراعة.</div>';
-            }
-
-            const irrBox = document.getElementById("res-irrigation-box");
-            if (assessment.irrigation_recommendation) {
-                irrBox.classList.remove("hidden");
-                document.getElementById("res-irrigation-text").textContent = assessment.irrigation_recommendation;
-            } else {
-                irrBox.classList.add("hidden");
-            }
-
-            const altBox = document.getElementById("res-alternatives-box");
-            const altList = document.getElementById("res-alternatives-list");
-            const alts = assessment.alternative_crops || [];
-            if (alts.length > 0) {
-                altBox.classList.remove("hidden");
-                altList.innerHTML = alts.map((alt) => `
-                    <div class="bg-green-50/60 border border-green-200 rounded-2xl p-3 flex items-center justify-between gap-3">
-                        <div>
-                            <div class="font-extrabold text-sm text-slate-900">${escapeHtml(alt.crop)} <span class="text-xs text-slate-500 font-semibold">(${escapeHtml(alt.crop_en)})</span></div>
-                            <div class="text-xs text-green-700 font-mono-tech font-bold mt-0.5">درجة الملاءمة: ${alt.score}/100</div>
-                        </div>
-                        <button type="button" onclick="reanalyzeWithAlternativeCrop('${escapeJsString(alt.crop)}')" class="no-print px-3 py-1.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs font-extrabold transition-all">
-                            فحص هذا المحصول
-                        </button>
-                    </div>
-                `).join("");
-            } else {
-                altBox.classList.add("hidden");
-            }
-
-            // 7. Open-Meteo Forecast + FAO ET0
-            const forecastSec = document.getElementById("res-forecast-section");
-            const forecast = data.forecast;
-            if (forecast) {
-                forecastSec.classList.remove("hidden");
-                document.getElementById("res-forecast-source-badge").textContent = forecast.source || "Open-Meteo Live Forecast";
-                const alertsEl = document.getElementById("res-forecast-alerts");
-                alertsEl.innerHTML = (forecast.alerts || []).map((a) => {
-                    const isGood = a.startsWith("✔");
-                    return `
-                        <div class="rounded-2xl px-4 py-2.5 text-xs md:text-sm font-bold border ${isGood ? "bg-green-50 border-green-300 text-green-900" : "bg-orange-50 border-orange-300 text-orange-950"}">
-                            ${escapeHtml(a)}
-                        </div>
-                    `;
-                }).join("");
-
-                const daysEl = document.getElementById("res-forecast-days");
-                daysEl.innerHTML = (forecast.days || []).map((d) => `
-                    <div class="min-w-[126px] bg-slate-50 border border-slate-200 rounded-2xl p-3 text-center shrink-0 space-y-1.5">
-                        <div class="notranslate font-mono-tech text-[11px] text-sky-700 font-extrabold" translate="no">${escapeHtml(d.date.slice(5))}</div>
-                        <div class="notranslate text-sm font-black text-slate-900 font-mono-tech" translate="no">${d.temperature_max_c}° / <span class="text-slate-500">${d.temperature_min_c}°</span></div>
-                        <div class="notranslate text-[11px] text-sky-700 font-bold" translate="no">☔ ${d.rain_mm} mm</div>
-                        <div class="notranslate text-[11px] text-sky-700 font-bold" translate="no">ET0: ${d.et0_mm != null ? d.et0_mm + " mm" : "—"}</div>
-                        <div class="notranslate text-[11px] text-slate-500 font-semibold" translate="no">💨 ${d.wind_max_kmh != null ? d.wind_max_kmh + " km/h" : "—"}</div>
-                    </div>
-                `).join("");
-
-                const outlookBox = document.getElementById("res-outlook-box");
-                if (forecast.outlook && forecast.outlook.text) {
-                    outlookBox.classList.remove("hidden");
-                    document.getElementById("res-outlook-text").textContent = forecast.outlook.text;
-                } else {
-                    outlookBox.classList.add("hidden");
-                }
-            } else {
-                forecastSec.classList.add("hidden");
-            }
-
-            // 8. Risks & Tips
-            const risksList = document.getElementById("res-risks-list");
-            const risks = assessment.risks || [];
-            risksList.innerHTML = risks.length
-                ? risks.map((r) => `<li class="flex items-start gap-2 bg-orange-50/70 border border-orange-200 rounded-xl p-2.5"><span class="text-orange-600 font-black">•</span><span>${escapeHtml(r)}</span></li>`).join("")
-                : '<li class="text-xs text-slate-500">لا توجد مخاطر محددة مسجلة لهذا الاختيار.</li>';
-
-            const tipsList = document.getElementById("res-tips-list");
-            const tips = assessment.recommendations || [];
-            tipsList.innerHTML = tips.length
-                ? tips.map((t) => `<li class="flex items-start gap-2 bg-green-50/70 border border-green-200 rounded-xl p-2.5"><span class="text-green-600 font-black">✓</span><span>${escapeHtml(t)}</span></li>`).join("")
-                : '<li class="text-xs text-slate-500">لا توجد نصائح إضافية حالياً.</li>';
-
-            // 9. Inline Methodology Breakdown
-            const methInline = document.getElementById("res-methodology-inline");
-            const meth = data.methodology;
-            if (meth && meth.current_run_breakdown) {
-                methInline.classList.remove("hidden");
-                const bd = meth.current_run_breakdown;
-                document.getElementById("res-meth-formula").textContent =
-                    `(${bd.weighted_points} ÷ ${bd.evaluated_weight_sum}) × 100 = ${bd.final_score}/100`;
-                document.getElementById("res-meth-factors").innerHTML = (bd.factors || []).map((f) => `
-                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-xs">
-                        <div class="font-extrabold text-slate-800">${escapeHtml(f.factor)}</div>
-                        <div class="font-mono-tech text-[11px] text-slate-600 mt-1">وزن: ${f.weight} | نقاط: ${f.points_earned !== null ? f.points_earned : "مستبعد"}</div>
-                    </div>
-                `).join("");
-            } else {
-                methInline.classList.add("hidden");
-            }
-
-            // 10. Observations, Missing Info, Limitations
-            document.getElementById("res-observations-list").innerHTML = (assessment.observations || [])
-                .map((o) => `<li class="border-b border-slate-100 pb-1.5">${escapeHtml(o)}</li>`).join("");
-
-            const missing = assessment.missing_information || [];
-            document.getElementById("res-missing-list").innerHTML = missing.length
-                ? missing.map((m) => `<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span><span>${escapeHtml(m)}</span></li>`).join("")
-                : '<li class="text-green-700 font-bold">كافة البيانات الاختيارية مكتملة.</li>';
-
-            document.getElementById("res-limitations-list").innerHTML = (data.limitations || [])
-                .map((l) => `<li class="flex items-start gap-2"><span class="text-sky-600 font-black">•</span><span>${escapeHtml(l)}</span></li>`).join("");
-
-            safeRefreshIcons();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-
-        // ============================================================
-        // 8B. LIVE ECONOMICS INTERACTIVE RECALCULATION
-        // ============================================================
-        function renderEconomicsNumbers(costFeddan, priceTon, yieldTon, areaFeddan, isAreaSpecified) {
-            const grossRev = Math.round(yieldTon * priceTon);
-            const netProfit = Math.round(grossRev - costFeddan);
-            const roiPct = costFeddan > 0 ? Number(((netProfit / costFeddan) * 100).toFixed(1)) : 0;
-
-            document.getElementById("res-econ-cost").textContent = `${formatNum(costFeddan)} ج.م`;
-            document.getElementById("res-econ-yield").textContent = `${formatNum(grossRev)} ج.م (${yieldTon} طن)`;
-
-            const profitEl = document.getElementById("res-econ-profit");
-            profitEl.textContent = `${formatNum(netProfit)} ج.م`;
-            profitEl.className = `font-mono-tech text-lg font-black mt-1 ${netProfit >= 0 ? "text-green-700" : "text-orange-700"}`;
-
-            const roiEl = document.getElementById("res-econ-roi");
-            roiEl.textContent = `${roiPct}%`;
-            roiEl.className = `notranslate font-mono-tech text-lg font-black mt-1 ${roiPct >= 0 ? "text-amber-700" : "text-orange-700"}`;
-
-            const totalBox = document.getElementById("res-econ-total-box");
-            if (isAreaSpecified && areaFeddan > 0) {
-                totalBox.classList.remove("hidden");
-                const totalCost = Math.round(costFeddan * areaFeddan);
-                const totalProfit = Math.round(netProfit * areaFeddan);
-                totalBox.innerHTML = `
-                    <span>إجمالي التكلفة (${areaFeddan} فدان): ${formatNum(totalCost)} ج.م</span>
-                    <span>إجمالي صافي الربح المتوقع: ${formatNum(totalProfit)} ج.م</span>
-                `;
-            } else {
-                totalBox.classList.add("hidden");
-            }
-        }
-
-        function recalcLiveEconomics() {
-            if (!lastAnalysisResponse || !lastAnalysisResponse.economics_and_water) return;
-            const ew = lastAnalysisResponse.economics_and_water;
-            const ec = ew.economics;
-
-            const costVal = Number(document.getElementById("live-edit-cost").value);
-            const priceVal = Number(document.getElementById("live-edit-price").value);
-            const yieldVal = Number(document.getElementById("live-edit-yield").value);
-
-            const cost = !Number.isNaN(costVal) && costVal > 0 ? costVal : ec.cost_per_feddan_egp;
-            const price = !Number.isNaN(priceVal) && priceVal > 0 ? priceVal : ec.price_per_ton_egp;
-            const yld = !Number.isNaN(yieldVal) && yieldVal > 0 ? yieldVal : ec.expected_yield_ton_per_feddan;
-
-            renderEconomicsNumbers(cost, price, yld, ew.area_feddan, ew.is_area_user_specified);
-        }
-
-        function resetLiveEconomicsToServer() {
-            if (!lastAnalysisResponse || !lastAnalysisResponse.economics_and_water) return;
-            const ew = lastAnalysisResponse.economics_and_water;
-            const ec = ew.economics;
-            document.getElementById("live-edit-cost").value = ec.cost_per_feddan_egp;
-            document.getElementById("live-edit-price").value = ec.price_per_ton_egp;
-            document.getElementById("live-edit-yield").value = ec.expected_yield_ton_per_feddan;
-            renderEconomicsNumbers(ec.cost_per_feddan_egp, ec.price_per_ton_egp, ec.expected_yield_ton_per_feddan, ew.area_feddan, ew.is_area_user_specified);
-        }
-
-        // ============================================================
-        // 9. TRANSPARENT METHODOLOGY MODAL ("إزاي بنحسب؟")
-        // ============================================================
-        async function openMethodologyModal() {
-            const modal = document.getElementById("methodology-modal");
-            const body = document.getElementById("modal-meth-body");
-            modal.classList.remove("hidden");
-
-            let meth = lastAnalysisResponse && lastAnalysisResponse.methodology;
-            if (!meth) {
-                try {
-                    const res = await fetch(`${API_BASE}/api/methodology?language=${encodeURIComponent(activeWorldLang || "ar")}`);
-                    if (res.ok) {
-                        const json = await res.json();
-                        meth = json.methodology;
-                    }
-                } catch {
-                    meth = null;
-                }
-            }
-
-            if (!meth) {
-                body.innerHTML = `
-                    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs font-bold text-amber-900">
-                        يعتمد النظام على دمج بيانات NASA POWER & SMAP وارتفاع SRTM وتربة ISRIC SoilGrids مع توقعات Open-Meteo (FAO ET0) وسعر الصرف اللحظي:
-                        Score = (Sum(Status_Value × Factor_Weight) / Sum(Evaluated_Weights)) × 100.
-                    </div>
-                `;
-                return;
-            }
-
-            document.getElementById("modal-meth-title").textContent = meth.title || "منهجية الحساب في N.A.D.A";
-            const sm = meth.scoring_model || {};
-            const ew = meth.economics_and_water_formulas || {};
-
-            body.innerHTML = `
-                <div class="space-y-2">
-                    <h4 class="font-black text-slate-900 text-sm">1. مصادر البيانات الحية المعتمدة (مجانية 100%)</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        ${(meth.data_sources || []).map((ds) => `
-                            <div class="bg-sky-50/60 border border-sky-200 rounded-2xl p-3">
-                                <div class="font-extrabold text-xs text-sky-900">${escapeHtml(ds.name)}</div>
-                                <div class="text-xs text-slate-700 mt-1 leading-relaxed">${escapeHtml(ds.purpose)}</div>
-                            </div>
-                        `).join("")}
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <h4 class="font-black text-slate-900 text-sm">2. معادلة حساب درجة الملاءمة والأوزان</h4>
-                    <div class="notranslate bg-slate-900 text-green-300 font-mono-tech text-xs p-3.5 rounded-2xl overflow-x-auto" translate="no">
-                        ${escapeHtml(sm.equation || "")}
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                        ${Object.entries(sm.factor_weights || {}).map(([k, v]) => `
-                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-2 flex justify-between items-center">
-                                <span class="font-bold text-slate-700">${escapeHtml(k)}</span>
-                                <span class="notranslate font-mono-tech font-black text-green-700" translate="no">${escapeHtml(String(v))}</span>
-                            </div>
-                        `).join("")}
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <h4 class="font-black text-slate-900 text-sm">3. معادلات الاحتياج المائي الحي والعائد الاقتصادي</h4>
-                    <div class="bg-green-50/70 border border-green-200 rounded-2xl p-3.5 text-xs space-y-1.5 font-semibold text-slate-800">
-                        <div>• الاحتياج المائي الحي: <span class="notranslate font-mono-tech" translate="no">${escapeHtml(ew.live_water_demand || "")}</span></div>
-                        <div>• صافي الربح: <span class="notranslate font-mono-tech" translate="no">${escapeHtml(ew.net_profit || "")}</span></div>
-                        <div>• نسبة العائد على الاستثمار (ROI): <span class="notranslate font-mono-tech" translate="no">${escapeHtml(ew.roi_percent || "")}</span></div>
-                        <div>• كفاءة التنقيط 90% والرش 78% مقابل الغمر 58% | وفر الأرز المتقطع (AWD): 15%</div>
-                    </div>
-                </div>
-            `;
-            safeRefreshIcons();
-        }
-
-        function closeMethodologyModal() {
-            document.getElementById("methodology-modal").classList.add("hidden");
-        }
-
-        // ============================================================
-        // 10. WHATSAPP SHARE, JSON EXPORT & UTILITIES
-        // ============================================================
-        function shareWhatsApp() {
-            if (!lastAnalysisResponse) return;
-            const d = lastAnalysisResponse;
-            const farm = d.farm || {};
-            const ass = d.assessment || {};
-            const ew = d.economics_and_water;
-            const elev = d.elevation || {};
-            const soilP = d.soil_profile || {};
-            const timing = ass.planting_timing_alert;
-
-            const lines = [
-                `🌱 *تقرير N.A.D.A الزراعي*`,
-                `📍 المحافظة: ${farm.governorate || ""} (ارتفاع ${elev.elevation_m ?? "--"} م)`,
-                `🧱 التربة (${soilP.source_label || ""}): طين ${soilP.clay_percent ?? "--"}% • رمل ${soilP.sand_percent ?? "--"}% • pH ${soilP.ph ?? "--"}`,
-                `🌾 المحصول: ${farm.crop || ""} (الشهر ${farm.planting_month || ""})`,
-                `📊 النتيجة: ${ass.crop_suitability_status || ""}`
-            ];
-
-            if (timing && timing.message) lines.push(`⏳ الموعد: ${timing.message}`);
-            if (ass.irrigation_recommendation) lines.push(`💧 الري: ${ass.irrigation_recommendation}`);
-            if (ew && ew.economics && ew.water_savings) {
-                const liveCost = Number(document.getElementById("live-edit-cost").value) || ew.economics.cost_per_feddan_egp;
-                const livePrice = Number(document.getElementById("live-edit-price").value) || ew.economics.price_per_ton_egp;
-                const liveYield = Number(document.getElementById("live-edit-yield").value) || ew.economics.expected_yield_ton_per_feddan;
-                const liveProfit = Math.round(liveYield * livePrice - liveCost);
-                const liveRoi = liveCost > 0 ? ((liveProfit / liveCost) * 100).toFixed(1) : 0;
-                lines.push(`💰 صافي الربح المتوقع للفدان: ${formatNum(liveProfit)} ج.م (ROI ${liveRoi}%)`);
-                lines.push(`🚿 الوفر المائي للفدان: ${formatNum(ew.water_savings.saved_vs_flood_m3_per_feddan)} م³/فدان (${ew.water_savings.water_saved_percent_vs_flood}%)`);
-            }
-            if (d.crop_comparison && d.crop_comparison.summary) {
-                lines.push(`⚖️ المقارنة: ${d.crop_comparison.summary}`);
-            }
-
-            const text = encodeURIComponent(lines.join("\n"));
-            window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
-        }
-
-        function downloadReportJSON() {
-            if (!lastAnalysisResponse) return;
-            const blob = new Blob([JSON.stringify(lastAnalysisResponse, null, 2)], { type: "application/json;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `nada-agri-report-${new Date().toISOString().slice(0, 10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-        }
-
-        function formatNum(val) {
-            if (val === null || val === undefined || Number.isNaN(Number(val))) return "—";
-            return Number(val).toLocaleString("en-US");
-        }
-
-        function showError(msg) {
-            document.getElementById("error-message").textContent = msg;
-            document.getElementById("error-banner").classList.remove("hidden");
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-
-        function hideError() {
-            document.getElementById("error-banner").classList.add("hidden");
-        }
-
-        function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
-        }
-
-        function escapeJsString(str) {
-            return String(str).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-        }
-
-        // ============================================================
-        // 11. BOOTSTRAP
-        // ============================================================
-        document.addEventListener("DOMContentLoaded", () => {
-            applyDirectionForLanguage(activeWorldLang);
-            syncLanguageDropdowns();
-            updateUtcClock();
-            setInterval(updateUtcClock, 1000);
-            applySeniorMode(localStorage.getItem(SENIOR_KEY) === "1");
-            initEgyptMap();
-            checkApiHealth();
-            loadOptions();
-            safeRefreshIcons();
-        });
-
-        window.addEventListener("load", () => {
-            if (egyptMap) {
-                setTimeout(() => egyptMap.invalidateSize(), 200);
-            }
-        });
-
-        // ============================================================
-        // 12. AI AGRONOMIC ADVISOR CHAT (/api/ask-ai - WORLD LANGUAGES)
-        // ============================================================
-        function collectCurrentCardContext() {
-            if (!lastAnalysisResponse) return {};
-            const d = lastAnalysisResponse;
-            const farm = d.farm || {};
-            const ass = d.assessment || {};
-            const summary = (d.climate && d.climate.summary) || {};
-            const soil = d.soil_profile || {};
-            const elev = d.elevation || {};
-            const water = d.live_water_demand || {};
-            const econ = (d.economics_and_water && d.economics_and_water.economics) || {};
-            const forecast = d.forecast || {};
-
-            return {
-                governorate: farm.governorate,
-                crop: farm.crop,
-                planting_month: farm.planting_month,
-                irrigation_method: farm.irrigation_method,
-                water_source: farm.water_source,
-                agricultural_problem: farm.agricultural_problem,
-                suitability_status: ass.crop_suitability_status,
-                suitability_score: ass.suitability_score,
-                planting_timing_alert: ass.planting_timing_alert ? ass.planting_timing_alert.message : null,
-                soil_profile: {
-                    source: soil.source_label,
-                    effective_type: soil.effective_soil_type,
-                    clay_percent: soil.clay_percent,
-                    sand_percent: soil.sand_percent,
-                    ph: soil.ph,
-                    ec_ds_m: soil.ec_ds_m
-                },
-                elevation_m: elev.elevation_m,
-                nasa_30d_weather: {
-                    avg_temp_c: summary.average_temperature_c,
-                    total_rain_mm: summary.total_rainfall_mm,
-                    avg_humidity_percent: summary.average_relative_humidity_percent,
-                    smap_root_zone_wetness: summary.average_root_zone_soil_wetness,
-                    estimated_daily_et_mm: summary.estimated_daily_et_mm
-                },
-                live_water_m3_per_feddan: water.recommended_m3_per_feddan || null,
-                daily_avg_water_m3_per_feddan: water.daily_avg_m3_per_feddan || null,
-                economics_per_feddan_egp: {
-                    cost: econ.cost_per_feddan_egp,
-                    net_profit: econ.net_profit_per_feddan_egp,
-                    roi_percent: econ.roi_percent
-                },
-                forecast_alerts: forecast.alerts || [],
-                irrigation_recommendation: ass.irrigation_recommendation || null,
-                risks: ass.risks || []
-            };
-        }
-
-        function appendAiChatMessage(role, text, isError = false) {
-            const box = document.getElementById("ai-chat-messages");
-            const wrapper = document.createElement("div");
-
-            if (role === "user") {
-                wrapper.className = "flex items-start justify-end gap-2.5";
-                wrapper.innerHTML = `
-                    <div class="bg-green-600 text-white rounded-2xl rounded-tl-none px-4 py-2.5 text-xs md:text-sm font-bold leading-relaxed max-w-[85%] shadow-sm">
-                        ${escapeHtml(text)}
-                    </div>
-                    <span class="w-7 h-7 rounded-xl bg-slate-800 text-white flex items-center justify-center text-[11px] font-black shrink-0">أنت</span>
-                `;
-            } else {
-                const bubbleCls = isError
-                    ? "bg-orange-50 border-orange-300 text-orange-900"
-                    : "bg-white border-slate-200 text-slate-800";
-                wrapper.className = "flex items-start gap-2.5";
-                wrapper.innerHTML = `
-                    <span class="notranslate w-7 h-7 rounded-xl bg-green-600 text-white flex items-center justify-center text-xs font-black shrink-0" translate="no">AI</span>
-                    <div class="border ${bubbleCls} rounded-2xl rounded-tr-none px-4 py-3 text-xs md:text-sm font-semibold leading-relaxed max-w-[90%] shadow-sm whitespace-pre-line">
-                        ${escapeHtml(text)}
-                    </div>
-                `;
-            }
-
-            box.appendChild(wrapper);
-            box.scrollTop = box.scrollHeight;
-            return wrapper;
-        }
-
-        function askAiQuick(text) {
-            document.getElementById("ai-question-input").value = text;
-            sendAiQuestion();
-        }
-
-        async function sendAiQuestion() {
-            const input = document.getElementById("ai-question-input");
-            const btn = document.getElementById("ai-send-btn");
-            const question = input.value.trim();
-
-            if (!question) return;
-            if (!lastAnalysisResponse) {
-                appendAiChatMessage("ai", "يرجى تحليل الأرض أولاً حتى يتمكن المرشد الذكي من الإجابة بناءً على بيانات أرضك.", true);
-                return;
-            }
-
-            appendAiChatMessage("user", question);
-            input.value = "";
-            input.disabled = true;
-            btn.disabled = true;
-            btn.innerHTML = '<span>جاري التفكير...</span>';
-
-            const typingNode = appendAiChatMessage("ai", "جاري تحليل سؤالك ومطابقته مع بيانات القمر الصناعي...");
-
-            try {
-                const res = await fetch(`${API_BASE}/api/ask-ai`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        question,
-                        farm_context: collectCurrentCardContext(),
-                        language: activeWorldLang || "ar"
-                    })
-                });
-
-                const data = await res.json().catch(() => null);
-                typingNode.remove();
-
-                if (!res.ok) {
-                    const errMsg = (data && data.detail) || `حدث خطأ من السيرفر (كود ${res.status}).`;
-                    appendAiChatMessage("ai", typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg), true);
-                } else {
-                    appendAiChatMessage("ai", data.answer || "لم يتم استلام رد من النموذج.");
-                }
-            } catch (err) {
-                typingNode.remove();
-                appendAiChatMessage("ai", "تعذر الاتصال بالسيرفر حالياً. تأكد من تشغيل السيرفر والإنترنت.", true);
-                console.error("Ask AI Error:", err);
-            } finally {
-                input.disabled = false;
-                btn.disabled = false;
-                btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i><span>إرسال</span>';
-                safeRefreshIcons();
-                input.focus();
-            }
-        }
-    </script>
-    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-</body>
-</html>
-

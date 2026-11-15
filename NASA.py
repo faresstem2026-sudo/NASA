@@ -5202,6 +5202,18 @@ def analyze_farm(farm: FarmData):
                     top_recommended, farm.compare_crop, farm, ctx, lang,
                     forecast_days=forecast_days, market_indicators=market_indicators
                 )
+                # Step 5D-2: Crop Rotation Strategies
+    target_crop_for_rot = (
+        farm.crop
+        if farm.crop != "مش متأكد"
+        else (assessment["alternative_crops"][0]["crop"] if assessment.get("alternative_crops") else "القمح")
+    )
+    rotation_strategies = [
+        model_to_dict(s)
+        for s in generate_rotation_strategies(farm.previous_crop or "غير معروف", target_crop_for_rot)
+    ]
+
+    # Step 5E: Transparent methodology
 
     # Step 5E: Transparent methodology
 
@@ -5275,13 +5287,15 @@ def analyze_farm(farm: FarmData):
 
         },
 
-        "assessment": assessment,
+   "assessment": assessment,
 
         "economics_and_water": economics_and_water,
 
         "crop_calendar": crop_calendar,
 
         "crop_comparison": crop_comparison,
+
+        "rotation_strategies": rotation_strategies,
 
         "methodology": methodology,
 
@@ -5290,7 +5304,6 @@ def analyze_farm(farm: FarmData):
         "limitations": limitations,
 
     }
-
 
 # ============================================================
 # 24B. DEDICATED SIDE-BY-SIDE CROP COMPARISON ENDPOINT

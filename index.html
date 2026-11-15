@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NASA Fallah | مستشار القرار الزراعي الذكي ببيانات ناسا</title>
+    <title>N.A.D.A | منصة ندى الذكية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -214,7 +214,7 @@
                 </div>
                 <div>
                     <h1 class="font-black text-lg md:text-xl text-slate-900 leading-tight">
-                        مستشار الفلاح الفضائي <span class="text-green-600">NASA Fallah</span>
+                        منصة ندى الذكية<span class="text-green-600">N.A.D.A</span>
                     </h1>
                     <p class="text-slate-500 text-xs font-semibold">أقمار ناسا (POWER/SMAP/SRTM) + تربة SoilGrids + توقعات الفاو ET0 + اقتصاديات حية</p>
                 </div>
@@ -1254,7 +1254,7 @@
                         <i data-lucide="calculator" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h3 id="modal-meth-title" class="font-black text-lg text-slate-900">منهجية الحساب والتقييم في NASA Fallah</h3>
+                        <h3 id="modal-meth-title" class="font-black text-lg text-slate-900">منهجية الحساب والتقييم في N.A.D.A</h3>
                         <p class="text-xs text-slate-500 font-semibold">شفافية كاملة لمصادر البيانات الفعلية والمعادلات والأوزان</p>
                     </div>
                 </div>
@@ -1270,7 +1270,7 @@
     </div>
 
     <footer class="no-print border-t border-slate-200 bg-white py-4 px-4 text-center text-xs font-semibold text-slate-500 mt-10">
-        NASA Fallah v2.0.0 • منصة إرشادية مجانية 100% تعتمد على بيانات NASA POWER/SMAP/SRTM و SoilGrids و Open-Meteo • لا تغني عن استشارة المهندس الزراعي
+        N.A.D.A v2.0.0 • منصة إرشادية مجانية 100% تعتمد على بيانات NASA POWER/SMAP/SRTM و SoilGrids و Open-Meteo • لا تغني عن استشارة المهندس الزراعي
     </footer>
 
     <script>
@@ -2281,7 +2281,7 @@
                 document.getElementById("wizard-view").classList.remove("hidden");
                 document.getElementById("hero-guide").classList.remove("hidden");
                 if (egyptMap) setTimeout(() => egyptMap.invalidateSize(), 150);
-                showError(err.message || "تعذر الاتصال بخادم NASA Fallah. تأكد من تشغيل الخادم على المنفذ 8000.");
+                showError(err.message || "تعذر الاتصال بخادم N.A.D.A. تأكد من تشغيل الخادم على المنفذ 8000.");
             }
         }
 
@@ -2922,7 +2922,7 @@
                 return;
             }
 
-            document.getElementById("modal-meth-title").textContent = meth.title || "منهجية الحساب في NASA Fallah";
+            document.getElementById("modal-meth-title").textContent = meth.title || "منهجية الحساب في N.A.D.A";
             const sm = meth.scoring_model || {};
             const ew = meth.economics_and_water_formulas || {};
 
@@ -2985,7 +2985,7 @@
             const timing = ass.planting_timing_alert;
 
             const lines = [
-                `🌱 *تقرير NASA Fallah الزراعي*`,
+                `🌱 *تقرير N.A.D.A الزراعي*`,
                 `📍 المحافظة: ${farm.governorate || ""} (ارتفاع ${elev.elevation_m ?? "--"} م)`,
                 `🧱 التربة (${soilP.source_label || ""}): طين ${soilP.clay_percent ?? "--"}% • رمل ${soilP.sand_percent ?? "--"}% • pH ${soilP.ph ?? "--"}`,
                 `🌾 المحصول: ${farm.crop || ""} (الشهر ${farm.planting_month || ""})`,

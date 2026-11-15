@@ -15,312 +15,277 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
 
     <style>
+        /* ============================================================
+           N.A.D.A — ثيم كحلي "مرصد الأرض" بست ألوان فقط
+           الأساس: كحلي  |  أخضر = نمو ونصائح  |  أزرق سماوي = مياه ورطوبة
+           أصفر عنبري = حرارة وتنبيه  |  طيني = تربة وتضاريس  |  أحمر = مخاطر
+           ============================================================ */
         :root {
             color-scheme: dark;
+            --bg: #0A1A2B;
+            --bar: #08141F;
+            --surface: #0F2236;
+            --surface-2: #14304A;
+            --line: rgba(255, 255, 255, 0.09);
+            --line-strong: rgba(255, 255, 255, 0.16);
+            --text: #E8EEF5;
+            --text-soft: #C3D0DE;
+            --muted: #8FA6BD;
+
+            --green: #4CAF50;  --green-t: #86D98B;  --green-bg: rgba(76, 175, 80, 0.13);  --green-bd: rgba(76, 175, 80, 0.38);  --green-solid: #2E7D32;
+            --water: #38BDF8;  --water-t: #7DD3FC;  --water-bg: rgba(56, 189, 248, 0.11); --water-bd: rgba(56, 189, 248, 0.38); --water-solid: #0B79B0;
+            --heat:  #F59E0B;  --heat-t:  #FBBF24;  --heat-bg:  rgba(245, 158, 11, 0.12); --heat-bd:  rgba(245, 158, 11, 0.40);
+            --clay:  #B8845A;  --clay-t:  #DDAE82;  --clay-bg:  rgba(184, 132, 90, 0.15); --clay-bd:  rgba(184, 132, 90, 0.42);  --clay-solid: #8A5E3C;
+            --risk:  #DC4C3C;  --risk-t:  #F59388;  --risk-bg:  rgba(220, 76, 60, 0.13);  --risk-bd:  rgba(220, 76, 60, 0.42);   --risk-solid: #B83A2C;
         }
 
-        html {
-            font-size: 16px;
-            scroll-behavior: smooth;
-        }
+        html { font-size: 16px; scroll-behavior: smooth; }
 
         /* وضع كبار السن */
-        html.senior-mode {
-            font-size: 19px;
-        }
+        html.senior-mode { font-size: 19px; }
         html.senior-mode .text-slate-500,
         html.senior-mode .text-slate-600,
-        html.senior-mode .text-slate-700 {
-            color: #ffffff !important;
-        }
+        html.senior-mode .text-slate-700 { color: #ffffff !important; }
         html.senior-mode .agri-card,
-        html.senior-mode .choice-card {
-            border-width: 2px !important;
-            border-color: #4ade80 !important;
-        }
+        html.senior-mode .choice-card { border-width: 2px !important; border-color: var(--green) !important; }
 
-        /* الخلفية العامة: أسود صريح تماماً بدون أي كحلي */
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #000000 !important;
+            background-color: var(--bg) !important;
             background-image: none !important;
-            color: #f5f5f5 !important;
+            color: var(--text) !important;
             overflow-x: hidden;
             top: 0px !important;
         }
-
-        .font-mono-tech {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* شبكة خفيفة جداً بالرمادي المحايد على الأسود */
+        .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
         .bg-agri-grid {
-            background-color: #000000 !important;
-            background-size: 32px 32px;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px) !important;
+            background-color: var(--bg) !important;
+            background-size: 36px 36px;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px) !important;
         }
 
-        /* الشريط العلوي والهيدر والفوتر بالأسود الصريح */
+        /* ---------- الشريط الجانبي (يظهر على الشاشات الكبيرة) ---------- */
+        #side-nav {
+            position: fixed; top: 0; bottom: 0; inset-inline-start: 0;
+            width: 232px; z-index: 45;
+            background: var(--bar);
+            border-inline-end: 1px solid var(--line);
+            display: none; flex-direction: column; padding: 18px 12px; gap: 6px;
+        }
+        @media (min-width: 1100px) {
+            #side-nav { display: flex; }
+            body { padding-inline-start: 232px; }
+        }
+        .side-brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 16px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+        .side-brand .logo { width: 40px; height: 40px; border-radius: 12px; background: var(--green-solid); display: flex; align-items: center; justify-content: center; color: #fff; }
+        .side-link {
+            display: flex; align-items: center; gap: 10px; width: 100%;
+            padding: 10px 12px; border-radius: 12px; border: 1px solid transparent;
+            color: var(--text-soft); font-weight: 700; font-size: 13px; cursor: pointer;
+            background: transparent; text-align: start; transition: background .15s, color .15s;
+        }
+        .side-link:hover { background: var(--surface-2); color: #fff; }
+        .side-link.active { background: var(--green-bg); border-color: var(--green-bd); color: var(--green-t); }
+        .side-link i, .side-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+        .side-foot { margin-top: auto; padding: 12px 8px 0; border-top: 1px solid var(--line); font-size: 10.5px; color: var(--muted); line-height: 1.7; }
+
+        /* ---------- الشريط العلوي والهيدر والفوتر ---------- */
         body > div.no-print {
-            background-color: #050505 !important;
+            background-color: var(--bar) !important;
             background-image: none !important;
-            border-bottom: 1px solid #262626 !important;
+            border-bottom: 1px solid var(--line) !important;
         }
-
         header.no-print {
-            background-color: rgba(8, 8, 8, 0.95) !important;
+            background-color: rgba(10, 26, 43, 0.92) !important;
             background-image: none !important;
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid #262626 !important;
+            border-bottom: 1px solid var(--line) !important;
+            box-shadow: none !important;
         }
-
         footer.no-print {
-            background-color: #050505 !important;
+            background-color: var(--bar) !important;
             background-image: none !important;
-            border-top: 1px solid #262626 !important;
-            color: #a3a3a3 !important;
+            border-top: 1px solid var(--line) !important;
+            color: var(--muted) !important;
         }
 
-        /* الكروت بالأسود الفحمي النقي (بدون أي كحلي) */
+        /* ---------- الكروت: مسطّحة بحدود رفيعة بدون توهج ---------- */
         .agri-card {
-            background-color: #0c0c0c !important;
+            background-color: var(--surface) !important;
             background-image: none !important;
-            border: 1px solid #262626 !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9) !important;
-            color: #f5f5f5 !important;
+            border: 1px solid var(--line) !important;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28) !important;
+            color: var(--text) !important;
         }
 
-        /* الصناديق الداخلية بالدرجات الرمادية الداكنة النقية */
-        .bg-white,
-        .bg-white\/90,
-        .bg-white\/80 {
-            background-color: #141414 !important;
-        }
+        /* ---------- الخلفيات الداخلية ---------- */
+        .bg-white, .bg-white\/90, .bg-white\/80 { background-color: var(--surface-2) !important; }
+        .bg-slate-50, .bg-slate-50\/80, .bg-slate-100 { background-color: rgba(255, 255, 255, 0.045) !important; }
 
-        .bg-slate-50,
-        .bg-slate-50\/80,
-        .bg-slate-100 {
-            background-color: #171717 !important;
-        }
+        .bg-green-50, .bg-green-50\/70, .bg-green-50\/60, .bg-green-100 { background-color: var(--green-bg) !important; }
+        .bg-sky-50, .bg-sky-50\/70, .bg-sky-50\/80, .bg-sky-50\/60, .bg-sky-100 { background-color: var(--water-bg) !important; }
+        .bg-amber-50, .bg-amber-50\/70, .bg-amber-100 { background-color: var(--heat-bg) !important; }
+        .bg-orange-50, .bg-orange-50\/70, .bg-orange-100 { background-color: var(--risk-bg) !important; }
+        .bg-indigo-50, .bg-indigo-50\/70, .bg-indigo-100 { background-color: var(--clay-bg) !important; }
 
-        .bg-green-50, .bg-green-50\/70, .bg-green-50\/60,
-        .bg-emerald-50, .bg-emerald-50\/70, .bg-green-100, .bg-emerald-100 {
-            background-color: rgba(34, 197, 94, 0.10) !important;
-        }
+        /* الأزرار والعناصر الصلبة */
+        .bg-green-500 { background-color: var(--green) !important; }
+        .bg-green-600, .bg-green-700 { background-color: var(--green-solid) !important; }
+        .bg-sky-600 { background-color: var(--water-solid) !important; }
+        .bg-amber-500 { background-color: var(--heat) !important; }
+        .bg-orange-500 { background-color: var(--risk) !important; }
+        .bg-orange-600 { background-color: var(--risk-solid) !important; }
+        .bg-indigo-600 { background-color: var(--clay-solid) !important; }
+        .bg-slate-900, .bg-slate-800 { background-color: var(--surface-2) !important; border: 1px solid var(--line-strong); }
+        .hover\:bg-green-700:hover, .hover\:bg-green-600:hover { background-color: #388E3C !important; }
+        .hover\:bg-slate-800:hover, .hover\:bg-slate-100:hover { background-color: #1B3C5C !important; }
+        .bg-slate-900\/50 { background-color: rgba(3, 10, 18, 0.72) !important; }
 
-        .bg-sky-50, .bg-sky-50\/70, .bg-sky-50\/80, .bg-sky-50\/60,
-        .bg-cyan-50, .bg-cyan-50\/70, .bg-indigo-50, .bg-indigo-50\/70, .bg-sky-100 {
-            background-color: rgba(56, 189, 248, 0.10) !important;
-        }
-
-        .bg-amber-50, .bg-amber-50\/70, .bg-orange-50, .bg-orange-50\/70,
-        .bg-amber-100, .bg-orange-100 {
-            background-color: rgba(250, 204, 21, 0.10) !important;
-        }
-
-        /* نافذة المنهجية وقسم المرشد الذكي AI */
         #methodology-modal > div {
-            background-color: #0d0d0d !important;
-            border: 1.5px solid #333333 !important;
+            background-color: var(--surface) !important;
+            border: 1px solid var(--line-strong) !important;
         }
         #ai-advisor-section {
-            background-color: #0c0c0c !important;
+            background-color: var(--surface) !important;
             background-image: none !important;
-            border: 1.5px solid #2e2e2e !important;
-            border-top: 4px solid #22c55e !important;
+            border: 1px solid var(--line) !important;
+            border-top: 4px solid var(--green) !important;
         }
         #ai-chat-messages {
-            background-color: #050505 !important;
-            border: 1px solid #262626 !important;
+            background-color: var(--bar) !important;
+            border: 1px solid var(--line) !important;
         }
 
-        /* ألوان الكلام: واضحة ومريحة جداً على الخلفية السوداء */
+        /* ---------- ألوان النصوص ---------- */
         .text-slate-900, .text-slate-800 { color: #ffffff !important; }
-        .text-slate-700, .text-slate-600 { color: #e5e5e5 !important; }
-        .text-slate-500, .text-slate-400 { color: #a3a3a3 !important; }
+        .text-slate-700, .text-slate-600 { color: var(--text-soft) !important; }
+        .text-slate-500, .text-slate-400 { color: var(--muted) !important; }
+        .text-white { color: #ffffff !important; }
 
-        .text-green-950, .text-green-900, .text-green-800, .text-green-700,
-        .text-emerald-900, .text-emerald-800, .text-emerald-700 {
-            color: #4ade80 !important;
-        }
+        .text-green-950, .text-green-900, .text-green-800, .text-green-700, .text-green-600, .text-green-500 { color: var(--green-t) !important; }
+        .text-sky-950, .text-sky-900, .text-sky-800, .text-sky-700, .text-sky-600, .text-sky-500 { color: var(--water-t) !important; }
+        .text-amber-950, .text-amber-900, .text-amber-800, .text-amber-700, .text-amber-600, .text-amber-500 { color: var(--heat-t) !important; }
+        .text-orange-950, .text-orange-900, .text-orange-800, .text-orange-700, .text-orange-600, .text-orange-500 { color: var(--risk-t) !important; }
+        .text-indigo-900, .text-indigo-800, .text-indigo-700, .text-indigo-600, .text-indigo-500 { color: var(--clay-t) !important; }
+        .bg-green-600 .text-green-700, .bg-green-700 .text-green-700 { color: #fff !important; }
 
-        .text-sky-950, .text-sky-900, .text-sky-800, .text-sky-700,
-        .text-cyan-900, .text-cyan-800, .text-cyan-700,
-        .text-indigo-900, .text-indigo-800 {
-            color: #38bdf8 !important;
-        }
+        /* ---------- الحدود ---------- */
+        .border-slate-200, .border-slate-200\/90, .border-slate-200\/80, .border-slate-300, .border-slate-100 { border-color: var(--line) !important; }
+        .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--line) !important; }
+        .border-green-200, .border-green-200\/70, .border-green-300, .border-green-400 { border-color: var(--green-bd) !important; }
+        .border-sky-100, .border-sky-200, .border-sky-200\/70, .border-sky-300 { border-color: var(--water-bd) !important; }
+        .border-amber-200, .border-amber-200\/70, .border-amber-200\/80, .border-amber-300, .border-amber-300\/80 { border-color: var(--heat-bd) !important; }
+        .border-orange-200, .border-orange-300 { border-color: var(--risk-bd) !important; }
+        .border-indigo-200 { border-color: var(--clay-bd) !important; }
 
-        .text-amber-950, .text-amber-900, .text-amber-800, .text-amber-700 {
-            color: #facc15 !important;
-        }
+        /* شرائط الألوان العلوية/الجانبية للكروت */
+        .border-t-green-500, .border-t-green-600, .border-r-green-600 { border-top-color: var(--green) !important; border-right-color: var(--green); }
+        .border-t-sky-500, .border-t-sky-600, .border-r-sky-600 { border-top-color: var(--water) !important; border-right-color: var(--water); }
+        .border-t-amber-500 { border-top-color: var(--heat) !important; }
+        .border-t-orange-500, .border-t-orange-600 { border-top-color: var(--risk) !important; }
+        .border-t-indigo-500 { border-top-color: var(--clay) !important; }
+        .border-r-green-600 { border-right-color: var(--green) !important; }
+        .border-r-sky-600 { border-right-color: var(--water) !important; }
 
-        .text-orange-950, .text-orange-900, .text-orange-800, .text-orange-700, .text-orange-600 {
-            color: #fb923c !important;
-        }
-
-        .text-white {
-            color: #ffffff !important;
-        }
-
-        /* الحدود باللون الرمادي المحايد الواضح */
-        .border-slate-200, .border-slate-200\/90, .border-slate-200\/80, .border-slate-300 {
-            border-color: #262626 !important;
-        }
-        .border-green-200, .border-green-200\/70, .border-green-300,
-        .border-emerald-200, .border-emerald-300, .border-emerald-400 {
-            border-color: rgba(74, 222, 128, 0.35) !important;
-        }
-        .border-sky-200, .border-sky-200\/70, .border-sky-300, .border-sky-100,
-        .border-cyan-200, .border-indigo-200 {
-            border-color: rgba(56, 189, 248, 0.35) !important;
-        }
-        .border-amber-200, .border-amber-200\/70, .border-amber-200\/80,
-        .border-amber-300, .border-amber-300\/80, .border-orange-200, .border-orange-300 {
-            border-color: rgba(250, 204, 21, 0.35) !important;
-        }
-
-        /* حقول الإدخال والقوائم المنسدلة */
+        /* ---------- حقول الإدخال ---------- */
         .custom-select, .custom-input, .custom-textarea {
-            background-color: #080808 !important;
-            border: 1.5px solid #333333 !important;
+            background-color: var(--bar) !important;
+            border: 1.5px solid var(--line-strong) !important;
             color: #ffffff !important;
             transition: all 0.2s ease;
         }
-        .custom-select option,
-        #world-language-select option {
-            background-color: #0c0c0c;
-            color: #ffffff;
-        }
+        .custom-select option, #world-language-select option { background-color: var(--surface); color: #ffffff; }
         .custom-select:focus, .custom-input:focus, .custom-textarea:focus {
             outline: none;
-            border-color: #4ade80 !important;
-            box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2) !important;
+            border-color: var(--green) !important;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.22) !important;
         }
 
-        /* أزرار الاختيارات */
+        /* ---------- بطاقات الاختيار ---------- */
         .choice-card {
-            background-color: #141414 !important;
-            border: 1.5px solid #2b2b2b !important;
-            color: #f5f5f5 !important;
+            background-color: var(--surface-2) !important;
+            border: 1.5px solid var(--line) !important;
+            color: var(--text) !important;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             user-select: none;
         }
-        .choice-card:hover {
-            border-color: #4ade80 !important;
-            background-color: #1c1c1c !important;
-            transform: translateY(-2px);
-        }
+        .choice-card:hover { border-color: var(--green) !important; background-color: #19395A !important; transform: translateY(-2px); }
         .choice-card.selected {
-            background-color: #112218 !important;
-            border-color: #4ade80 !important;
-            box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.25) !important;
+            background-color: var(--green-bg) !important;
+            border-color: var(--green) !important;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.25) !important;
             color: #ffffff !important;
         }
         .choice-card.selected .icon-box {
-            background: #16a34a !important;
+            background: var(--green-solid) !important;
             color: #ffffff !important;
-            border-color: #22c55e !important;
+            border-color: var(--green) !important;
         }
 
-        /* مسار الحلقة الدائرية للنتيجة */
-        svg circle:first-child {
-            stroke: #262626 !important;
-        }
+        /* مسار الحلقة الدائرية */
+        svg circle:first-child { stroke: rgba(255, 255, 255, 0.10) !important; }
 
-        /* نافذة الخريطة التفاعلية */
-        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-            background-color: #111111 !important;
-            color: #ffffff !important;
-            border: 1px solid #333333;
-        }
+        /* الخريطة */
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip { background-color: var(--surface) !important; color: #ffffff !important; border: 1px solid var(--line-strong); }
+        .leaflet-control-layers { background: var(--surface) !important; color: var(--text) !important; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; font-family: 'Cairo', sans-serif; }
+        .leaflet-control-layers label { color: var(--text); font-size: 12px; font-weight: 700; }
 
-        /* إخفاء شريط جوجل للترجمة العلوي ليظل التصميم الأسود نظيفاً */
-        .goog-te-banner-frame.skiptranslate,
-        iframe.goog-te-banner-frame,
-        .VIpgJd-ZVi9od-ORHb-OEVmcd,
-        .VIpgJd-ZVi9od-l4eHX-hSRGPd {
-            display: none !important;
-        }
-        .goog-tooltip, .goog-tooltip:hover {
-            display: none !important;
-        }
-        .goog-text-highlight {
-            background-color: transparent !important;
-            box-shadow: none !important;
-        }
+        /* ---------- NDVI ---------- */
+        .ndvi-scale { height: 8px; border-radius: 999px; background: linear-gradient(90deg, #DC4C3C 0%, #F59E0B 35%, #86D98B 65%, #2E7D32 100%); position: relative; }
+        .ndvi-scale-marker { position: absolute; top: -5px; width: 4px; height: 18px; background: #fff; border-radius: 2px; transform: translateX(-50%); box-shadow: 0 0 0 2px var(--surface); transition: left .6s; }
 
-        .step-container {
-            display: none;
-        }
-        .step-container.active {
-            display: block;
-            animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* إخفاء شريط جوجل للترجمة */
+        .goog-te-banner-frame.skiptranslate, iframe.goog-te-banner-frame,
+        .VIpgJd-ZVi9od-ORHb-OEVmcd, .VIpgJd-ZVi9od-l4eHX-hSRGPd { display: none !important; }
+        .goog-tooltip, .goog-tooltip:hover { display: none !important; }
+        .goog-text-highlight { background-color: transparent !important; box-shadow: none !important; }
 
-        @keyframes pulseRadar {
-            0% { transform: scale(0.78); opacity: 0.75; }
-            100% { transform: scale(2.05); opacity: 0; }
-        }
-        .radar-wave {
-            animation: pulseRadar 2.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-        }
+        .step-container { display: none; }
+        .step-container.active { display: block; animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseRadar { 0% { transform: scale(0.78); opacity: 0.75; } 100% { transform: scale(2.05); opacity: 0; } }
+        .radar-wave { animation: pulseRadar 2.4s cubic-bezier(0.24, 0, 0.38, 1) infinite; }
 
-        #egypt-map {
-            height: 310px;
-            width: 100%;
-            border-radius: 1rem;
-            border: 1.5px solid #333333;
-            z-index: 1;
-            background-color: #000000;
-        }
+        #egypt-map { height: 310px; width: 100%; border-radius: 1rem; border: 1.5px solid var(--line-strong); z-index: 1; background-color: var(--bar); }
 
-        .custom-scrollbar::-webkit-scrollbar {
-            height: 7px;
-            width: 7px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #0a0a0a;
-            border-radius: 999px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #333333;
-            border-radius: 999px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #4ade80;
-        }
+        .custom-scrollbar::-webkit-scrollbar { height: 7px; width: 7px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: var(--bar); border-radius: 999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2A4560; border-radius: 999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--green); }
 
         @media print {
-            body {
-                background: #ffffff !important;
-                background-image: none !important;
-                color: #0f172a !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            #results-view {
-                display: block !important;
-            }
+            body { background: #ffffff !important; background-image: none !important; color: #0f172a !important; padding: 0 !important; }
+            .no-print, #side-nav { display: none !important; }
+            #results-view { display: block !important; }
             .agri-card, .bg-white, #printable-decision-card > div {
-                background: #ffffff !important;
-                color: #0f172a !important;
-                box-shadow: none !important;
-                border: 1px solid #cbd5e1 !important;
-                break-inside: avoid;
+                background: #ffffff !important; color: #0f172a !important; box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important; break-inside: avoid;
             }
-            .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600 {
-                color: #0f172a !important;
-            }
+            .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600 { color: #0f172a !important; }
         }
     </style>
 </head>
 <body class="bg-agri-grid min-h-screen flex flex-col">
+    <!-- الشريط الجانبي (شاشات كبيرة) -->
+    <aside id="side-nav" class="no-print" aria-label="التنقل">
+        <div class="side-brand">
+            <div class="logo"><i data-lucide="sprout" class="w-6 h-6"></i></div>
+            <div>
+                <div class="notranslate font-black text-white text-base leading-tight" translate="no">N.A.D.A</div>
+                <div class="text-[11px] font-bold" style="color:var(--muted)">ندى • دعم قرار المزارع</div>
+            </div>
+        </div>
+        <button type="button" class="side-link active" data-nav="farm" onclick="navTo('farm')"><i data-lucide="map-pin"></i><span>بيانات المزرعة</span></button>
+        <button type="button" class="side-link" data-nav="res-ndvi-section" onclick="navTo('res-ndvi-section')"><i data-lucide="leaf"></i><span>صحة النبات NDVI</span></button>
+        <button type="button" class="side-link" data-nav="res-soil-hybrid-card" onclick="navTo('res-soil-hybrid-card')"><i data-lucide="layers"></i><span>التربة والتضاريس</span></button>
+        <button type="button" class="side-link" data-nav="res-temp-30" onclick="navTo('res-temp-30')"><i data-lucide="thermometer"></i><span>طقس وقياسات ناسا</span></button>
+        <button type="button" class="side-link" data-nav="res-forecast-section" onclick="navTo('res-forecast-section')"><i data-lucide="cloud-sun"></i><span>توقعات 16 يوم</span></button>
+        <button type="button" class="side-link" data-nav="res-risks-list" onclick="navTo('res-risks-list')"><i data-lucide="alert-triangle"></i><span>المخاطر والنصائح</span></button>
+        <button type="button" class="side-link" data-nav="ai-advisor-section" onclick="navTo('ai-advisor-section')"><i data-lucide="bot"></i><span>المرشد الذكي</span></button>
+        <div class="side-foot">بيانات حية: NASA POWER • MODIS • SMAP • SRTM<br>التقدير إرشادي ولا يغني عن الفحص الميداني.</div>
+    </aside>
+
 
     <!-- 1. الشريط العلوي للنظام والشفافية واختيار لغة العالم -->
     <div class="no-print bg-white border-b border-slate-200 text-xs py-2 px-4 text-slate-600">
@@ -403,7 +368,7 @@
                     <h1 class="font-black text-lg md:text-xl text-slate-900 leading-tight">
                         منصة ندى الذكية <span class="notranslate text-green-600" translate="no">N.A.D.A</span>
                     </h1>
-                    <p class="text-slate-500 text-xs font-semibold">أقمار ناسا (POWER/SMAP/SRTM) + تربة SoilGrids + توقعات الفاو ET0 + اقتصاديات حية</p>
+                    <p class="text-slate-500 text-xs font-semibold">أقمار ناسا (POWER/SMAP/SRTM/MODIS) + تربة SoilGrids + توقعات الفاو ET0 + اقتصاديات حية</p>
                 </div>
             </div>
 
@@ -806,7 +771,7 @@
                                 <span>السابق</span>
                             </button>
 
-                            <button type="submit" id="analyze-submit-btn" class="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-l from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-black text-sm md:text-base shadow-lg shadow-green-600/25 transition-all">
+                            <button type="submit" id="analyze-submit-btn" class="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-l from-green-600 to-green-600 hover:from-green-700 hover:to-green-700 text-white font-black text-sm md:text-base shadow-lg shadow-green-600/25 transition-all">
                                 <i data-lucide="sparkles" class="w-5 h-5"></i>
                                 <span>تحليل الأرض وإصدار بطاقة القرار</span>
                             </button>
@@ -902,7 +867,7 @@
                 <div class="bg-sky-50 rounded-2xl p-3 border border-sky-200">NASA POWER & SMAP</div>
                 <div class="bg-green-50 rounded-2xl p-3 border border-green-200">SoilGrids & SRTM</div>
                 <div class="bg-amber-50 rounded-2xl p-3 border border-amber-200">Open-Meteo FAO ET0</div>
-                <div class="bg-emerald-50 rounded-2xl p-3 border border-emerald-200">Live FX & ROI</div>
+                <div class="bg-green-50 rounded-2xl p-3 border border-green-200">Live FX & ROI</div>
             </div>
         </section>
 
@@ -923,7 +888,7 @@
                         <i data-lucide="calculator" class="w-4 h-4 text-amber-600"></i>
                         <span>إزاي بنحسب؟</span>
                     </button>
-                    <button type="button" onclick="shareWhatsApp()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm font-extrabold shadow-sm transition-all">
+                    <button type="button" onclick="shareWhatsApp()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-green-600 hover:bg-green-700 text-white text-xs md:text-sm font-extrabold shadow-sm transition-all">
                         <i data-lucide="share-2" class="w-4 h-4"></i>
                         <span>مشاركة عبر واتساب</span>
                     </button>
@@ -948,7 +913,7 @@
                         <div class="relative w-36 h-36 shrink-0 flex items-center justify-center">
                             <svg class="w-36 h-36 -rotate-90" viewBox="0 0 120 120">
                                 <circle cx="60" cy="60" r="52" stroke="#e2e8f0" stroke-width="10" fill="none" />
-                                <circle id="score-ring" cx="60" cy="60" r="52" stroke="#16a34a" stroke-width="10" stroke-linecap="round" fill="none" stroke-dasharray="326.73" stroke-dashoffset="326.73" class="transition-all duration-700" />
+                                <circle id="score-ring" cx="60" cy="60" r="52" stroke="#4CAF50" stroke-width="10" stroke-linecap="round" fill="none" stroke-dasharray="326.73" stroke-dashoffset="326.73" class="transition-all duration-700" />
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
                                 <span id="res-score-value" class="notranslate font-mono-tech text-3xl font-black text-slate-900" translate="no">--</span>
@@ -984,6 +949,34 @@
                     </div>
                 </div>
 
+
+                <!-- 1A. صحة المحصول من القمر: NASA MODIS NDVI -->
+                <div id="res-ndvi-section" class="agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-green-500 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="font-black text-base md:text-lg text-slate-900 flex items-center gap-2">
+                            <i data-lucide="leaf" class="w-5 h-5 text-green-600"></i>
+                            <span>صحة الغطاء النباتي من القمر (NDVI)</span>
+                        </h3>
+                        <span id="res-ndvi-source" class="notranslate font-mono-tech text-[11px] font-bold px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-200" translate="no">NASA MODIS</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+                        <div class="md:col-span-4 space-y-2 text-center md:text-start">
+                            <div id="res-ndvi-value" class="notranslate font-mono-tech text-5xl font-black text-slate-900" translate="no">--</div>
+                            <span id="res-ndvi-status" class="inline-block px-3.5 py-1 rounded-full text-xs font-black border bg-slate-100 border-slate-200 text-slate-700">جارٍ التحميل…</span>
+                            <div id="res-ndvi-date" class="notranslate font-mono-tech text-[11px] font-bold text-slate-500" translate="no"></div>
+                        </div>
+                        <div class="md:col-span-8 space-y-2">
+                            <div class="text-[11px] font-black text-slate-500">آخر 6 شهور (مركّب كل 16 يوم)</div>
+                            <div id="res-ndvi-chart" class="w-full" style="min-height:96px"></div>
+                            <div class="pt-3">
+                                <div class="ndvi-scale"><div id="res-ndvi-marker" class="ndvi-scale-marker" style="left:0%"></div></div>
+                                <div class="flex justify-between text-[10.5px] font-bold text-slate-500 mt-1.5 notranslate" translate="no"><span>0.0</span><span>0.2</span><span>0.4</span><span>0.6</span><span>0.8+</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p id="res-ndvi-note" class="text-xs text-slate-600 font-semibold leading-relaxed"></p>
+                </div>
+
                 <!-- 1B. بطاقة ارتفاع الأرض (NASA SRTM) والتربة الهجينة (SoilGrids / Lab) -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <!-- ارتفاع الأرض SRTM وتقييم كفاءة الري -->
@@ -1003,10 +996,10 @@
                     </div>
 
                     <!-- ملف التربة الهجين -->
-                    <div id="res-soil-hybrid-card" class="lg:col-span-7 agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-emerald-600 space-y-3">
+                    <div id="res-soil-hybrid-card" class="lg:col-span-7 agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-green-600 space-y-3">
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <h3 class="font-black text-base text-slate-900 flex items-center gap-2">
-                                <i data-lucide="layers" class="w-5 h-5 text-emerald-600"></i>
+                                <i data-lucide="layers" class="w-5 h-5 text-green-600"></i>
                                 <span>ملف التربة الهجين (فضائي + معملي)</span>
                             </h3>
                             <span id="res-soil-source-badge" class="text-[11px] font-black px-3 py-1 rounded-full border">--</span>
@@ -1026,7 +1019,7 @@
                             </div>
                             <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                                 <div class="text-[11px] text-slate-500 font-bold">الحموضة (pH)</div>
-                                <div id="res-soil-ph" class="notranslate font-mono-tech text-lg font-black text-emerald-700 mt-0.5" translate="no">--</div>
+                                <div id="res-soil-ph" class="notranslate font-mono-tech text-lg font-black text-green-700 mt-0.5" translate="no">--</div>
                             </div>
                         </div>
                         <div id="res-soil-extra" class="text-xs text-slate-600 font-bold"></div>
@@ -1069,7 +1062,7 @@
                                 <span>حاسبة التكلفة والعائد الديناميكية</span>
                             </h3>
                             <div class="flex flex-wrap items-center gap-1.5">
-                                <span id="res-fx-badge" class="notranslate font-mono-tech text-[11px] font-black px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200" translate="no">USD/EGP --</span>
+                                <span id="res-fx-badge" class="notranslate font-mono-tech text-[11px] font-black px-2.5 py-1 rounded-full bg-green-50 text-green-800 border border-green-200" translate="no">USD/EGP --</span>
                                 <span id="res-econ-area-badge" class="text-xs font-extrabold px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">للفدان الواحد</span>
                             </div>
                         </div>
@@ -1168,16 +1161,16 @@
                 </div>
 
                 <!-- 3B. جدول الري والتسميد المستقبلي لـ 16 يوماً (Open-Meteo FAO ET0 + NASA SMAP) -->
-                <div id="res-schedule-16d-section" class="hidden agri-card rounded-3xl p-5 md:p-6 space-y-4 border-t-4 border-t-cyan-600">
+                <div id="res-schedule-16d-section" class="hidden agri-card rounded-3xl p-5 md:p-6 space-y-4 border-t-4 border-t-sky-600">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div>
                             <h3 class="font-black text-base md:text-lg text-slate-900 flex items-center gap-2">
-                                <i data-lucide="calendar-check" class="w-5 h-5 text-cyan-600"></i>
+                                <i data-lucide="calendar-check" class="w-5 h-5 text-sky-600"></i>
                                 <span>جدول الري والتسميد المستقبلي لـ 16 يوماً (معادلة الفاو ET0 + رطوبة SMAP)</span>
                             </h3>
                             <p id="res-schedule-16d-subtitle" class="text-xs text-slate-600 font-semibold mt-0.5"></p>
                         </div>
-                        <span id="res-schedule-16d-total" class="font-mono-tech text-xs font-black px-3 py-1 rounded-full bg-cyan-50 text-cyan-900 border border-cyan-200"></span>
+                        <span id="res-schedule-16d-total" class="font-mono-tech text-xs font-black px-3 py-1 rounded-full bg-sky-50 text-sky-900 border border-sky-200"></span>
                     </div>
 
                     <div id="res-schedule-16d-list" class="flex gap-3 overflow-x-auto custom-scrollbar pb-2"></div>
@@ -1213,7 +1206,7 @@
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
                                 <div class="flex items-center gap-1.5 text-xs text-slate-600 font-bold">
-                                    <i data-lucide="thermometer" class="w-4 h-4 text-orange-500"></i>
+                                    <i data-lucide="thermometer" class="w-4 h-4 text-amber-500"></i>
                                     <span>متوسط الحرارة</span>
                                 </div>
                                 <div id="res-temp-30" class="notranslate font-mono-tech text-xl font-black text-slate-900 mt-1.5" translate="no">--</div>
@@ -1239,12 +1232,12 @@
                                 </div>
                                 <div id="res-wind-30" class="notranslate font-mono-tech text-xl font-black text-slate-900 mt-1.5" translate="no">--</div>
                             </div>
-                            <div class="bg-emerald-50/70 rounded-2xl p-3.5 border border-emerald-200">
-                                <div class="flex items-center gap-1.5 text-[11px] text-emerald-800 font-bold">
-                                    <i data-lucide="sprout" class="w-4 h-4 text-emerald-600"></i>
+                            <div class="bg-green-50/70 rounded-2xl p-3.5 border border-green-200">
+                                <div class="flex items-center gap-1.5 text-[11px] text-green-800 font-bold">
+                                    <i data-lucide="sprout" class="w-4 h-4 text-green-600"></i>
                                     <span>رطوبة الجذور SMAP</span>
                                 </div>
-                                <div id="res-gwet-root" class="notranslate font-mono-tech text-xl font-black text-emerald-800 mt-1.5" translate="no">--</div>
+                                <div id="res-gwet-root" class="notranslate font-mono-tech text-xl font-black text-green-800 mt-1.5" translate="no">--</div>
                             </div>
                             <div class="bg-sky-50/70 rounded-2xl p-3.5 border border-sky-200">
                                 <div class="flex items-center gap-1.5 text-[11px] text-sky-800 font-bold">
@@ -1260,12 +1253,12 @@
                                 </div>
                                 <div id="res-solar-30" class="notranslate font-mono-tech text-lg font-black text-amber-800 mt-1.5" translate="no">--</div>
                             </div>
-                            <div class="bg-cyan-50/70 rounded-2xl p-3.5 border border-cyan-200">
-                                <div class="flex items-center gap-1.5 text-[11px] text-cyan-800 font-bold">
-                                    <i data-lucide="waves" class="w-4 h-4 text-cyan-600"></i>
+                            <div class="bg-sky-50/70 rounded-2xl p-3.5 border border-sky-200">
+                                <div class="flex items-center gap-1.5 text-[11px] text-sky-800 font-bold">
+                                    <i data-lucide="waves" class="w-4 h-4 text-sky-600"></i>
                                     <span>البخر-نتح EVPTRNS</span>
                                 </div>
-                                <div id="res-et-30" class="notranslate font-mono-tech text-lg font-black text-cyan-800 mt-1.5" translate="no">--</div>
+                                <div id="res-et-30" class="notranslate font-mono-tech text-lg font-black text-sky-800 mt-1.5" translate="no">--</div>
                             </div>
                         </div>
 
@@ -1394,10 +1387,10 @@
             </div>
 
             <!-- قسم شات المرشد الزراعي الذكي AI -->
-            <div id="ai-advisor-section" class="no-print agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-emerald-600 space-y-4">
+            <div id="ai-advisor-section" class="no-print agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-green-600 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-sky-600 text-white flex items-center justify-center shadow-sm">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-green-600 to-sky-600 text-white flex items-center justify-center shadow-sm">
                             <i data-lucide="bot" class="w-5 h-5"></i>
                         </div>
                         <div>
@@ -1405,7 +1398,7 @@
                             <p class="text-xs text-slate-500 font-semibold">اسأل أي سؤال عن أرضك وسيجيبك بلغتك المختارة بناءً على بيانات ناسا والتربة والطقس المعروضة</p>
                         </div>
                     </div>
-                    <span class="notranslate font-mono-tech text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200" translate="no">Gemini AI • World Languages</span>
+                    <span class="notranslate font-mono-tech text-[11px] font-bold px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-200" translate="no">Gemini AI • World Languages</span>
                 </div>
 
                 <!-- أسئلة سريعة مقترحة -->
@@ -1424,7 +1417,7 @@
                 <!-- منطقة عرض المحادثة -->
                 <div id="ai-chat-messages" class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar bg-slate-50/80 border border-slate-200 rounded-2xl p-4">
                     <div class="flex items-start gap-2.5">
-                        <span class="notranslate w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shrink-0" translate="no">AI</span>
+                        <span class="notranslate w-7 h-7 rounded-xl bg-green-600 text-white flex items-center justify-center text-xs font-black shrink-0" translate="no">AI</span>
                         <div class="bg-white border border-slate-200 rounded-2xl rounded-tr-none px-4 py-2.5 text-xs md:text-sm text-slate-700 font-semibold leading-relaxed shadow-sm">
                             أهلاً بك! أنا جاهز للرد على أي استفسار بخصوص هذه الأرض والمحصول بأي لغة تختارها. اكتب سؤالك بالأسفل أو اختر سؤالاً سريعاً.
                         </div>
@@ -1443,7 +1436,7 @@
                     <button
                         type="submit"
                         id="ai-send-btn"
-                        class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-l from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-black text-sm shadow-md shadow-emerald-600/20 transition-all shrink-0"
+                        class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-l from-green-600 to-green-600 hover:from-green-700 hover:to-green-700 text-white font-black text-sm shadow-md shadow-green-600/20 transition-all shrink-0"
                     >
                         <i data-lucide="send" class="w-4 h-4"></i>
                         <span>إرسال</span>
@@ -1788,6 +1781,15 @@
                 }
             ).addTo(egyptMap);
 
+            // طبقة NDVI حقيقية من NASA GIBS (MODIS Terra، مركّب 8 أيام) تُفعَّل من زر الطبقات
+            if (L.control && L.control.layers) {
+                const ndviLayer = L.tileLayer(
+                    "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_NDVI_8Day/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png",
+                    { attribution: "NASA GIBS / MODIS Terra NDVI", maxNativeZoom: 9, maxZoom: 19, opacity: 0.78 }
+                );
+                L.control.layers(null, { "🌿 طبقة NDVI (NASA)": ndviLayer }, { collapsed: false, position: "topleft" }).addTo(egyptMap);
+            }
+
             egyptMap.on("click", (e) => {
                 const wrapped = e.latlng.wrap();
                 const lat = Number(wrapped.lat.toFixed(5));
@@ -2010,7 +2012,7 @@
 
             if (soilManualEdited || hasEcOrN) {
                 badge.textContent = "تحليل معملي يدوي (أولوية قصوى)";
-                badge.className = "px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-100 border border-emerald-400 text-emerald-900";
+                badge.className = "px-2.5 py-1 rounded-full text-[11px] font-black bg-green-100 border border-green-400 text-green-900";
             } else if (lastSoilGridsPayload) {
                 badge.textContent = lastSoilGridsPayload.is_fallback
                     ? "تقدير إقليمي احتياطي للتربة"
@@ -2651,6 +2653,105 @@
             document.getElementById("loading-view").classList.add("hidden");
         }
 
+
+        // ============================================================
+        // NDVI من NASA MODIS (عبر /api/ndvi) + التنقل الجانبي
+        // ============================================================
+        const NDVI_COLORS = { excellent: "#86D98B", good: "#86D98B", moderate: "#FBBF24", poor: "#F59388", unknown: "#8FA6BD" };
+        const NDVI_CLASSES = {
+            excellent: "bg-green-50 border-green-200 text-green-800",
+            good: "bg-green-50 border-green-200 text-green-800",
+            moderate: "bg-amber-50 border-amber-200 text-amber-800",
+            poor: "bg-orange-50 border-orange-200 text-orange-800",
+            unknown: "bg-slate-100 border-slate-200 text-slate-700"
+        };
+
+        function drawNdviChart(series) {
+            const box = document.getElementById("res-ndvi-chart");
+            if (!series || series.length < 2) { box.innerHTML = ""; return; }
+            const W = 320, H = 96, padX = 8, padY = 10;
+            const xs = (i) => padX + (i * (W - 2 * padX)) / (series.length - 1);
+            const ys = (v) => H - padY - Math.max(0, Math.min(1, v)) * (H - 2 * padY);
+            const pts = series.map((p, i) => `${xs(i).toFixed(1)},${ys(p.ndvi).toFixed(1)}`);
+            const last = series[series.length - 1];
+            const area = `M${xs(0)},${H - padY} L${pts.join(" L")} L${xs(series.length - 1)},${H - padY} Z`;
+            box.innerHTML = `
+                <svg viewBox="0 0 ${W} ${H}" class="w-full h-24" role="img" aria-label="NDVI">
+                    <line x1="${padX}" x2="${W - padX}" y1="${ys(0.4)}" y2="${ys(0.4)}" stroke="rgba(255,255,255,0.12)" stroke-dasharray="4 4"/>
+                    <path d="${area}" fill="rgba(76,175,80,0.16)" stroke="none"/>
+                    <polyline points="${pts.join(" ")}" fill="none" stroke="#4CAF50" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                    <circle cx="${xs(series.length - 1)}" cy="${ys(last.ndvi)}" r="4.5" fill="#4CAF50" stroke="#0F2236" stroke-width="2"/>
+                </svg>
+                <div class="flex justify-between text-[10.5px] font-bold text-slate-500 notranslate" translate="no"><span>${series[0].date}</span><span>${last.date}</span></div>`;
+        }
+
+        async function loadNdvi(lat, lon, lang) {
+            const valEl = document.getElementById("res-ndvi-value");
+            const stEl = document.getElementById("res-ndvi-status");
+            const dateEl = document.getElementById("res-ndvi-date");
+            const noteEl = document.getElementById("res-ndvi-note");
+            const markerEl = document.getElementById("res-ndvi-marker");
+            if (!valEl) return;
+            valEl.textContent = "--";
+            stEl.textContent = "جارٍ التحميل…";
+            stEl.className = "inline-block px-3.5 py-1 rounded-full text-xs font-black border " + NDVI_CLASSES.unknown;
+            dateEl.textContent = "";
+            noteEl.textContent = "";
+            document.getElementById("res-ndvi-chart").innerHTML = "";
+            markerEl.style.left = "0%";
+
+            const la = Number(lat), lo = Number(lon);
+            if (!isFinite(la) || !isFinite(lo)) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/ndvi?latitude=${la}&longitude=${lo}&language=${encodeURIComponent(lang || "ar")}`);
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+                const n = data.ndvi || {};
+                if (!n.available) {
+                    stEl.textContent = n.status_text || "غير متاح حالياً";
+                    noteEl.textContent = "تعذّر جلب قراءة NDVI من خادم ناسا في هذه اللحظة. لم نعرض أي رقم تقديري. جرّب مرة أخرى بعد قليل.";
+                    return;
+                }
+                valEl.textContent = Number(n.latest_ndvi).toFixed(2);
+                stEl.textContent = n.status_text;
+                stEl.className = "inline-block px-3.5 py-1 rounded-full text-xs font-black border " + (NDVI_CLASSES[n.status] || NDVI_CLASSES.unknown);
+                dateEl.textContent = n.latest_date || "";
+                markerEl.style.left = Math.max(0, Math.min(100, (n.latest_ndvi / 0.8) * 100)) + "%";
+                drawNdviChart(n.series);
+                noteEl.textContent =
+                    `المصدر: ${n.source}. القيمة تمثل أخضرار الغطاء النباتي حول نقطة مزرعتك (بكسل 250 متر)، ومتوسط الفترة ${n.average_ndvi}. ` +
+                    "لو الأرض لسه مش مزروعة فالقيمة المنخفضة طبيعية، وهي ليست تقييماً للمحصول المختار.";
+            } catch (err) {
+                console.warn("NDVI load failed", err);
+                stEl.textContent = "غير متاح حالياً";
+                noteEl.textContent = "تعذّر الاتصال بخدمة NDVI. لم نعرض أي رقم تقديري.";
+            }
+        }
+
+        function navTo(id) {
+            if (id === "farm") {
+                const results = document.getElementById("results-view");
+                if (results && !results.classList.contains("hidden")) backToWizard();
+                else window.scrollTo({ top: 0, behavior: "smooth" });
+                setActiveNav("farm");
+                return;
+            }
+            let el = document.getElementById(id);
+            if (el && !el.classList.contains("agri-card")) el = el.closest(".agri-card") || el;
+            const results = document.getElementById("results-view");
+            if (!el || (results && results.classList.contains("hidden")) || el.offsetParent === null) {
+                alert("النتائج بتظهر بعد ما تكمّل بيانات المزرعة وتضغط تحليل.");
+                return;
+            }
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            setActiveNav(id);
+        }
+
+        function setActiveNav(id) {
+            document.querySelectorAll("#side-nav .side-link").forEach((b) => b.classList.toggle("active", b.dataset.nav === id));
+        }
+
         function backToWizard() {
             document.getElementById("results-view").classList.add("hidden");
             document.getElementById("wizard-view").classList.remove("hidden");
@@ -2674,6 +2775,7 @@
             const liveWater = data.live_water_demand || null;
             const schedule16d = data.irrigation_schedule_16_days || null;
             const lang = assessment.language || "ar";
+            loadNdvi(location.latitude, location.longitude, lang);
 
             // 1. Score Ring & Suitability
             const score = assessment.suitability_score;
@@ -2693,22 +2795,22 @@
                 suitable: {
                     text: lang === "ar" ? "مناسب للزراعة" : "Suitable",
                     cls: "bg-green-100 text-green-800 border-green-300",
-                    stroke: "#16a34a"
+                    stroke: "#4CAF50"
                 },
                 suitable_with_conditions: {
                     text: lang === "ar" ? "مناسب بشروط" : "Suitable with conditions",
                     cls: "bg-amber-100 text-amber-900 border-amber-300",
-                    stroke: "#eab308"
+                    stroke: "#F59E0B"
                 },
                 not_suitable: {
                     text: lang === "ar" ? "غير مناسب حالياً" : "Not suitable",
                     cls: "bg-orange-100 text-orange-900 border-orange-300",
-                    stroke: "#f97316"
+                    stroke: "#DC4C3C"
                 },
                 not_evaluated: {
                     text: lang === "ar" ? "اقتراح محاصيل مناسبة" : "Crop suggestions",
                     cls: "bg-sky-100 text-sky-900 border-sky-300",
-                    stroke: "#0284c7"
+                    stroke: "#38BDF8"
                 }
             };
 
@@ -2748,11 +2850,11 @@
 
             const nasaStatusLabel = summary.data_quality && summary.data_quality.nasa_live_status === "live" ? "حي" : "احتياطي";
             const sourceBadges = [
-                { text: `رطوبة التربة: قمر ناسا SMAP (${nasaStatusLabel})`, cls: "bg-emerald-50 text-emerald-800 border-emerald-200" },
+                { text: `رطوبة التربة: قمر ناسا SMAP (${nasaStatusLabel})`, cls: "bg-green-50 text-green-800 border-green-200" },
                 { text: `البخر والنتح والإشعاع: NASA POWER (${nasaStatusLabel})`, cls: "bg-sky-50 text-sky-800 border-sky-200" },
                 { text: `ارتفاع الأرض: ${elevation.source || "NASA SRTM"}`, cls: "bg-indigo-50 text-indigo-800 border-indigo-200" },
-                { text: `التربة: ${soilProfile.source_label || "ISRIC SoilGrids"}`, cls: soilProfile.manual_lab_override_applied ? "bg-emerald-100 text-emerald-900 border-emerald-300" : "bg-teal-50 text-teal-800 border-teal-200" },
-                { text: "التوقعات: معادلة الفاو Open-Meteo ET0", cls: "bg-cyan-50 text-cyan-900 border-cyan-200" },
+                { text: `التربة: ${soilProfile.source_label || "ISRIC SoilGrids"}`, cls: soilProfile.manual_lab_override_applied ? "bg-green-100 text-green-900 border-green-300" : "bg-sky-50 text-sky-800 border-sky-200" },
+                { text: "التوقعات: معادلة الفاو Open-Meteo ET0", cls: "bg-sky-50 text-sky-900 border-sky-200" },
                 { text: `التكلفة: سعر الصرف اللحظي (${market.usd_egp_rate || "--"} ج.م/$)`, cls: "bg-amber-50 text-amber-900 border-amber-200" }
             ];
             document.getElementById("res-data-sources-badges").innerHTML = sourceBadges
@@ -2794,7 +2896,7 @@
             const soilBadgeEl = document.getElementById("res-soil-source-badge");
             soilBadgeEl.textContent = soilProfile.source_label || "SoilGrids";
             soilBadgeEl.className = soilProfile.manual_lab_override_applied
-                ? "text-[11px] font-black px-3 py-1 rounded-full border bg-emerald-100 text-emerald-900 border-emerald-400"
+                ? "text-[11px] font-black px-3 py-1 rounded-full border bg-green-100 text-green-900 border-green-400"
                 : "text-[11px] font-black px-3 py-1 rounded-full border bg-sky-100 text-sky-900 border-sky-300";
 
             document.getElementById("res-soil-clay").textContent = soilProfile.clay_percent != null ? `${soilProfile.clay_percent}%` : "—";
@@ -3000,7 +3102,7 @@
                 climBody.innerHTML = `
                     <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                         <div class="text-xs text-slate-600 font-bold">متوسط الحرارة</div>
-                        <div class="notranslate font-mono-tech text-lg font-black text-orange-600 mt-1" translate="no">${pmClim.temp != null ? pmClim.temp + "°C" : "—"}</div>
+                        <div class="notranslate font-mono-tech text-lg font-black text-amber-600 mt-1" translate="no">${pmClim.temp != null ? pmClim.temp + "°C" : "—"}</div>
                     </div>
                     <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                         <div class="text-xs text-slate-600 font-bold">أمطار الشهر</div>
@@ -3093,7 +3195,7 @@
                         <div class="notranslate font-mono-tech text-[11px] text-sky-700 font-extrabold" translate="no">${escapeHtml(d.date.slice(5))}</div>
                         <div class="notranslate text-sm font-black text-slate-900 font-mono-tech" translate="no">${d.temperature_max_c}° / <span class="text-slate-500">${d.temperature_min_c}°</span></div>
                         <div class="notranslate text-[11px] text-sky-700 font-bold" translate="no">☔ ${d.rain_mm} mm</div>
-                        <div class="notranslate text-[11px] text-cyan-700 font-bold" translate="no">ET0: ${d.et0_mm != null ? d.et0_mm + " mm" : "—"}</div>
+                        <div class="notranslate text-[11px] text-sky-700 font-bold" translate="no">ET0: ${d.et0_mm != null ? d.et0_mm + " mm" : "—"}</div>
                         <div class="notranslate text-[11px] text-slate-500 font-semibold" translate="no">💨 ${d.wind_max_kmh != null ? d.wind_max_kmh + " km/h" : "—"}</div>
                     </div>
                 `).join("");
@@ -3265,7 +3367,7 @@
 
                 <div class="space-y-2">
                     <h4 class="font-black text-slate-900 text-sm">2. معادلة حساب درجة الملاءمة والأوزان</h4>
-                    <div class="notranslate bg-slate-900 text-emerald-300 font-mono-tech text-xs p-3.5 rounded-2xl overflow-x-auto" translate="no">
+                    <div class="notranslate bg-slate-900 text-green-300 font-mono-tech text-xs p-3.5 rounded-2xl overflow-x-auto" translate="no">
                         ${escapeHtml(sm.equation || "")}
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
@@ -3469,7 +3571,7 @@
                     : "bg-white border-slate-200 text-slate-800";
                 wrapper.className = "flex items-start gap-2.5";
                 wrapper.innerHTML = `
-                    <span class="notranslate w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shrink-0" translate="no">AI</span>
+                    <span class="notranslate w-7 h-7 rounded-xl bg-green-600 text-white flex items-center justify-center text-xs font-black shrink-0" translate="no">AI</span>
                     <div class="border ${bubbleCls} rounded-2xl rounded-tr-none px-4 py-3 text-xs md:text-sm font-semibold leading-relaxed max-w-[90%] shadow-sm whitespace-pre-line">
                         ${escapeHtml(text)}
                     </div>
@@ -3541,5 +3643,4 @@
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
-
 

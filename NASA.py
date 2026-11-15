@@ -10,6 +10,7 @@
 #   - ISRIC SoilGrids REST API v2.0 (Hybrid Soil Profile)
 #   - Open-Meteo (16-day Forecast + FAO ET0 + Seasonal Outlook)
 #   - Open ExchangeRate API (Live USD/EGP + Input Cost Indexing)
+#   - Gemini AI Advisor (All World Languages)
 # Version: 2.0.0
 # ============================================================
 
@@ -47,7 +48,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-logger = logging.getLogger("NASA_Fallah")
+logger = logging.getLogger("NADA_Agri")
 
 APP_VERSION = "2.0.0"
 
@@ -57,7 +58,7 @@ APP_VERSION = "2.0.0"
 # ============================================================
 
 app = FastAPI(
-    title=" API",
+    title="N.A.D.A API",
     description="Agricultural Decision Support System for Egypt",
     version=APP_VERSION
 )
@@ -538,7 +539,7 @@ class FarmData(BaseModel):
         le=180
     )
 
-    # Optional language of the assessment text ("ar" by default)
+    # Optional language of the assessment text (accepts any world language code)
 
     language: Optional[str] = "ar"
 
@@ -693,11 +694,11 @@ def validate_farm_data(farm):
                 detail="Please specify the farm area unit."
             )
 
-    if farm.language is not None and farm.language not in SUPPORTED_LANGUAGES:
+    if farm.language is not None and (not isinstance(farm.language, str) or not farm.language.strip()):
 
         raise HTTPException(
             status_code=422,
-            detail="Language must be 'ar' or 'en'."
+            detail="Invalid language code."
         )
 
     return True
@@ -866,7 +867,6 @@ def prepare_nasa_dates():
 # 13. GET NASA DATA (TIMEOUT=3.5s + SMART EGYPT FALLBACK)
 # ============================================================
 
-# Monthly regional climate normals for Egypt fallback (temp C, rain mm/month, rh %, solar MJ/m2/day, wind m/s)
 _EGYPT_MONTHLY_NORMALS = {
     1:  {"temp": 14.0, "rain_m": 8.0,  "rh": 65.0, "solar": 13.5, "wind": 3.4},
     2:  {"temp": 15.5, "rain_m": 6.0,  "rh": 60.0, "solar": 16.5, "wind": 3.7},
@@ -1233,7 +1233,6 @@ def get_soilgrids_data(latitude, longitude, governorate=None, reported_soil_type
                 if d.get("values", {}).get("mean") is not None
             ]
             if vals:
-                # SoilGrids stores clay/sand in g/kg (d_factor 10 -> %) and phh2o in pH*10 (d_factor 10 -> pH)
                 d_factor = layer.get("unit_measure", {}).get("d_factor") or 10
                 extracted[prop_name] = round(mean(vals) / float(d_factor), 2)
 
@@ -1313,7 +1312,6 @@ def build_hybrid_soil_profile(farm, soilgrids_data, lang):
 
     inferred_texture = _classify_soil_texture_from_percentages(final_clay, final_sand)
 
-    # Determine effective soil type for agronomic evaluation
     effective_soil_type = farm.soil_type
     if farm.soil_type == "لا أعرف" and inferred_texture is not None:
         effective_soil_type = inferred_texture
@@ -1403,7 +1401,6 @@ def _build_forecast_fallback(latitude, climatology):
         t_max = round(t_mean + 5.5, 1)
         t_min = round(t_mean - 5.5, 1)
         solar = clim_m.get("solar") or 19.0
-        # Hargreaves approximation for ET0 (mm/day)
         et0 = round(max(1.8, 0.0023 * (t_mean + 17.8) * math.sqrt(max(1.0, t_max - t_min)) * (solar * 0.408)), 2)
         days.append({
             "date": d.isoformat(),
@@ -1595,11 +1592,8 @@ def get_live_market_indicators():
     except (requests.exceptions.RequestException, ValueError, KeyError, TypeError) as error:
         logger.warning("Exchange rate API failed (%s); using fallback rate %.2f.", error, FALLBACK_USD_EGP)
 
-    # Dynamic FX pass-through:
-    # Imported inputs (fertilizers, agrochemicals, diesel/machinery) adjust ~60% with FX delta
-    # Local crop prices adjust ~45% with FX delta against baseline
     fx_ratio = usd_egp / BASELINE_USD_EGP
-    fertilizer_global_index = 1.04  # Global urea/DAP/potash seasonal index multiplier
+    fertilizer_global_index = 1.04
     cost_index_factor = round((0.40 + 0.60 * fx_ratio) * (0.75 + 0.25 * fertilizer_global_index), 4)
     price_index_factor = round(0.55 + 0.45 * fx_ratio, 4)
 
@@ -1678,11 +1672,9 @@ def calculate_weather_summary(weather_data):
     avg_gwet_root = round(mean(gwet_root), 3) if gwet_root else None
     avg_evptrns_w_m2 = round(mean(evptrns), 2) if evptrns else None
 
-    # Convert EVPTRNS (W/m2) to mm/day: 1 mm/day ≈ 28.35 W/m2 (latent heat of vaporization)
     if avg_evptrns_w_m2 is not None and avg_evptrns_w_m2 > 0:
         est_daily_et_mm = round(avg_evptrns_w_m2 / 28.35, 2)
     elif avg_solar is not None:
-        # Radiation-based ET0 approximation (Makkink/Hargreaves hybrid)
         est_daily_et_mm = round(max(1.5, 0.0135 * (avg_temp + 17.78) * (avg_solar * 0.408)), 2)
     else:
         est_daily_et_mm = round(max(1.8, 0.17 * max(5.0, avg_temp)), 2)
@@ -2187,7 +2179,6 @@ CROP_PROFILES = {
 }
 
 
-# Baseline Egyptian economic & water guidance table per Feddan (dynamically adjusted by live FX & NASA water model)
 CROP_ECONOMICS = {
     "القمح": {"cost": 18000, "yield_ton": 2.7, "price_per_ton": 13500, "water_flood_m3": 2200, "duration_days": 155, "category": "field"},
     "الأرز": {"cost": 24000, "yield_ton": 4.0, "price_per_ton": 14500, "water_flood_m3": 6200, "duration_days": 135, "category": "rice"},
@@ -2352,9 +2343,15 @@ def L(lang, arabic, english):
     return arabic if lang == "ar" else english
 
 
+def normalize_backend_lang(raw_lang):
+
+    code = (raw_lang or "ar").strip().lower()
+    return "ar" if code.startswith("ar") else "en"
+
+
 def get_language(farm):
 
-    return farm.language if farm.language in SUPPORTED_LANGUAGES else "ar"
+    return normalize_backend_lang(farm.language)
 
 
 def label(lang, value):
@@ -3247,7 +3244,6 @@ def calculate_live_crop_water_demand(
     duration_days = econ["duration_days"]
     kc = profile["kc"]
 
-    # 1. Determine daily reference ET0 (mm/day) from live Open-Meteo + NASA POWER
     open_meteo_et0_vals = [
         d["et0_mm"] for d in (forecast_days or [])
         if d.get("et0_mm") is not None
@@ -3264,7 +3260,6 @@ def calculate_live_crop_water_demand(
     else:
         live_et0_mm_day = 4.2
 
-    # Seasonal scaling across full crop cycle (since current month ET0 may be winter/summer)
     if season and season.get("temp") is not None:
         season_temp = season["temp"]
         season_solar = season.get("solar") or weather_summary.get("average_solar_radiation_mj_m2_day") or 19.0
@@ -3273,18 +3268,15 @@ def calculate_live_crop_water_demand(
     else:
         blended_et0_mm_day = live_et0_mm_day
 
-    # 2. Effective rainfall credit (mm over season)
     monthly_rain = (season or {}).get("rain_total")
     if monthly_rain is None:
         monthly_rain = weather_summary.get("total_rainfall_mm") or 0.0
     effective_seasonal_rain_mm = round(min(180.0, monthly_rain * (duration_days / 30.0) * 0.65), 1)
 
-    # 3. Live SMAP/MERRA-2 soil moisture adjustment (GWETTOP & GWETROOT)
     gwet_top = weather_summary.get("average_surface_soil_wetness")
     gwet_root = weather_summary.get("average_root_zone_soil_wetness")
     effective_soil = (soil_profile or {}).get("effective_soil_type") or farm.soil_type
 
-    # Initial moisture credit (mm/feddan) from current root-zone moisture
     smap_credit_mm = 0.0
     soil_moisture_status = "normal"
     if gwet_root is not None:
@@ -3295,18 +3287,15 @@ def calculate_live_crop_water_demand(
             smap_credit_mm = 22.0
             soil_moisture_status = "moderate"
         elif gwet_root < 0.25:
-            smap_credit_mm = -25.0  # Dry profile needs pre-sowing moisture refill
+            smap_credit_mm = -25.0
             soil_moisture_status = "dry"
 
-    # Net crop evapotranspiration water requirement (mm -> m3 per feddan: 1 mm = 4.20083 m3/feddan)
     crop_etc_mm = blended_et0_mm_day * kc * duration_days
     net_irrigation_mm = max(220.0, crop_etc_mm - effective_seasonal_rain_mm - smap_credit_mm)
 
-    # Add rice percolation / puddling requirement
     rice_puddling_mm = 480.0 if crop == "الأرز" else 0.0
     net_m3_per_feddan = (net_irrigation_mm + rice_puddling_mm) * (FEDDAN_AREA_M2 / 1000.0)
 
-    # Soil & SRTM Elevation percolation factor for flood vs pressurized systems
     soil_loss_factor = 1.15 if effective_soil == "رملية" else (0.98 if effective_soil == "طينية" else 1.03)
     elev_m = (elevation_data or {}).get("elevation_m") or 25.0
     elev_flood_penalty = 1.08 if elev_m > 80.0 else (1.05 if elev_m <= 15.0 else 1.0)
@@ -3314,7 +3303,6 @@ def calculate_live_crop_water_demand(
     flood_m3_per_feddan = round(
         (net_m3_per_feddan / IRRIGATION_EFFICIENCY["الغمر"]) * soil_loss_factor * elev_flood_penalty
     )
-    # Clamp within realistic agronomic bounds around crop baseline (0.70x - 1.35x baseline)
     baseline_flood = econ["water_flood_m3"]
     flood_m3_per_feddan = max(round(baseline_flood * 0.72), min(round(baseline_flood * 1.35), flood_m3_per_feddan))
 
@@ -3329,7 +3317,6 @@ def calculate_live_crop_water_demand(
         eff_best = IRRIGATION_EFFICIENCY.get(best_method, 0.85)
         eff_flood = IRRIGATION_EFFICIENCY["الغمر"]
         recommended_m3_per_feddan = round(flood_m3_per_feddan * (eff_flood / eff_best))
-        # Ensure sensible saving ceiling
         recommended_m3_per_feddan = min(flood_m3_per_feddan, recommended_m3_per_feddan)
 
     eff_current = IRRIGATION_EFFICIENCY.get(farm.irrigation_method, 0.65)
@@ -3531,7 +3518,6 @@ def build_16_day_irrigation_schedule(crop, farm, forecast_days, weather_summary,
     eff_irr = IRRIGATION_EFFICIENCY.get(farm.irrigation_method, 0.70)
     gwet_root = weather_summary.get("average_root_zone_soil_wetness")
 
-    # Root-zone Readily Available Water (RAW) threshold in mm
     if eff_soil == "رملية":
         raw_threshold_mm = 16.0
     elif eff_soil == "طينية":
@@ -3539,7 +3525,6 @@ def build_16_day_irrigation_schedule(crop, farm, forecast_days, weather_summary,
     else:
         raw_threshold_mm = 24.0
 
-    # Initial soil moisture deficit based on NASA SMAP GWETROOT
     if gwet_root is not None and gwet_root >= 0.55:
         cumulative_deficit_mm = 0.0
     elif gwet_root is not None and gwet_root >= 0.35:
@@ -3595,7 +3580,6 @@ def build_16_day_irrigation_schedule(crop, farm, forecast_days, weather_summary,
         gross_m3_feddan = round(gross_irrigation_mm * (FEDDAN_AREA_M2 / 1000.0), 1)
         total_net_m3_feddan += gross_m3_feddan
 
-        # Fertilization / spraying window guidance
         if rain >= 5.0 or wind >= 35.0:
             fert_note = L(lang, "تأجيل الرش الورقي (أمطار أو رياح)", "Avoid foliar spray (rain/wind)")
         elif irrigate_today and t_max < 36.0:
@@ -4185,7 +4169,6 @@ def create_initial_assessment(
             "Its frequency and duration need investigation."
         ))
 
-    # Hybrid Soil & NASA SMAP & SRTM Elevation Observations
     if soil_profile:
         observations.append(L(
             lang,
@@ -4996,7 +4979,6 @@ def _fetch_farm_environmental_data(latitude, longitude, governorate=None, soil_t
             "is_fallback": True,
         }
 
-    # Fetch SRTM elevation (reusing Open-Meteo elevation if Open-Elevation timed out)
     open_meteo_elev = forecast_payload.get("elevation") if forecast_payload else None
     elevation_data = get_elevation_srtm(
         latitude, longitude, governorate=governorate, open_meteo_elevation=open_meteo_elev
@@ -5021,9 +5003,6 @@ def get_soil_endpoint(
     governorate: Optional[str] = Query(default=None),
     language: str = Query(default="ar"),
 ):
-    if language not in SUPPORTED_LANGUAGES:
-        raise HTTPException(status_code=422, detail="Language must be 'ar' or 'en'.")
-
     sg = get_soilgrids_data(latitude, longitude, governorate=governorate)
     elev = get_elevation_srtm(latitude, longitude, governorate=governorate)
     inferred_texture = _classify_soil_texture_from_percentages(sg.get("clay_pct"), sg.get("sand_pct"))
@@ -5169,7 +5148,7 @@ def analyze_farm(farm: FarmData):
         if climatology else None
     )
 
-    # Step 8: Return complete response (preserving all existing JSON keys + adding new live keys)
+    # Step 8: Return complete response
 
     return {
 
@@ -5309,17 +5288,13 @@ def compare_crops_endpoint(request: CompareRequest):
 @app.get("/api/methodology")
 def get_methodology(language: str = Query(default="ar")):
 
-    if language not in SUPPORTED_LANGUAGES:
-        raise HTTPException(
-            status_code=422,
-            detail="Language must be 'ar' or 'en'."
-        )
+    lang = normalize_backend_lang(language)
 
     return {
         "success": True,
         "application": "N.A.D.A",
         "version": APP_VERSION,
-        "methodology": build_methodology(language),
+        "methodology": build_methodology(lang),
     }
 
 
@@ -5367,8 +5342,9 @@ def root():
 
     return HTMLResponse(content=html_content, status_code=200)
 
+
 # ============================================================
-# 26B. ASK AI AGRONOMIC ADVISOR (GEMINI API - AUTO .ENV & FALLBACK)
+# 26B. ASK AI AGRONOMIC ADVISOR (GEMINI API - ALL WORLD LANGUAGES)
 # ============================================================
 
 class AskAIRequest(BaseModel):
@@ -5381,14 +5357,17 @@ def _load_gemini_api_key():
     key = os.environ.get("GEMINI_API_KEY", "").strip()
     if key:
         return key
+    alt_key = os.environ.get("GOOGLE_API_KEY", "").strip()
+    if alt_key:
+        return alt_key
     env_path = os.path.join(os.path.dirname(__file__), ".env")
     if os.path.exists(env_path):
         try:
             with open(env_path, "r", encoding="utf-8") as f:
                 for line in f:
-                    line = line.strip()
-                    if line.startswith("GEMINI_API_KEY="):
-                        return line.split("=", 1)[1].strip().strip('"').strip("'")
+                    clean_line = line.lstrip("\ufeff").strip()
+                    if clean_line.startswith("GEMINI_API_KEY="):
+                        return clean_line.split("=", 1)[1].strip().strip('"').strip("'")
         except Exception:
             pass
     return ""
@@ -5413,20 +5392,26 @@ def ask_ai_advisor(req: AskAIRequest):
     ]
 
     context_json = json.dumps(req.farm_context, ensure_ascii=False)
-    lang_instruction = (
-        "أجب باللهجة المصرية البسيطة الممزوجة بالعربية الفصحى السهلة الواضحة للفلاح."
-        if req.language != "en"
-        else "Answer in clear, simple, practical English for a farmer."
-    )
+    req_lang = (req.language or "ar").strip()
 
-    prompt = (
-        "أنت مرشد زراعي ذكي خبير في الزراعة المصرية وبيانات أقمار ناسا (N.A.D.A). "
-        f"{lang_instruction} "
-        "التزم بأن تكون إجابتك عملية ومباشرة ومختصرة (في حدود 4 إلى 6 أسطر أو نقاط واضحة) "
-        "ومبنية على بيانات الأرض التالية فقط:\n\n"
-        f"بيانات الأرض والتحليل الحالي:\n{context_json}\n\n"
-        f"سؤال المزارع:\n{req.question.strip()}"
-    )
+    if req_lang.lower().startswith("ar"):
+        prompt = (
+            "أنت مرشد زراعي ذكي خبير في الزراعة المصرية وبيانات أقمار ناسا (N.A.D.A). "
+            "أجب باللهجة المصرية البسيطة الممزوجة بالعربية الفصحى السهلة الواضحة للفلاح. "
+            "التزم بأن تكون إجابتك عملية ومباشرة ومختصرة (في حدود 4 إلى 6 أسطر أو نقاط واضحة) "
+            "ومبنية على بيانات الأرض التالية فقط:\n\n"
+            f"بيانات الأرض والتحليل الحالي:\n{context_json}\n\n"
+            f"سؤال المزارع:\n{req.question.strip()}"
+        )
+    else:
+        prompt = (
+            "You are N.A.D.A, an expert smart agricultural advisor for farming and NASA satellite data. "
+            f"You MUST write your entire reply in the language corresponding to code/name: '{req_lang}'. "
+            "Keep your reply clear, practical, simple for a farmer, and concise (4 to 6 short lines or bullet points), "
+            "strictly grounded in the following farm data:\n\n"
+            f"Current farm & analysis data:\n{context_json}\n\n"
+            f"Farmer question:\n{req.question.strip()}"
+        )
 
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
@@ -5472,7 +5457,6 @@ def ask_ai_advisor(req: AskAIRequest):
             candidates = data.get("candidates") or []
             parts = candidates[0].get("content", {}).get("parts", []) if candidates else []
 
-            # استبعاد أجزاء التفكير الداخلية إن وجدت وأخذ النص الفعلي فقط
             text_parts = [p.get("text", "") for p in parts if not p.get("thought") and p.get("text")]
             if not text_parts:
                 text_parts = [p.get("text", "") for p in parts if p.get("text")]
@@ -5497,6 +5481,8 @@ def ask_ai_advisor(req: AskAIRequest):
             break
 
     raise HTTPException(status_code=502, detail=last_error_msg)
+
+
 # ============================================================
 # 27. RUN SERVER
 # ============================================================
@@ -5514,5 +5500,4 @@ if __name__ == "__main__":
         reload=True
 
     )
-
 

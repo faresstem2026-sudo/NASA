@@ -5307,7 +5307,7 @@ NDVI_URL = "https://modis.ornl.gov/rst/api/v1/MOD13Q1/subset"
 NDVI_BAND = "250m_16_days_NDVI"
 NDVI_CACHE_TTL = 12 * 3600
 NDVI_TIMEOUT = 7.0          # خادم ORNL أبطأ من باقي المصادر
-NDVI_PERIODS = 12           # 12 مركّب كل 16 يوم = نحو 6 شهور
+NDVI_PERIODS = 10           # خادم ORNL يسمح بحد أقصى 10 فترات في الطلب الواحد (نحو 5 شهور)
 
 
 def _modis_date(d):
@@ -5334,7 +5334,7 @@ def get_ndvi_series(latitude, longitude, lang="ar"):
         return cached
 
     end_date = date.today() - timedelta(days=16)
-    start_date = end_date - timedelta(days=16 * NDVI_PERIODS)
+    start_date = end_date - timedelta(days=16 * (NDVI_PERIODS - 1))
 
     params = {
         "latitude": latitude,

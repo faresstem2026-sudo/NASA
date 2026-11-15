@@ -646,12 +646,16 @@ def calculate_fallow_days_from_ndvi(ndvi_data):
 
         low_ndvi_count += 1
 
-    return low_ndvi_count * 16
-   def generate_rotation_strategies(
+       return low_ndvi_count * 16
+
+def generate_rotation_strategies(
     previous_crop: str,
     target_crop: str,
     fallow_days_override: Optional[int] = None
 ) -> List[RotationStrategy]:
+
+   
+    
 
     strategies = []
 

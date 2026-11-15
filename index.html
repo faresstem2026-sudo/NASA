@@ -13,7 +13,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
-  <style>
+
+    <style>
         :root {
             color-scheme: dark;
         }
@@ -45,6 +46,7 @@
             background-image: none !important;
             color: #f5f5f5 !important;
             overflow-x: hidden;
+            top: 0px !important;
         }
 
         .font-mono-tech {
@@ -184,7 +186,8 @@
             color: #ffffff !important;
             transition: all 0.2s ease;
         }
-        .custom-select option {
+        .custom-select option,
+        #world-language-select option {
             background-color: #0c0c0c;
             color: #ffffff;
         }
@@ -230,6 +233,21 @@
             background-color: #111111 !important;
             color: #ffffff !important;
             border: 1px solid #333333;
+        }
+
+        /* إخفاء شريط جوجل للترجمة العلوي ليظل التصميم الأسود نظيفاً */
+        .goog-te-banner-frame.skiptranslate,
+        iframe.goog-te-banner-frame,
+        .VIpgJd-ZVi9od-ORHb-OEVmcd,
+        .VIpgJd-ZVi9od-l4eHX-hSRGPd {
+            display: none !important;
+        }
+        .goog-tooltip, .goog-tooltip:hover {
+            display: none !important;
+        }
+        .goog-text-highlight {
+            background-color: transparent !important;
+            box-shadow: none !important;
         }
 
         .step-container {
@@ -301,25 +319,63 @@
             }
         }
     </style>
-
 </head>
 <body class="bg-agri-grid min-h-screen flex flex-col">
 
-    <!-- 1. الشريط العلوي للنظام والشفافية وإعدادات المزارع -->
+    <!-- 1. الشريط العلوي للنظام والشفافية واختيار لغة العالم -->
     <div class="no-print bg-white border-b border-slate-200 text-xs py-2 px-4 text-slate-600">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
             <div class="flex items-center gap-2 font-extrabold text-sky-700">
                 <span class="w-2.5 h-2.5 rounded-full bg-green-600 animate-pulse"></span>
-                <span>NASA EARTH OBSERVATORY • FALLAH DECISION SYSTEM</span>
+                <span class="notranslate" translate="no">N.A.D.A • NASA EARTH OBSERVATORY SYSTEM</span>
             </div>
 
             <div class="flex flex-wrap items-center gap-2 md:gap-3">
-                <span id="api-status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-mono-tech text-[11px] font-bold">
+                <span id="api-status-badge" class="notranslate inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-mono-tech text-[11px] font-bold" translate="no">
                     <span id="api-status-dot" class="w-2 h-2 rounded-full bg-amber-500"></span>
                     <span id="api-status-text">API: CHECKING...</span>
                 </span>
 
-                <span id="utc-clock" class="hidden sm:inline font-mono-tech text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full">UTC 00:00:00</span>
+                <span id="utc-clock" class="notranslate hidden sm:inline font-mono-tech text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full" translate="no">UTC 00:00:00</span>
+
+                <!-- قائمة جميع لغات العالم (130+ لغة) -->
+                <div class="notranslate inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-300" translate="no">
+                    <i data-lucide="globe" class="w-3.5 h-3.5 text-sky-600"></i>
+                    <select id="world-language-select" aria-label="Choose World Language" onchange="setWorldLanguage(this.value)" class="bg-transparent text-xs font-extrabold text-slate-800 focus:outline-none cursor-pointer max-w-[165px]">
+                        <option value="ar">🇪🇬 العربية (Arabic)</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="fr">🇫🇷 Français (French)</option>
+                        <option value="es">🇪🇸 Español (Spanish)</option>
+                        <option value="de">🇩🇪 Deutsch (German)</option>
+                        <option value="it">🇮🇹 Italiano (Italian)</option>
+                        <option value="pt">🇵🇹 Português (Portuguese)</option>
+                        <option value="tr">🇹🇷 Türkçe (Turkish)</option>
+                        <option value="ru">🇷🇺 Русский (Russian)</option>
+                        <option value="zh-CN">🇨🇳 中文 (Chinese)</option>
+                        <option value="ja">🇯🇵 日本語 (Japanese)</option>
+                        <option value="ko">🇰🇷 한국어 (Korean)</option>
+                        <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+                        <option value="ur">🇵🇰 اردو (Urdu)</option>
+                        <option value="fa">🇮🇷 فارسی (Persian)</option>
+                        <option value="id">🇮🇩 Bahasa Indonesia</option>
+                        <option value="ms">🇲🇾 Bahasa Melayu</option>
+                        <option value="bn">🇧🇩 বাংলা (Bengali)</option>
+                        <option value="sw">🇰🇪 Kiswahili (Swahili)</option>
+                        <option value="am">🇪🇹 አማርኛ (Amharic)</option>
+                        <option value="nl">🇳🇱 Nederlands (Dutch)</option>
+                        <option value="pl">🇵🇱 Polski (Polish)</option>
+                        <option value="uk">🇺🇦 Українська (Ukrainian)</option>
+                        <option value="el">🇬🇷 Ελληνικά (Greek)</option>
+                        <option value="sv">🇸🇪 Svenska (Swedish)</option>
+                        <option value="th">🇹🇭 ไทย (Thai)</option>
+                        <option value="vi">🇻🇳 Tiếng Việt (Vietnamese)</option>
+                        <option value="ro">🇷🇴 Română (Romanian)</option>
+                        <option value="ha">🇳🇬 Hausa</option>
+                        <option value="yo">🇳🇬 Yorùbá</option>
+                        <option value="more">🌐 كل لغات العالم (130+)...</option>
+                    </select>
+                </div>
+                <div id="google_translate_element" class="hidden"></div>
 
                 <!-- زر منهجية الحساب الشفافة -->
                 <button type="button" onclick="openMethodologyModal()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold text-xs transition-all">
@@ -345,7 +401,7 @@
                 </div>
                 <div>
                     <h1 class="font-black text-lg md:text-xl text-slate-900 leading-tight">
-                        منصة ندى الذكية<span class="text-green-600">N.A.D.A</span>
+                        منصة ندى الذكية <span class="notranslate text-green-600" translate="no">N.A.D.A</span>
                     </h1>
                     <p class="text-slate-500 text-xs font-semibold">أقمار ناسا (POWER/SMAP/SRTM) + تربة SoilGrids + توقعات الفاو ET0 + اقتصاديات حية</p>
                 </div>
@@ -354,15 +410,15 @@
             <!-- شريط الخطوات -->
             <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
                 <button type="button" onclick="goToStep(1)" id="prog-1" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-600 text-white font-bold text-xs shadow-sm transition-all">
-                    <span class="w-5 h-5 rounded-full bg-white text-green-700 flex items-center justify-center text-[11px] font-black">1</span>
+                    <span class="notranslate w-5 h-5 rounded-full bg-white text-green-700 flex items-center justify-center text-[11px] font-black" translate="no">1</span>
                     <span>الموقع والمحصول</span>
                 </button>
                 <button type="button" onclick="goToStep(2)" id="prog-2" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 font-bold text-xs transition-all">
-                    <span class="w-5 h-5 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center text-[11px] font-black">2</span>
+                    <span class="notranslate w-5 h-5 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center text-[11px] font-black" translate="no">2</span>
                     <span>التربة والري</span>
                 </button>
                 <button type="button" onclick="goToStep(3)" id="prog-3" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 font-bold text-xs transition-all">
-                    <span class="w-5 h-5 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center text-[11px] font-black">3</span>
+                    <span class="notranslate w-5 h-5 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center text-[11px] font-black" translate="no">3</span>
                     <span>التوثيق والفحص</span>
                 </button>
             </div>
@@ -375,21 +431,21 @@
         <div id="hero-guide" class="no-print mb-6 agri-card rounded-3xl p-5 border-r-4 border-r-green-600">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="flex items-start gap-3 bg-green-50/70 p-3.5 rounded-2xl border border-green-200/70">
-                    <div class="w-8 h-8 rounded-xl bg-green-600 text-white flex items-center justify-center font-black shrink-0">1</div>
+                    <div class="notranslate w-8 h-8 rounded-xl bg-green-600 text-white flex items-center justify-center font-black shrink-0" translate="no">1</div>
                     <div>
                         <h3 class="font-extrabold text-sm text-slate-900">اضغط على الخريطة واسحب بيانات التربة</h3>
                         <p class="text-xs text-slate-600 mt-0.5">بمجرد تحديد أرضك يتم جلب الطين والرمل والحموضة pH من SoilGrids وارتفاع SRTM تلقائياً</p>
                     </div>
                 </div>
                 <div class="flex items-start gap-3 bg-sky-50/70 p-3.5 rounded-2xl border border-sky-200/70">
-                    <div class="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black shrink-0">2</div>
+                    <div class="notranslate w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black shrink-0" translate="no">2</div>
                     <div>
                         <h3 class="font-extrabold text-sm text-slate-900">بيانات ناسا الحية + معادلة الفاو ET0</h3>
                         <p class="text-xs text-slate-600 mt-0.5">رطوبة الجذور SMAP والبخر والنتح EVPTRNS لحساب احتياج الفدان الفعلي بالمتر المكعب</p>
                     </div>
                 </div>
                 <div class="flex items-start gap-3 bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200/70">
-                    <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shrink-0">3</div>
+                    <div class="notranslate w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shrink-0" translate="no">3</div>
                     <div>
                         <h3 class="font-extrabold text-sm text-slate-900">تسعير ديناميكي وجدول ري 16 يوماً</h3>
                         <p class="text-xs text-slate-600 mt-0.5">ربط بسعر الصرف اللحظي مع حرية تعديل الأسعار يدوياً وتقويم زراعي حتى الحصاد</p>
@@ -432,6 +488,27 @@
                             </button>
                         </div>
 
+                        <!-- بانر اختيار اللغة في بداية الاستخدام -->
+                        <div class="rounded-2xl bg-sky-50/70 border border-sky-200 p-3.5 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center gap-2 text-xs md:text-sm font-extrabold text-sky-900">
+                                <i data-lucide="languages" class="w-4 h-4 text-sky-600"></i>
+                                <span>اختر لغتك المفضلة (جميع لغات العالم مدعومة للواجهة والذكاء الاصطناعي):</span>
+                            </div>
+                            <select id="step-world-language-select" aria-label="Select Language" onchange="setWorldLanguage(this.value)" class="notranslate custom-select rounded-xl px-3 py-1.5 text-xs font-extrabold cursor-pointer" translate="no">
+                                <option value="ar">🇪🇬 العربية</option>
+                                <option value="en">🇬🇧 English</option>
+                                <option value="fr">🇫🇷 Français</option>
+                                <option value="es">🇪🇸 Español</option>
+                                <option value="de">🇩🇪 Deutsch</option>
+                                <option value="tr">🇹🇷 Türkçe</option>
+                                <option value="zh-CN">🇨🇳 中文</option>
+                                <option value="hi">🇮🇳 हिन्दी</option>
+                                <option value="ur">🇵🇰 اردو</option>
+                                <option value="sw">🇰🇪 Kiswahili</option>
+                                <option value="more">🌐 كل اللغات (130+) من الأعلى</option>
+                            </select>
+                        </div>
+
                         <!-- المحافظة + GPS + خريطة القمر الصناعي التفاعلية -->
                         <div class="space-y-3">
                             <div class="flex flex-wrap items-center justify-between gap-2">
@@ -459,7 +536,7 @@
                             <div class="space-y-1.5">
                                 <div class="flex items-center justify-between text-xs text-slate-600 font-semibold">
                                     <span>خريطة القمر الصناعي (Satellite GPS Map) — اضغط على أي نقطة لتحديد أرضك وسحب التربة والارتفاع:</span>
-                                    <span id="map-pin-badge" class="font-mono-tech text-[11px] text-sky-700 bg-sky-50 px-2 py-0.5 rounded-lg border border-sky-200">جاهزة للنقر</span>
+                                    <span id="map-pin-badge" class="notranslate font-mono-tech text-[11px] text-sky-700 bg-sky-50 px-2 py-0.5 rounded-lg border border-sky-200" translate="no">جاهزة للنقر</span>
                                 </div>
                                 <div id="egypt-map"></div>
                             </div>
@@ -612,8 +689,8 @@
                             </div>
 
                             <div>
-                                <label for="report-language" class="block text-xs font-extrabold text-slate-700 mb-1.5">لغة التقرير والنتائج</label>
-                                <select id="report-language" class="custom-select w-full rounded-xl px-3.5 py-2.5 text-sm font-bold" onchange="onFormFieldChange()">
+                                <label for="report-language" class="block text-xs font-extrabold text-slate-700 mb-1.5">لغة التقرير والنتائج (متزامنة مع لغة الموقع)</label>
+                                <select id="report-language" class="custom-select w-full rounded-xl px-3.5 py-2.5 text-sm font-bold" onchange="setWorldLanguage(this.value)">
                                     <option value="ar">العربية (ar)</option>
                                     <option value="en">English (en)</option>
                                 </select>
@@ -746,7 +823,7 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-green-600 animate-pulse"></span>
                         <h3 class="font-black text-sm text-slate-900">ملخص بيانات أرضك الحي</h3>
                     </div>
-                    <span class="font-mono-tech text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full">AUTO-SAVED</span>
+                    <span class="notranslate font-mono-tech text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full" translate="no">AUTO-SAVED</span>
                 </div>
 
                 <!-- بطاقة إحداثيات القمر الصناعي والتربة والارتفاع -->
@@ -756,9 +833,9 @@
                             <i data-lucide="satellite" class="w-4 h-4 text-sky-600"></i>
                             <span>نطاق الرصد الفضائي</span>
                         </span>
-                        <span id="twin-coord-type" class="font-mono-tech text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-sky-200 text-sky-700">WAITING</span>
+                        <span id="twin-coord-type" class="notranslate font-mono-tech text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-sky-200 text-sky-700" translate="no">WAITING</span>
                     </div>
-                    <div id="twin-coords" class="font-mono-tech text-xs font-extrabold text-slate-800 bg-white/90 px-3 py-2 rounded-xl border border-slate-200 text-center">
+                    <div id="twin-coords" class="notranslate font-mono-tech text-xs font-extrabold text-slate-800 bg-white/90 px-3 py-2 rounded-xl border border-slate-200 text-center" translate="no">
                         LAT -- / LON --
                     </div>
                     <div id="twin-satellite-soil" class="text-[11px] font-bold text-slate-700 bg-white/80 px-3 py-2 rounded-xl border border-sky-100 flex flex-wrap justify-between gap-1">
@@ -798,7 +875,7 @@
                 <div class="bg-green-50/70 rounded-2xl p-3.5 border border-green-200">
                     <div class="flex justify-between items-center text-xs mb-2">
                         <span class="font-extrabold text-green-900">اكتمال الأسئلة الإجبارية</span>
-                        <span id="twin-completion-text" class="font-mono-tech font-black text-green-700">0 / 8</span>
+                        <span id="twin-completion-text" class="notranslate font-mono-tech font-black text-green-700" translate="no">0 / 8</span>
                     </div>
                     <div class="w-full h-2.5 rounded-full bg-white border border-green-200 overflow-hidden">
                         <div id="twin-completion-bar" class="h-full bg-gradient-to-l from-green-600 to-sky-500 transition-all duration-300" style="width: 0%"></div>
@@ -852,7 +929,7 @@
                     </button>
                     <button type="button" onclick="downloadReportJSON()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs md:text-sm font-extrabold border border-sky-300 transition-all">
                         <i data-lucide="download" class="w-4 h-4"></i>
-                        <span>JSON</span>
+                        <span class="notranslate" translate="no">JSON</span>
                     </button>
                     <button type="button" onclick="window.print()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs md:text-sm font-black shadow-sm transition-all">
                         <i data-lucide="printer" class="w-4 h-4"></i>
@@ -874,7 +951,7 @@
                                 <circle id="score-ring" cx="60" cy="60" r="52" stroke="#16a34a" stroke-width="10" stroke-linecap="round" fill="none" stroke-dasharray="326.73" stroke-dashoffset="326.73" class="transition-all duration-700" />
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                <span id="res-score-value" class="font-mono-tech text-3xl font-black text-slate-900">--</span>
+                                <span id="res-score-value" class="notranslate font-mono-tech text-3xl font-black text-slate-900" translate="no">--</span>
                                 <span class="text-[11px] text-slate-500 font-extrabold">من 100</span>
                             </div>
                         </div>
@@ -919,7 +996,7 @@
                             <span id="res-elev-source-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200">NASA SRTM</span>
                         </div>
                         <div class="flex items-baseline gap-2 bg-indigo-50/70 border border-indigo-200 rounded-2xl p-3.5">
-                            <span id="res-elev-meters" class="font-mono-tech text-2xl font-black text-indigo-800">--</span>
+                            <span id="res-elev-meters" class="notranslate font-mono-tech text-2xl font-black text-indigo-800" translate="no">--</span>
                             <span class="text-xs font-extrabold text-indigo-900">متر فوق سطح البحر</span>
                         </div>
                         <p id="res-elev-note" class="text-xs md:text-sm text-slate-700 font-semibold leading-relaxed"></p>
@@ -937,19 +1014,19 @@
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                                 <div class="text-[11px] text-slate-500 font-bold">الطين (Clay)</div>
-                                <div id="res-soil-clay" class="font-mono-tech text-lg font-black text-slate-900 mt-0.5">--</div>
+                                <div id="res-soil-clay" class="notranslate font-mono-tech text-lg font-black text-slate-900 mt-0.5" translate="no">--</div>
                             </div>
                             <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                                 <div class="text-[11px] text-slate-500 font-bold">الرمل (Sand)</div>
-                                <div id="res-soil-sand" class="font-mono-tech text-lg font-black text-slate-900 mt-0.5">--</div>
+                                <div id="res-soil-sand" class="notranslate font-mono-tech text-lg font-black text-slate-900 mt-0.5" translate="no">--</div>
                             </div>
                             <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                                 <div class="text-[11px] text-slate-500 font-bold">الطمي (Silt)</div>
-                                <div id="res-soil-silt" class="font-mono-tech text-lg font-black text-slate-900 mt-0.5">--</div>
+                                <div id="res-soil-silt" class="notranslate font-mono-tech text-lg font-black text-slate-900 mt-0.5" translate="no">--</div>
                             </div>
                             <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                                 <div class="text-[11px] text-slate-500 font-bold">الحموضة (pH)</div>
-                                <div id="res-soil-ph" class="font-mono-tech text-lg font-black text-emerald-700 mt-0.5">--</div>
+                                <div id="res-soil-ph" class="notranslate font-mono-tech text-lg font-black text-emerald-700 mt-0.5" translate="no">--</div>
                             </div>
                         </div>
                         <div id="res-soil-extra" class="text-xs text-slate-600 font-bold"></div>
@@ -992,7 +1069,7 @@
                                 <span>حاسبة التكلفة والعائد الديناميكية</span>
                             </h3>
                             <div class="flex flex-wrap items-center gap-1.5">
-                                <span id="res-fx-badge" class="font-mono-tech text-[11px] font-black px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">USD/EGP --</span>
+                                <span id="res-fx-badge" class="notranslate font-mono-tech text-[11px] font-black px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200" translate="no">USD/EGP --</span>
                                 <span id="res-econ-area-badge" class="text-xs font-extrabold px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">للفدان الواحد</span>
                             </div>
                         </div>
@@ -1036,7 +1113,7 @@
                             </div>
                             <div class="bg-amber-50 rounded-2xl p-3.5 border border-amber-200">
                                 <div class="text-xs text-amber-900 font-bold">العائد على الاستثمار ROI</div>
-                                <div id="res-econ-roi" class="font-mono-tech text-lg font-black text-amber-700 mt-1">--</div>
+                                <div id="res-econ-roi" class="notranslate font-mono-tech text-lg font-black text-amber-700 mt-1" translate="no">--</div>
                             </div>
                         </div>
 
@@ -1130,7 +1207,7 @@
                                 <i data-lucide="satellite" class="w-5 h-5 text-sky-600"></i>
                                 <span>قياسات NASA POWER و SMAP (آخر 30 يوماً)</span>
                             </h3>
-                            <span id="res-nasa-period" class="font-mono-tech text-[11px] font-bold text-sky-800 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">--</span>
+                            <span id="res-nasa-period" class="notranslate font-mono-tech text-[11px] font-bold text-sky-800 bg-sky-50 px-3 py-1 rounded-full border border-sky-200" translate="no">--</span>
                         </div>
 
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1139,56 +1216,56 @@
                                     <i data-lucide="thermometer" class="w-4 h-4 text-orange-500"></i>
                                     <span>متوسط الحرارة</span>
                                 </div>
-                                <div id="res-temp-30" class="font-mono-tech text-xl font-black text-slate-900 mt-1.5">--</div>
+                                <div id="res-temp-30" class="notranslate font-mono-tech text-xl font-black text-slate-900 mt-1.5" translate="no">--</div>
                             </div>
                             <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
                                 <div class="flex items-center gap-1.5 text-xs text-slate-600 font-bold">
                                     <i data-lucide="cloud-rain" class="w-4 h-4 text-sky-600"></i>
                                     <span>إجمالي الأمطار</span>
                                 </div>
-                                <div id="res-rain-30" class="font-mono-tech text-xl font-black text-slate-900 mt-1.5">--</div>
+                                <div id="res-rain-30" class="notranslate font-mono-tech text-xl font-black text-slate-900 mt-1.5" translate="no">--</div>
                             </div>
                             <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
                                 <div class="flex items-center gap-1.5 text-xs text-slate-600 font-bold">
                                     <i data-lucide="droplets" class="w-4 h-4 text-green-600"></i>
                                     <span>الرطوبة النسبية</span>
                                 </div>
-                                <div id="res-rh-30" class="font-mono-tech text-xl font-black text-slate-900 mt-1.5">--</div>
+                                <div id="res-rh-30" class="notranslate font-mono-tech text-xl font-black text-slate-900 mt-1.5" translate="no">--</div>
                             </div>
                             <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
                                 <div class="flex items-center gap-1.5 text-xs text-slate-600 font-bold">
                                     <i data-lucide="wind" class="w-4 h-4 text-sky-500"></i>
                                     <span>سرعة الرياح</span>
                                 </div>
-                                <div id="res-wind-30" class="font-mono-tech text-xl font-black text-slate-900 mt-1.5">--</div>
+                                <div id="res-wind-30" class="notranslate font-mono-tech text-xl font-black text-slate-900 mt-1.5" translate="no">--</div>
                             </div>
                             <div class="bg-emerald-50/70 rounded-2xl p-3.5 border border-emerald-200">
                                 <div class="flex items-center gap-1.5 text-[11px] text-emerald-800 font-bold">
                                     <i data-lucide="sprout" class="w-4 h-4 text-emerald-600"></i>
                                     <span>رطوبة الجذور SMAP</span>
                                 </div>
-                                <div id="res-gwet-root" class="font-mono-tech text-xl font-black text-emerald-800 mt-1.5">--</div>
+                                <div id="res-gwet-root" class="notranslate font-mono-tech text-xl font-black text-emerald-800 mt-1.5" translate="no">--</div>
                             </div>
                             <div class="bg-sky-50/70 rounded-2xl p-3.5 border border-sky-200">
                                 <div class="flex items-center gap-1.5 text-[11px] text-sky-800 font-bold">
                                     <i data-lucide="droplet" class="w-4 h-4 text-sky-600"></i>
                                     <span>الرطوبة السطحية</span>
                                 </div>
-                                <div id="res-gwet-top" class="font-mono-tech text-xl font-black text-sky-800 mt-1.5">--</div>
+                                <div id="res-gwet-top" class="notranslate font-mono-tech text-xl font-black text-sky-800 mt-1.5" translate="no">--</div>
                             </div>
                             <div class="bg-amber-50/70 rounded-2xl p-3.5 border border-amber-200">
                                 <div class="flex items-center gap-1.5 text-[11px] text-amber-800 font-bold">
                                     <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i>
                                     <span>الإشعاع الشمسي</span>
                                 </div>
-                                <div id="res-solar-30" class="font-mono-tech text-lg font-black text-amber-800 mt-1.5">--</div>
+                                <div id="res-solar-30" class="notranslate font-mono-tech text-lg font-black text-amber-800 mt-1.5" translate="no">--</div>
                             </div>
                             <div class="bg-cyan-50/70 rounded-2xl p-3.5 border border-cyan-200">
                                 <div class="flex items-center gap-1.5 text-[11px] text-cyan-800 font-bold">
                                     <i data-lucide="waves" class="w-4 h-4 text-cyan-600"></i>
                                     <span>البخر-نتح EVPTRNS</span>
                                 </div>
-                                <div id="res-et-30" class="font-mono-tech text-lg font-black text-cyan-800 mt-1.5">--</div>
+                                <div id="res-et-30" class="notranslate font-mono-tech text-lg font-black text-cyan-800 mt-1.5" translate="no">--</div>
                             </div>
                         </div>
 
@@ -1282,7 +1359,7 @@
                             <i data-lucide="calculator" class="w-5 h-5 text-amber-600"></i>
                             <span>شفافية الحسابات: كيف حُسِبت درجة ملاءمة أرضك؟</span>
                         </h3>
-                        <span id="res-meth-formula" class="font-mono-tech text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1 rounded-full"></span>
+                        <span id="res-meth-formula" class="notranslate font-mono-tech text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1 rounded-full" translate="no"></span>
                     </div>
                     <div id="res-meth-factors" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5"></div>
                 </div>
@@ -1325,10 +1402,10 @@
                         </div>
                         <div>
                             <h3 class="font-black text-base md:text-lg text-slate-900">اسأل المرشد الذكي AI 🤖</h3>
-                            <p class="text-xs text-slate-500 font-semibold">اسأل أي سؤال عن أرضك وسيجيبك بناءً على بيانات ناسا والتربة والطقس المعروضة</p>
+                            <p class="text-xs text-slate-500 font-semibold">اسأل أي سؤال عن أرضك وسيجيبك بلغتك المختارة بناءً على بيانات ناسا والتربة والطقس المعروضة</p>
                         </div>
                     </div>
-                    <span class="font-mono-tech text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">Gemini AI • Context-Aware</span>
+                    <span class="notranslate font-mono-tech text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200" translate="no">Gemini AI • World Languages</span>
                 </div>
 
                 <!-- أسئلة سريعة مقترحة -->
@@ -1347,9 +1424,9 @@
                 <!-- منطقة عرض المحادثة -->
                 <div id="ai-chat-messages" class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar bg-slate-50/80 border border-slate-200 rounded-2xl p-4">
                     <div class="flex items-start gap-2.5">
-                        <span class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shrink-0">AI</span>
+                        <span class="notranslate w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shrink-0" translate="no">AI</span>
                         <div class="bg-white border border-slate-200 rounded-2xl rounded-tr-none px-4 py-2.5 text-xs md:text-sm text-slate-700 font-semibold leading-relaxed shadow-sm">
-                            أهلاً بك يا هندسة! أنا جاهز للرد على أي استفسار بخصوص هذه الأرض والمحصول. اكتب سؤالك بالأسفل أو اختر سؤالاً سريعاً.
+                            أهلاً بك! أنا جاهز للرد على أي استفسار بخصوص هذه الأرض والمحصول بأي لغة تختارها. اكتب سؤالك بالأسفل أو اختر سؤالاً سريعاً.
                         </div>
                     </div>
                 </div>
@@ -1360,7 +1437,7 @@
                         id="ai-question-input"
                         type="text"
                         maxlength="500"
-                        placeholder="اكتب سؤالك هنا... مثال: هل أزرع الأسبوع ده ولا أستنى؟"
+                        placeholder="اكتب سؤالك هنا بأي لغة... مثال: هل أزرع الأسبوع ده ولا أستنى؟"
                         class="custom-input flex-grow rounded-2xl px-4 py-3 text-sm font-semibold"
                     />
                     <button
@@ -1401,7 +1478,7 @@
     </div>
 
     <footer class="no-print border-t border-slate-200 bg-white py-4 px-4 text-center text-xs font-semibold text-slate-500 mt-10">
-        N.A.D.A v2.0.0 • منصة إرشادية مجانية 100% تعتمد على بيانات NASA POWER/SMAP/SRTM و SoilGrids و Open-Meteo • لا تغني عن استشارة المهندس الزراعي
+        <span class="notranslate" translate="no">N.A.D.A v2.0.0</span> • منصة إرشادية مجانية 100% تعتمد على بيانات NASA POWER/SMAP/SRTM و SoilGrids و Open-Meteo • لا تغني عن استشارة المهندس الزراعي
     </footer>
 
     <script>
@@ -1421,6 +1498,9 @@
 
         const STORAGE_KEY = "nasa_fallah_state_v20";
         const SENIOR_KEY = "nasa_fallah_senior_mode";
+        const WORLD_LANG_KEY = "nada_world_language";
+        const RTL_LANGS = new Set(["ar", "ur", "fa", "he", "ps", "ku", "sd", "yi"]);
+        let activeWorldLang = localStorage.getItem(WORLD_LANG_KEY) || "ar";
 
         const FALLBACK_OPTIONS = {
             governorates: [
@@ -1502,7 +1582,7 @@
         }
 
         // ============================================================
-        // 2. CLOCK, SENIOR MODE & API HEALTH
+        // 2. CLOCK, SENIOR MODE, WORLD LANGUAGES & API HEALTH
         // ============================================================
         function updateUtcClock() {
             const now = new Date();
@@ -1549,6 +1629,120 @@
             } catch {
                 dot.className = "w-2 h-2 rounded-full bg-orange-500";
                 text.textContent = "API: OFFLINE";
+            }
+        }
+
+        // World Languages Engine (130+ languages via Google Translate + Gemini Sync)
+        function googleTranslateElementInit() {
+            if (typeof google === "undefined" || !google.translate) return;
+            new google.translate.TranslateElement(
+                {
+                    pageLanguage: "ar",
+                    autoDisplay: false
+                },
+                "google_translate_element"
+            );
+            setTimeout(populateAllGoogleLanguages, 900);
+        }
+
+        function populateAllGoogleLanguages() {
+            const combo = document.querySelector(".goog-te-combo");
+            const topSel = document.getElementById("world-language-select");
+            const stepSel = document.getElementById("step-world-language-select");
+            if (!combo || !topSel) return;
+
+            const existingTop = new Set(Array.from(topSel.options).map((o) => o.value));
+            const moreTop = topSel.querySelector('option[value="more"]');
+            if (moreTop) moreTop.remove();
+
+            Array.from(combo.options).forEach((opt) => {
+                if (!opt.value) return;
+                if (!existingTop.has(opt.value)) {
+                    const newOpt = document.createElement("option");
+                    newOpt.value = opt.value;
+                    newOpt.textContent = opt.textContent;
+                    topSel.appendChild(newOpt);
+                    existingTop.add(opt.value);
+                }
+                if (stepSel && !Array.from(stepSel.options).some((o) => o.value === opt.value)) {
+                    const moreStep = stepSel.querySelector('option[value="more"]');
+                    if (moreStep) moreStep.remove();
+                    const sOpt = document.createElement("option");
+                    sOpt.value = opt.value;
+                    sOpt.textContent = opt.textContent;
+                    stepSel.appendChild(sOpt);
+                }
+            });
+
+            syncLanguageDropdowns();
+            if (activeWorldLang && activeWorldLang !== "ar") {
+                triggerGoogleTranslate(activeWorldLang);
+            }
+        }
+
+        function syncLanguageDropdowns() {
+            const topSel = document.getElementById("world-language-select");
+            const stepSel = document.getElementById("step-world-language-select");
+            const reportSel = document.getElementById("report-language");
+
+            [topSel, stepSel, reportSel].forEach((sel) => {
+                if (!sel) return;
+                if (!Array.from(sel.options).some((o) => o.value === activeWorldLang)) {
+                    const opt = document.createElement("option");
+                    opt.value = activeWorldLang;
+                    opt.textContent = activeWorldLang;
+                    sel.appendChild(opt);
+                }
+                sel.value = activeWorldLang;
+            });
+        }
+
+        function triggerGoogleTranslate(langCode) {
+            const combo = document.querySelector(".goog-te-combo");
+            if (!combo) return false;
+            combo.value = langCode;
+            combo.dispatchEvent(new Event("change"));
+            return true;
+        }
+
+        function clearGoogleTranslateCookie() {
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            if (location.hostname) {
+                document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.${location.hostname}; path=/;`;
+            }
+        }
+
+        function applyDirectionForLanguage(langCode) {
+            const baseCode = (langCode || "ar").split("-")[0].toLowerCase();
+            document.documentElement.lang = langCode || "ar";
+            document.documentElement.dir = RTL_LANGS.has(baseCode) ? "rtl" : "ltr";
+        }
+
+        function setWorldLanguage(langCode) {
+            if (langCode === "more") {
+                populateAllGoogleLanguages();
+                syncLanguageDropdowns();
+                const topSel = document.getElementById("world-language-select");
+                if (topSel) topSel.focus();
+                return;
+            }
+
+            activeWorldLang = langCode || "ar";
+            localStorage.setItem(WORLD_LANG_KEY, activeWorldLang);
+            applyDirectionForLanguage(activeWorldLang);
+            syncLanguageDropdowns();
+            saveStateToLocalStorage();
+
+            if (activeWorldLang === "ar") {
+                clearGoogleTranslateCookie();
+                window.location.reload();
+                return;
+            }
+
+            document.cookie = `googtrans=/ar/${activeWorldLang}; path=/;`;
+            const applied = triggerGoogleTranslate(activeWorldLang);
+            if (!applied) {
+                window.location.reload();
             }
         }
 
@@ -1712,7 +1906,7 @@
                 const qs = new URLSearchParams({
                     latitude: String(lat),
                     longitude: String(lon),
-                    language: document.getElementById("report-language").value || "ar"
+                    language: activeWorldLang || "ar"
                 });
                 if (governorate) qs.set("governorate", governorate);
 
@@ -1969,8 +2163,11 @@
         }
 
         function filterCrops(query) {
-            const q = (query || "").trim();
-            const filtered = q ? appOptions.crops.filter((c) => c.includes(q)) : appOptions.crops;
+            const q = (query || "").trim().toLowerCase();
+            const enMap = (appOptions.labels_en && appOptions.labels_en.crops) || {};
+            const filtered = q
+                ? appOptions.crops.filter((c) => c.toLowerCase().includes(q) || (enMap[c] || "").toLowerCase().includes(q))
+                : appOptions.crops;
             renderCropsGrid(filtered);
         }
 
@@ -2016,7 +2213,7 @@
                     latitude: document.getElementById("latitude-input").value,
                     longitude: document.getElementById("longitude-input").value,
                     farmer_name: document.getElementById("farmer-name").value,
-                    language: document.getElementById("report-language").value,
+                    language: activeWorldLang,
                     farm_area: document.getElementById("farm-area").value,
                     farm_area_unit: document.getElementById("farm-area-unit").value,
                     soil_photo_url: document.getElementById("soil-photo-url").value,
@@ -2066,7 +2263,6 @@
                 setVal("latitude-input", saved.latitude);
                 setVal("longitude-input", saved.longitude);
                 setVal("farmer-name", saved.farmer_name);
-                setVal("report-language", saved.language || "ar");
                 setVal("farm-area", saved.farm_area);
                 setVal("farm-area-unit", saved.farm_area_unit || "فدان");
                 setVal("soil-photo-url", saved.soil_photo_url);
@@ -2082,6 +2278,8 @@
                 setVal("custom-price-ton", saved.custom_price_ton);
                 setVal("custom-yield-ton", saved.custom_yield_ton);
                 setVal("additional-notes", saved.additional_notes);
+
+                syncLanguageDropdowns();
 
                 if (saved.compare_crop) {
                     const cmpSel = document.getElementById("compare-crop-select");
@@ -2121,7 +2319,6 @@
             ].forEach((id) => {
                 document.getElementById(id).value = "";
             });
-            document.getElementById("report-language").value = "ar";
             document.getElementById("farm-area-unit").value = "فدان";
             document.getElementById("map-soilgrids-live-bar").classList.add("hidden");
             document.getElementById("step2-soilgrids-hint").classList.add("hidden");
@@ -2146,11 +2343,11 @@
                 if (n === stepNumber) {
                     stepEl.classList.add("active");
                     progEl.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-600 text-white font-bold text-xs shadow-sm transition-all";
-                    badgeEl.className = "w-5 h-5 rounded-full bg-white text-green-700 flex items-center justify-center text-[11px] font-black";
+                    badgeEl.className = "notranslate w-5 h-5 rounded-full bg-white text-green-700 flex items-center justify-center text-[11px] font-black";
                 } else {
                     stepEl.classList.remove("active");
                     progEl.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 font-bold text-xs transition-all";
-                    badgeEl.className = "w-5 h-5 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center text-[11px] font-black";
+                    badgeEl.className = "notranslate w-5 h-5 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center text-[11px] font-black";
                 }
             });
             if (stepNumber === 1 && egyptMap) {
@@ -2279,7 +2476,7 @@
         }
 
         // ============================================================
-        // 7. PAYLOAD & POST /api/analyze (HYBRID SOIL PRIORITY)
+        // 7. PAYLOAD & POST /api/analyze (HYBRID SOIL + WORLD LANG)
         // ============================================================
         function buildPayload() {
             const gov = document.getElementById("governorate-select").value;
@@ -2292,7 +2489,7 @@
                 soil_type: formState.soil_type,
                 standing_water: formState.standing_water,
                 agricultural_problem: formState.agricultural_problem,
-                language: document.getElementById("report-language").value || "ar"
+                language: activeWorldLang || "ar"
             };
 
             const compareCrop = document.getElementById("compare-crop-select").value;
@@ -2318,7 +2515,6 @@
             const cropPhoto = document.getElementById("crop-photo-url").value.trim();
             if (cropPhoto) payload.crop_photo_url = cropPhoto;
 
-            // Hybrid Soil Logic: Only send soil_lab_results if user manually entered/edited lab values!
             const soilLab = {};
             const soilEc = document.getElementById("soil-ec").value.trim();
             const soilN = document.getElementById("soil-n").value.trim();
@@ -2550,7 +2746,6 @@
             if (farm.farm_area) pills.push(`📐 ${farm.farm_area} ${farm.farm_area_unit || ""}`);
             metaPills.innerHTML = pills.map((p) => `<span class="bg-slate-100 border border-slate-200 px-3 py-1 rounded-xl">${escapeHtml(p)}</span>`).join("");
 
-            // Credibility & Live Data Sources Badges
             const nasaStatusLabel = summary.data_quality && summary.data_quality.nasa_live_status === "live" ? "حي" : "احتياطي";
             const sourceBadges = [
                 { text: `رطوبة التربة: قمر ناسا SMAP (${nasaStatusLabel})`, cls: "bg-emerald-50 text-emerald-800 border-emerald-200" },
@@ -2564,7 +2759,6 @@
                 .map((b) => `<span class="px-3 py-1 rounded-full border ${b.cls}">${escapeHtml(b.text)}</span>`)
                 .join("");
 
-            // Early / Late Planting Timing Alert
             const timingBox = document.getElementById("res-timing-alert-box");
             const timing = assessment.planting_timing_alert;
             if (timing && timing.message) {
@@ -2711,7 +2905,7 @@
                     return `
                         <div class="min-w-[185px] max-w-[205px] rounded-2xl border p-3.5 shrink-0 space-y-2 ${cardCls}">
                             <div class="flex items-center justify-between gap-1">
-                                <span class="font-mono-tech text-xs font-black text-slate-800">${escapeHtml(d.date.slice(5))}</span>
+                                <span class="notranslate font-mono-tech text-xs font-black text-slate-800" translate="no">${escapeHtml(d.date.slice(5))}</span>
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${badgeCls}">يوم ${d.day_index}</span>
                             </div>
                             <div class="font-mono-tech text-[11px] font-bold text-slate-600 flex justify-between">
@@ -2750,7 +2944,7 @@
                                 <span class="font-mono-tech text-[11px] font-bold text-slate-600">يوم ${st.start_day}–${st.end_day}</span>
                             </div>
                             <h4 class="font-black text-sm text-slate-900">${escapeHtml(st.stage_name)}</h4>
-                            <div class="text-[11px] font-mono-tech font-bold text-sky-700">${escapeHtml(st.estimated_start_date)} → ${escapeHtml(st.estimated_end_date)}</div>
+                            <div class="notranslate text-[11px] font-mono-tech font-bold text-sky-700" translate="no">${escapeHtml(st.estimated_start_date)} → ${escapeHtml(st.estimated_end_date)}</div>
                             <div class="bg-white rounded-xl p-2.5 border border-slate-200/80 text-xs text-slate-700 font-semibold">
                                 <span class="text-sky-700 font-extrabold">💧 الري:</span> ${escapeHtml(st.irrigation_guidance)}
                             </div>
@@ -2806,19 +3000,19 @@
                 climBody.innerHTML = `
                     <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                         <div class="text-xs text-slate-600 font-bold">متوسط الحرارة</div>
-                        <div class="font-mono-tech text-lg font-black text-orange-600 mt-1">${pmClim.temp != null ? pmClim.temp + "°C" : "—"}</div>
+                        <div class="notranslate font-mono-tech text-lg font-black text-orange-600 mt-1" translate="no">${pmClim.temp != null ? pmClim.temp + "°C" : "—"}</div>
                     </div>
                     <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                         <div class="text-xs text-slate-600 font-bold">أمطار الشهر</div>
-                        <div class="font-mono-tech text-lg font-black text-sky-700 mt-1">${pmClim.rain_total != null ? pmClim.rain_total + " mm" : "—"}</div>
+                        <div class="notranslate font-mono-tech text-lg font-black text-sky-700 mt-1" translate="no">${pmClim.rain_total != null ? pmClim.rain_total + " mm" : "—"}</div>
                     </div>
                     <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                         <div class="text-xs text-slate-600 font-bold">الرطوبة المتوقعة</div>
-                        <div class="font-mono-tech text-lg font-black text-green-700 mt-1">${pmClim.humidity != null ? pmClim.humidity + "%" : "—"}</div>
+                        <div class="notranslate font-mono-tech text-lg font-black text-green-700 mt-1" translate="no">${pmClim.humidity != null ? pmClim.humidity + "%" : "—"}</div>
                     </div>
                     <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                         <div class="text-xs text-slate-600 font-bold">متوسط الرياح</div>
-                        <div class="font-mono-tech text-lg font-black text-sky-600 mt-1">${pmClim.wind != null ? pmClim.wind + " m/s" : "—"}</div>
+                        <div class="notranslate font-mono-tech text-lg font-black text-sky-600 mt-1" translate="no">${pmClim.wind != null ? pmClim.wind + " m/s" : "—"}</div>
                     </div>
                 `;
             } else {
@@ -2896,11 +3090,11 @@
                 const daysEl = document.getElementById("res-forecast-days");
                 daysEl.innerHTML = (forecast.days || []).map((d) => `
                     <div class="min-w-[126px] bg-slate-50 border border-slate-200 rounded-2xl p-3 text-center shrink-0 space-y-1.5">
-                        <div class="font-mono-tech text-[11px] text-sky-700 font-extrabold">${escapeHtml(d.date.slice(5))}</div>
-                        <div class="text-sm font-black text-slate-900 font-mono-tech">${d.temperature_max_c}° / <span class="text-slate-500">${d.temperature_min_c}°</span></div>
-                        <div class="text-[11px] text-sky-700 font-bold">☔ ${d.rain_mm} mm</div>
-                        <div class="text-[11px] text-cyan-700 font-bold">ET0: ${d.et0_mm != null ? d.et0_mm + " mm" : "—"}</div>
-                        <div class="text-[11px] text-slate-500 font-semibold">💨 ${d.wind_max_kmh != null ? d.wind_max_kmh + " km/h" : "—"}</div>
+                        <div class="notranslate font-mono-tech text-[11px] text-sky-700 font-extrabold" translate="no">${escapeHtml(d.date.slice(5))}</div>
+                        <div class="notranslate text-sm font-black text-slate-900 font-mono-tech" translate="no">${d.temperature_max_c}° / <span class="text-slate-500">${d.temperature_min_c}°</span></div>
+                        <div class="notranslate text-[11px] text-sky-700 font-bold" translate="no">☔ ${d.rain_mm} mm</div>
+                        <div class="notranslate text-[11px] text-cyan-700 font-bold" translate="no">ET0: ${d.et0_mm != null ? d.et0_mm + " mm" : "—"}</div>
+                        <div class="notranslate text-[11px] text-slate-500 font-semibold" translate="no">💨 ${d.wind_max_kmh != null ? d.wind_max_kmh + " km/h" : "—"}</div>
                     </div>
                 `).join("");
 
@@ -2979,7 +3173,7 @@
 
             const roiEl = document.getElementById("res-econ-roi");
             roiEl.textContent = `${roiPct}%`;
-            roiEl.className = `font-mono-tech text-lg font-black mt-1 ${roiPct >= 0 ? "text-amber-700" : "text-orange-700"}`;
+            roiEl.className = `notranslate font-mono-tech text-lg font-black mt-1 ${roiPct >= 0 ? "text-amber-700" : "text-orange-700"}`;
 
             const totalBox = document.getElementById("res-econ-total-box");
             if (isAreaSpecified && areaFeddan > 0) {
@@ -3032,8 +3226,7 @@
             let meth = lastAnalysisResponse && lastAnalysisResponse.methodology;
             if (!meth) {
                 try {
-                    const lang = document.getElementById("report-language").value || "ar";
-                    const res = await fetch(`${API_BASE}/api/methodology?language=${lang}`);
+                    const res = await fetch(`${API_BASE}/api/methodology?language=${encodeURIComponent(activeWorldLang || "ar")}`);
                     if (res.ok) {
                         const json = await res.json();
                         meth = json.methodology;
@@ -3072,14 +3265,14 @@
 
                 <div class="space-y-2">
                     <h4 class="font-black text-slate-900 text-sm">2. معادلة حساب درجة الملاءمة والأوزان</h4>
-                    <div class="bg-slate-900 text-emerald-300 font-mono-tech text-xs p-3.5 rounded-2xl overflow-x-auto">
+                    <div class="notranslate bg-slate-900 text-emerald-300 font-mono-tech text-xs p-3.5 rounded-2xl overflow-x-auto" translate="no">
                         ${escapeHtml(sm.equation || "")}
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                         ${Object.entries(sm.factor_weights || {}).map(([k, v]) => `
                             <div class="bg-slate-50 border border-slate-200 rounded-xl p-2 flex justify-between items-center">
                                 <span class="font-bold text-slate-700">${escapeHtml(k)}</span>
-                                <span class="font-mono-tech font-black text-green-700">${escapeHtml(String(v))}</span>
+                                <span class="notranslate font-mono-tech font-black text-green-700" translate="no">${escapeHtml(String(v))}</span>
                             </div>
                         `).join("")}
                     </div>
@@ -3088,9 +3281,9 @@
                 <div class="space-y-2">
                     <h4 class="font-black text-slate-900 text-sm">3. معادلات الاحتياج المائي الحي والعائد الاقتصادي</h4>
                     <div class="bg-green-50/70 border border-green-200 rounded-2xl p-3.5 text-xs space-y-1.5 font-semibold text-slate-800">
-                        <div>• الاحتياج المائي الحي: <span class="font-mono-tech">${escapeHtml(ew.live_water_demand || "")}</span></div>
-                        <div>• صافي الربح: <span class="font-mono-tech">${escapeHtml(ew.net_profit || "")}</span></div>
-                        <div>• نسبة العائد على الاستثمار (ROI): <span class="font-mono-tech">${escapeHtml(ew.roi_percent || "")}</span></div>
+                        <div>• الاحتياج المائي الحي: <span class="notranslate font-mono-tech" translate="no">${escapeHtml(ew.live_water_demand || "")}</span></div>
+                        <div>• صافي الربح: <span class="notranslate font-mono-tech" translate="no">${escapeHtml(ew.net_profit || "")}</span></div>
+                        <div>• نسبة العائد على الاستثمار (ROI): <span class="notranslate font-mono-tech" translate="no">${escapeHtml(ew.roi_percent || "")}</span></div>
                         <div>• كفاءة التنقيط 90% والرش 78% مقابل الغمر 58% | وفر الأرز المتقطع (AWD): 15%</div>
                     </div>
                 </div>
@@ -3148,7 +3341,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `nasa-fallah-report-${new Date().toISOString().slice(0, 10)}.json`;
+            a.download = `nada-agri-report-${new Date().toISOString().slice(0, 10)}.json`;
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -3187,6 +3380,8 @@
         // 11. BOOTSTRAP
         // ============================================================
         document.addEventListener("DOMContentLoaded", () => {
+            applyDirectionForLanguage(activeWorldLang);
+            syncLanguageDropdowns();
             updateUtcClock();
             setInterval(updateUtcClock, 1000);
             applySeniorMode(localStorage.getItem(SENIOR_KEY) === "1");
@@ -3203,7 +3398,7 @@
         });
 
         // ============================================================
-        // 12. AI AGRONOMIC ADVISOR CHAT (/api/ask-ai)
+        // 12. AI AGRONOMIC ADVISOR CHAT (/api/ask-ai - WORLD LANGUAGES)
         // ============================================================
         function collectCurrentCardContext() {
             if (!lastAnalysisResponse) return {};
@@ -3274,7 +3469,7 @@
                     : "bg-white border-slate-200 text-slate-800";
                 wrapper.className = "flex items-start gap-2.5";
                 wrapper.innerHTML = `
-                    <span class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shrink-0">AI</span>
+                    <span class="notranslate w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shrink-0" translate="no">AI</span>
                     <div class="border ${bubbleCls} rounded-2xl rounded-tr-none px-4 py-3 text-xs md:text-sm font-semibold leading-relaxed max-w-[90%] shadow-sm whitespace-pre-line">
                         ${escapeHtml(text)}
                     </div>
@@ -3311,14 +3506,13 @@
             const typingNode = appendAiChatMessage("ai", "جاري تحليل سؤالك ومطابقته مع بيانات القمر الصناعي...");
 
             try {
-                const lang = (lastAnalysisResponse.assessment && lastAnalysisResponse.assessment.language) || "ar";
                 const res = await fetch(`${API_BASE}/api/ask-ai`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         question,
                         farm_context: collectCurrentCardContext(),
-                        language: lang
+                        language: activeWorldLang || "ar"
                     })
                 });
 
@@ -3344,6 +3538,8 @@
             }
         }
     </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
+
 

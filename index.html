@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
 
-   <style>
+  <style>
         :root {
             color-scheme: light;
         }
@@ -30,24 +30,20 @@
         }
         html.senior-mode .text-slate-500,
         html.senior-mode .text-slate-600 {
-            color: #0f172a !important;
+            color: #1e293b !important;
         }
         html.senior-mode .agri-card,
         html.senior-mode .choice-card {
             border-width: 2px !important;
         }
 
-        /* 1. الخلفية العامة: تدرج الطبيعة (سماء صافية -> مراعي خضراء -> أرض قمح دافئة) */
+        /* الخلفية العامة: تدرج مطفي هادئ جداً (أزرق هادئ -> أخضر هادئ -> أصفر كريمي هادئ) */
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #cdebd8;
-            color: #0f172a;
+            background-color: #dfece7;
+            color: #1e293b;
             overflow-x: hidden;
-            background-image:
-                radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.25), transparent 38%),
-                radial-gradient(circle at 90% 20%, rgba(34, 197, 94, 0.22), transparent 40%),
-                radial-gradient(circle at 50% 95%, rgba(234, 179, 8, 0.25), transparent 45%),
-                linear-gradient(180deg, #cbeafe 0%, #d1fae5 48%, #f5e6c8 100%);
+            background-image: linear-gradient(160deg, #dce9f3 0%, #dfede5 52%, #f0ebd6 100%);
             background-attachment: fixed;
         }
 
@@ -58,248 +54,148 @@
         .bg-agri-grid {
             background-size: 40px 40px;
             background-image:
-                linear-gradient(to right, rgba(21, 128, 61, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(2, 132, 199, 0.05) 1px, transparent 1px);
+                linear-gradient(to right, rgba(30, 64, 175, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(21, 128, 61, 0.03) 1px, transparent 1px);
         }
 
-        /* 2. الشريط العلوي (لون أوراق الشجر والأعشاب) */
+        /* الشريط العلوي والهيدر والفوتر بألوان هادئة */
         body > div.no-print {
-            background: linear-gradient(90deg, #bbf7d0 0%, #bae6fd 50%, #fde68a 100%) !important;
-            border-bottom: 1.5px solid #86efac !important;
+            background-color: #e2edf5 !important;
+            border-bottom: 1px solid #bfd3e3 !important;
         }
 
-        /* 3. الهيدر الرئيسي (لون السماء والمياه النيلية) */
         header.no-print {
-            background: linear-gradient(90deg, rgba(186, 230, 253, 0.94) 0%, rgba(209, 250, 229, 0.94) 100%) !important;
-            border-bottom: 2px solid #38bdf8 !important;
+            background-color: rgba(226, 238, 247, 0.94) !important;
+            border-bottom: 1.5px solid #b5cde0 !important;
         }
 
-        /* 4. الفوتر (لون التربة والقمح والخضرة) */
         footer.no-print {
-            background: linear-gradient(90deg, #b7e4c7 0%, #e7d8c9 50%, #fde68a 100%) !important;
-            border-top: 2px solid #74c69d !important;
-            color: #1e293b !important;
+            background-color: #e4ede5 !important;
+            border-top: 1px solid #c1d4c4 !important;
+            color: #334155 !important;
         }
 
-        /* الإطار العام للكروت */
+        /* الإطار الافتراضي للكروت */
         .agri-card {
-            background: rgba(235, 248, 240, 0.90);
-            border: 1.5px solid #95d5b2;
-            box-shadow: 0 12px 32px -12px rgba(15, 23, 42, 0.12), 0 2px 8px -2px rgba(15, 23, 42, 0.06);
+            background-color: #e7f1eb;
+            border: 1px solid #c3d9cc;
+            box-shadow: 0 8px 24px -12px rgba(15, 23, 42, 0.08);
         }
 
         /* =========================================================
-           ألوان مخصصة لكل قسم حسب عناصر الطبيعة
+           توزيع الألوان الهادئة (أزرق هادئ • أخضر هادئ • أصفر هادئ)
            ========================================================= */
 
-        /* بانر الدليل السريع: لون الرمال الذهبية والشمس */
-        #hero-guide {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 55%, #ffedd5 100%) !important;
-            border-color: #f59e0b !important;
-        }
-
-        /* نموذج إدخال البيانات (اليمين): لون الزرع والمراعي الخضراء */
-        #wizard-view > div.agri-card {
-            background: linear-gradient(160deg, #dcfce7 0%, #ecfccb 100%) !important;
-            border: 1.5px solid #4ade80 !important;
-        }
-
-        /* ملخص الأرض الحي (اليسار): لون التربة الخصبة والطمي */
-        #wizard-view > aside.agri-card {
-            background: linear-gradient(160deg, #f3e5d8 0%, #e6ccb2 100%) !important;
-            border: 1.5px solid #b08968 !important;
-        }
-        #wizard-view > aside .bg-slate-50 {
-            background-color: rgba(255, 248, 235, 0.65) !important;
-            border-color: rgba(176, 137, 104, 0.4) !important;
-        }
-
-        /* شاشة التحميل الفضائية: لون السماء والبحر */
-        #loading-view {
-            background: linear-gradient(135deg, #dbeafe 0%, #cffafe 100%) !important;
-            border-color: #0ea5e9 !important;
-        }
-
-        /* بطاقة النتيجة الرئيسية (الدرجة والملاءمة): لون الربيع والنماء */
-        #printable-decision-card > div:nth-child(1) {
-            background: linear-gradient(135deg, #dcfce7 0%, #fef9c3 100%) !important;
-            border-color: #22c55e !important;
-        }
-
-        /* بطاقة ارتفاع الأرض (SRTM): لون الجبال والصخور والهضاب */
-        #res-elevation-card {
-            background: linear-gradient(135deg, #e0e7ff 0%, #cbd5e1 100%) !important;
-            border-color: #6366f1 !important;
-        }
-
-        /* بطاقة ملف التربة الهجين: لون التربة الطينية والرمال */
-        #res-soil-hybrid-card {
-            background: linear-gradient(135deg, #f5e6d3 0%, #e7d3be 100%) !important;
-            border-color: #b45309 !important;
-        }
-        #res-soil-hybrid-card .bg-slate-50 {
-            background-color: rgba(255, 249, 240, 0.68) !important;
-        }
-
-        /* مقارنة محصولين: لون القمح والذرة الذهبية */
-        #res-comparison-section {
-            background: linear-gradient(135deg, #fef3c7 0%, #ffedd5 100%) !important;
-            border-color: #f59e0b !important;
-        }
-
-        /* حاسبة التكلفة والعائد: لون الحصاد الذهبي والشمس */
-        #res-economics-section > div:first-child {
-            background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%) !important;
-            border-color: #eab308 !important;
-        }
-        #res-economics-section > div:first-child .bg-slate-50 {
-            background-color: rgba(255, 251, 235, 0.72) !important;
-        }
-
-        /* حاسبة توفير المياه: لون مياه النيل والأنهار */
-        #res-economics-section > div:last-child {
-            background: linear-gradient(135deg, #cffafe 0%, #bae6fd 100%) !important;
-            border-color: #0284c7 !important;
-        }
-
-        /* جدول الري الـ 16 يوماً: لون الندى والأمطار */
-        #res-schedule-16d-section {
-            background: linear-gradient(135deg, #e0f2fe 0%, #ccfbf1 100%) !important;
-            border-color: #0891b2 !important;
-        }
-
-        /* التقويم الزراعي التفاعلي: لون الأوراق الخضراء والغابات */
-        #res-calendar-section {
-            background: linear-gradient(135deg, #d1fae5 0%, #ecfccb 100%) !important;
-            border-color: #10b981 !important;
-        }
-
-        /* قياسات NASA POWER (30 يوم): لون الفضاء والسماء الصافية */
-        #printable-decision-card > div:nth-child(7) > div:first-child {
-            background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%) !important;
-            border-color: #0284c7 !important;
-        }
-        /* مناخ شهر الزراعة المرجعي: لون الفصول والطبيعة الدافئة */
-        #printable-decision-card > div:nth-child(7) > div:last-child {
-            background: linear-gradient(135deg, #ecfccb 0%, #fef3c7 100%) !important;
-            border-color: #65a30d !important;
-        }
-
-        /* تحليل العوامل التفصيلي */
-        #res-checks-section {
-            background: linear-gradient(135deg, #e2f5ea 0%, #e0f2fe 100%) !important;
-            border-color: #16a34a !important;
-        }
-        /* توصية نظام الري: لون المياه الصافية */
-        #res-irrigation-box {
-            background: linear-gradient(135deg, #bae6fd 0%, #cffafe 100%) !important;
-            border-color: #0284c7 !important;
-        }
-        /* المحاصيل البديلة: لون البراعم الخضراء */
-        #res-alternatives-box {
-            background: linear-gradient(135deg, #bbf7d0 0%, #d9f99d 100%) !important;
-            border-color: #16a34a !important;
-        }
-
-        /* توقعات الطقس للأسبوعين: لون السماء والغيوم */
-        #res-forecast-section {
-            background: linear-gradient(135deg, #dbeafe 0%, #cffafe 100%) !important;
-            border-color: #2563eb !important;
-        }
-
-        /* المخاطر المحتملة: لون الغروب والخريف التحذيري */
-        #printable-decision-card > div:nth-child(10) > div:first-child {
-            background: linear-gradient(135deg, #ffedd5 0%, #fee2e2 100%) !important;
-            border-color: #f97316 !important;
-        }
-        /* التوصيات والنصائح العملية: لون المراعي الخضراء */
-        #printable-decision-card > div:nth-child(10) > div:last-child {
-            background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%) !important;
-            border-color: #16a34a !important;
-        }
-
-        /* قسم شفافية الحسابات: لون القمح الدافئ */
-        #res-methodology-inline {
-            background: linear-gradient(135deg, #fef3c7 0%, #ecfccb 100%) !important;
-            border-color: #d97706 !important;
-        }
-
-        /* الملاحظات والبيانات الناقصة والقيود */
-        #printable-decision-card > div:nth-child(12) > div:nth-child(1) {
-            background: linear-gradient(135deg, #e0f2fe 0%, #e2e8f0 100%) !important;
-            border-color: #38bdf8 !important;
-        }
-        #printable-decision-card > div:nth-child(12) > div:nth-child(2) {
-            background: linear-gradient(135deg, #fef3c7 0%, #ffedd5 100%) !important;
-            border-color: #f59e0b !important;
-        }
-        #printable-decision-card > div:nth-child(12) > div:nth-child(3) {
-            background: linear-gradient(135deg, #e6ccb2 0%, #f3e5d8 100%) !important;
-            border-color: #a16207 !important;
-        }
-
-        /* قسم اسأل المرشد الذكي AI: لون البحيرة والزمرد */
+        /* 1) الأقسام الخضراء الهادئة (الزرع، الملاءمة، التقويم، التوصيات، المرشد AI) */
+        #wizard-view > div.agri-card,
+        #printable-decision-card > div:nth-child(1),
+        #res-calendar-section,
+        #res-checks-section,
+        #res-alternatives-box,
+        #printable-decision-card > div:nth-child(10) > div:last-child,
         #ai-advisor-section {
-            background: linear-gradient(135deg, #ccfbf1 0%, #d1fae5 50%, #bae6fd 100%) !important;
-            border-color: #059669 !important;
+            background-color: #e4f0e8 !important;
+            border-color: #b7d3c2 !important;
+        }
+
+        /* 2) الأقسام الزرقاء الهادئة (ناسا، المياه، الارتفاع، الطقس، جدول الـ16 يوم) */
+        #loading-view,
+        #res-elevation-card,
+        #res-economics-section > div:last-child,
+        #res-schedule-16d-section,
+        #printable-decision-card > div:nth-child(7) > div:first-child,
+        #res-irrigation-box,
+        #res-forecast-section,
+        #printable-decision-card > div:nth-child(12) > div:nth-child(1) {
+            background-color: #e3eef6 !important;
+            border-color: #b6cee0 !important;
+        }
+
+        /* 3) الأقسام الصفراء الهادئة (الدليل، ملخص الأرض، التربة، الأرباح، المقارنة، الملاحظات) */
+        #hero-guide,
+        #wizard-view > aside.agri-card,
+        #res-soil-hybrid-card,
+        #res-comparison-section,
+        #res-economics-section > div:first-child,
+        #printable-decision-card > div:nth-child(7) > div:last-child,
+        #printable-decision-card > div:nth-child(10) > div:first-child,
+        #res-methodology-inline,
+        #printable-decision-card > div:nth-child(12) > div:nth-child(2),
+        #printable-decision-card > div:nth-child(12) > div:nth-child(3) {
+            background-color: #f4efe0 !important;
+            border-color: #dcd3b4 !important;
+        }
+
+        /* نافذة المنهجية وصندوق الشات */
+        #methodology-modal > div {
+            background-color: #ebf2ee !important;
+            border: 1.5px solid #b7d3c2 !important;
         }
         #ai-chat-messages {
-            background-color: rgba(236, 253, 245, 0.72) !important;
-            border-color: #6ee7b7 !important;
+            background-color: rgba(235, 245, 239, 0.78) !important;
+            border-color: #bdd6c7 !important;
         }
 
-        /* نافذة المنهجية والعناصر الداخلية بشفافية ناعمة تعكس لون القسم */
-        #methodology-modal > div {
-            background: linear-gradient(160deg, #ecfdf5 0%, #fef3c7 100%) !important;
-            border: 2px solid #34d399 !important;
-        }
-
+        /* الخلفيات الفرعية داخل الكروت بدرجة ناعمة غير مزعجة */
         .bg-white,
         .bg-white\/90,
         .bg-white\/80 {
-            background-color: rgba(244, 252, 245, 0.72) !important;
+            background-color: rgba(244, 249, 246, 0.75) !important;
         }
 
         .bg-slate-50,
         .bg-slate-50\/80,
         .bg-slate-100 {
-            background-color: rgba(232, 245, 236, 0.68) !important;
+            background-color: rgba(232, 241, 237, 0.65) !important;
+        }
+
+        /* تهدئة الخلفيات الملوّنة الفرعية */
+        .bg-green-50, .bg-green-50\/70, .bg-green-50\/60,
+        .bg-emerald-50, .bg-emerald-50\/70 {
+            background-color: rgba(218, 238, 226, 0.72) !important;
+        }
+        .bg-sky-50, .bg-sky-50\/70, .bg-sky-50\/80, .bg-sky-50\/60,
+        .bg-cyan-50, .bg-cyan-50\/70, .bg-indigo-50, .bg-indigo-50\/70 {
+            background-color: rgba(217, 234, 246, 0.72) !important;
+        }
+        .bg-amber-50, .bg-amber-50\/70, .bg-orange-50, .bg-orange-50\/70 {
+            background-color: rgba(244, 237, 212, 0.78) !important;
         }
 
         /* حقول الإدخال */
         .custom-select, .custom-input, .custom-textarea {
-            background: rgba(247, 254, 247, 0.88);
-            border: 1.5px solid #65a30d;
-            color: #0f172a;
+            background: #f1f6f3;
+            border: 1.5px solid #b8cec1;
+            color: #1e293b;
             transition: all 0.2s ease;
         }
         .custom-select:focus, .custom-input:focus, .custom-textarea:focus {
             outline: none;
-            background: #f0fdf4;
-            border-color: #16a34a;
-            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.16);
+            background: #f6faf7;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
         }
 
         /* أزرار الاختيارات */
         .choice-card {
-            background: rgba(236, 253, 245, 0.78);
-            border: 1.5px solid #86efac;
-            color: #143625;
+            background: #edf4ef;
+            border: 1.5px solid #c2d7ca;
+            color: #1e293b;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             user-select: none;
         }
         .choice-card:hover {
-            border-color: #16a34a;
-            background: #bbf7d0;
+            border-color: #60a5fa;
+            background: #e1eef7;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px -6px rgba(22, 163, 74, 0.25);
+            box-shadow: 0 4px 12px -4px rgba(59, 130, 246, 0.15);
         }
         .choice-card.selected {
-            background: linear-gradient(135deg, #86efac 0%, #bae6fd 100%);
-            border-color: #15803d;
-            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.22);
-            color: #052e16;
+            background: linear-gradient(135deg, #d7ecdf 0%, #d8e9f5 100%);
+            border-color: #229954;
+            box-shadow: 0 0 0 2.5px rgba(34, 153, 84, 0.18);
+            color: #14532d;
         }
         .choice-card.selected .icon-box {
             background: #16a34a !important;
@@ -331,7 +227,7 @@
             height: 310px;
             width: 100%;
             border-radius: 1rem;
-            border: 2px solid #22c55e;
+            border: 1.5px solid #a9c5b5;
             z-index: 1;
             background-color: #0b132b;
         }
@@ -341,15 +237,15 @@
             width: 7px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #cce7d8;
+            background: #dce8e2;
             border-radius: 999px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #22c55e;
+            background: #8eb39e;
             border-radius: 999px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #15803d;
+            background: #4d8b6b;
         }
 
         @media print {

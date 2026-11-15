@@ -34,21 +34,24 @@
         }
         html.senior-mode .agri-card {
             border-width: 2px !important;
-            border-color: #cbd5e1 !important;
+            border-color: #52b788 !important;
         }
         html.senior-mode .choice-card {
             border-width: 2px !important;
+            border-color: #52b788 !important;
         }
 
+        /* الخلفية العامة للبرنامج بألوان الطبيعة والزراعة */
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #f8fafc;
+            background-color: #cdebd8;
             color: #0f172a;
             overflow-x: hidden;
             background-image:
-                radial-gradient(circle at 8% 12%, rgba(22, 163, 74, 0.08), transparent 34%),
-                radial-gradient(circle at 92% 15%, rgba(14, 165, 233, 0.09), transparent 36%),
-                radial-gradient(circle at 50% 90%, rgba(234, 179, 8, 0.07), transparent 42%);
+                radial-gradient(circle at 8% 12%, rgba(22, 163, 74, 0.22), transparent 38%),
+                radial-gradient(circle at 92% 15%, rgba(14, 165, 233, 0.22), transparent 40%),
+                radial-gradient(circle at 50% 90%, rgba(234, 179, 8, 0.18), transparent 45%),
+                linear-gradient(135deg, #c7ebd5 0%, #c8e7f5 50%, #e7ecc6 100%);
             background-attachment: fixed;
         }
 
@@ -59,52 +62,67 @@
         .bg-agri-grid {
             background-size: 40px 40px;
             background-image:
-                linear-gradient(to right, rgba(22, 163, 74, 0.035) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(2, 132, 199, 0.035) 1px, transparent 1px);
+                linear-gradient(to right, rgba(22, 163, 74, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(2, 132, 199, 0.06) 1px, transparent 1px);
         }
 
+        /* كروت البرنامج بخلفية زراعية ناعمة غير بيضاء */
         .agri-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 12px 32px -12px rgba(15, 23, 42, 0.08), 0 2px 8px -2px rgba(15, 23, 42, 0.04);
+            background: linear-gradient(160deg, rgba(228, 247, 236, 0.94) 0%, rgba(221, 241, 250, 0.94) 100%) !important;
+            border: 1.5px solid #95d5b2;
+            box-shadow: 0 12px 32px -12px rgba(15, 23, 42, 0.10), 0 2px 8px -2px rgba(15, 23, 42, 0.05);
+        }
+
+        /* تحويل أي خلفيات بيضاء أو رمادية باهتة لدرجات نعناعية متناسقة */
+        .bg-white,
+        .bg-white\/90,
+        .bg-white\/80 {
+            background-color: rgba(224, 245, 233, 0.92) !important;
+        }
+
+        .bg-slate-50,
+        .bg-slate-50\/80,
+        .bg-slate-100 {
+            background-color: rgba(205, 235, 220, 0.85) !important;
         }
 
         .custom-select, .custom-input, .custom-textarea {
-            background: #ffffff;
-            border: 1.5px solid #cbd5e1;
+            background: #e2f5ea;
+            border: 1.5px solid #74c69d;
             color: #0f172a;
             transition: all 0.2s ease;
         }
         .custom-select:focus, .custom-input:focus, .custom-textarea:focus {
             outline: none;
+            background: #ebf9f1;
             border-color: #16a34a;
-            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.14);
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.16);
         }
 
         .choice-card {
-            background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-            color: #1e293b;
+            background: #d5efe1;
+            border: 1.5px solid #86cfa8;
+            color: #143625;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             user-select: none;
         }
         .choice-card:hover {
             border-color: #16a34a;
-            background: #f0fdf4;
+            background: #c3ead5;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px -6px rgba(22, 163, 74, 0.18);
+            box-shadow: 0 6px 16px -6px rgba(22, 163, 74, 0.22);
         }
         .choice-card.selected {
-            background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
+            background: linear-gradient(135deg, #b7e4c7 0%, #bae6fd 100%);
             border-color: #16a34a;
-            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
-            color: #14532d;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.18);
+            color: #052e16;
         }
         .choice-card.selected .icon-box {
-            background: #16a34a;
-            color: #ffffff;
-            border-color: #15803d;
+            background: #16a34a !important;
+            color: #ffffff !important;
+            border-color: #15803d !important;
         }
 
         .step-container {
@@ -131,7 +149,7 @@
             height: 310px;
             width: 100%;
             border-radius: 1rem;
-            border: 1.5px solid #cbd5e1;
+            border: 1.5px solid #52b788;
             z-index: 1;
             background-color: #0b132b;
         }
@@ -141,11 +159,11 @@
             width: 7px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: #cce7d8;
             border-radius: 999px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #94a3b8;
+            background: #52b788;
             border-radius: 999px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -164,12 +182,14 @@
             #results-view {
                 display: block !important;
             }
-            .agri-card {
+            .agri-card, .bg-white {
+                background: #ffffff !important;
                 box-shadow: none !important;
                 border: 1px solid #cbd5e1 !important;
                 break-inside: avoid;
             }
         }
+
     </style>
 </head>
 <body class="bg-agri-grid min-h-screen flex flex-col">

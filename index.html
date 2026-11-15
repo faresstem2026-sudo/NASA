@@ -980,6 +980,18 @@
                     </div>
                 </div>
 
+                <!-- التدوير الزراعي (Crop Rotation) -->
+                <div id="res-rotation-section" class="hidden agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-indigo-500 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="font-black text-base md:text-lg text-slate-900 flex items-center gap-2">
+                            <i data-lucide="refresh-cw" class="w-5 h-5 text-indigo-600"></i>
+                            <span>استراتيجيات التدوير الزراعي (Crop Rotation)</span>
+                        </h3>
+                    </div>
+
+                    <div id="res-rotation-strategies" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    </div>
+                </div>
 
                 <!-- 1A. صحة المحصول من القمر: NASA MODIS NDVI -->
                 <div id="res-ndvi-section" class="agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-green-500 space-y-4">
@@ -1056,18 +1068,6 @@
                         <div id="res-soil-extra" class="text-xs text-slate-600 font-bold"></div>
                     </div>
                 </div>
-                <!-- التدوير الزراعي (Crop Rotation) -->
-<div id="res-rotation-section" class="hidden agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-indigo-500 space-y-4">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-        <h3 class="font-black text-base md:text-lg text-slate-900 flex items-center gap-2">
-            <i data-lucide="refresh-cw" class="w-5 h-5 text-indigo-600"></i>
-            <span>استراتيجيات التدوير الزراعي (Crop Rotation)</span>
-        </h3>
-    </div>
-
-    <div id="res-rotation-strategies" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    </div>
-</div>
 
                 <!-- 2. مقارنة محصولين جنباً إلى جنب (إن وُجدت) -->
                 <div id="res-comparison-section" class="hidden agri-card rounded-3xl p-5 md:p-6 border-t-4 border-t-amber-500 space-y-4">
@@ -2759,9 +2759,9 @@ if (prevCrop && prevCrop !== "غير معروف") {
                 if (!res.ok) throw new Error("HTTP " + res.status);
                 const data = await res.json();
                 const n = data.ndvi || {};
-                if (!n.available) {
+             if (!n.available) {
                     stEl.textContent = n.status_text || "غير متاح حالياً";
-                    noteEl.textContent = "تعذّر جلب قراءة NDVI من خادم ناسا في هذه اللحظة. لم نعرض أي رقم تقديري. جرّب مرة أخرى بعد قليل." + (n.error ? " (سبب تقني: " + n.error + ")" : "");
+                    noteEl.textContent = "المعلومات غير متاحة حالياً";
                     return;
                 }
                 valEl.textContent = Number(n.latest_ndvi).toFixed(2);

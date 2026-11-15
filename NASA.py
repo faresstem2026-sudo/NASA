@@ -57,6 +57,7 @@ APP_VERSION = "2.0.0"
 # 3. FASTAPI APPLICATION
 # ============================================================
 
+APP_VERSION = "2.0.0"
 app = FastAPI(
     title="N.A.D.A API",
     description="Agricultural Decision Support System for Egypt",

@@ -1,7 +1,7 @@
 
 
 # ============================================================
-# Orbit Gudie EG 
+# N.A.D.A
 # Agricultural Decision Support System for Egypt
 # Backend: Python + FastAPI (Vercel Serverless Ready)
 # Data Sources:
@@ -57,7 +57,7 @@ APP_VERSION = "2.0.0"
 # ============================================================
 
 app = FastAPI(
-    title="OrbitGudie EG API",
+    title=" API",
     description="Agricultural Decision Support System for Egypt",
     version=APP_VERSION
 )
@@ -3952,8 +3952,8 @@ def build_methodology(lang, evaluation=None):
     methodology = {
         "title": L(
             lang,
-            "منهجية الحساب والتقييم في OrbitGudie EG",
-            "OrbitGudie EG Evaluation & Calculation Methodology"
+            "منهجية الحساب والتقييم في N.A.D.A",
+            "N.A.D.A Evaluation & Calculation Methodology"
         ),
         "data_sources": [
             {
@@ -5130,7 +5130,7 @@ def analyze_farm(farm: FarmData):
 
         "success": True,
 
-        "application": "OrbitGudie EG",
+        "application": "N.A.D.A",
 
         "version": APP_VERSION,
 
@@ -5238,7 +5238,7 @@ def compare_crops_endpoint(request: CompareRequest):
 
     return {
         "success": True,
-        "application": "OrbitGudie EG",
+        "application": "N.A.D.A",
         "version": APP_VERSION,
         "location": location,
         "elevation": elevation_data,
@@ -5272,7 +5272,7 @@ def get_methodology(language: str = Query(default="ar")):
 
     return {
         "success": True,
-        "application": "OrbitGudie EG",
+        "application": "N.A.D.A",
         "version": APP_VERSION,
         "methodology": build_methodology(language),
     }
@@ -5289,7 +5289,7 @@ def health_check():
 
         "status": "running",
 
-        "application": "OrbitGudie EG",
+        "application": "N.A.D.A",
 
         "version": APP_VERSION,
 
@@ -5309,8 +5309,8 @@ def root():
         return HTMLResponse(
             content=(
                 "<!DOCTYPE html><html lang='ar' dir='rtl'><head><meta charset='UTF-8'>"
-                "<title>OrbitGudie EG</title></head><body style='font-family:sans-serif;padding:2rem;'>"
-                "<h2>OrbitGudie EG API is running</h2>"
+                "<title>N.A.D.A</title></head><body style='font-family:sans-serif;padding:2rem;'>"
+                "<h2>N.A.D.A API is running</h2>"
                 "<p>ملف index.html غير موجود بجانب NASA.py. يرجى وضعه في نفس المجلد.</p>"
                 "</body></html>"
             ),
@@ -5375,7 +5375,7 @@ def ask_ai_advisor(req: AskAIRequest):
     )
 
     prompt = (
-        "أنت مرشد زراعي ذكي خبير في الزراعة المصرية وبيانات أقمار ناسا (NASA Fallah). "
+        "أنت مرشد زراعي ذكي خبير في الزراعة المصرية وبيانات أقمار ناسا (N.A.D.A). "
         f"{lang_instruction} "
         "التزم بأن تكون إجابتك عملية ومباشرة ومختصرة (في حدود 4 إلى 6 أسطر أو نقاط واضحة) "
         "ومبنية على بيانات الأرض التالية فقط:\n\n"

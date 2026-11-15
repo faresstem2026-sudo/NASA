@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
-   <style>
+  <style>
         :root {
             color-scheme: dark;
         }
@@ -23,7 +23,7 @@
             scroll-behavior: smooth;
         }
 
-        /* وضع كبار السن: تكبير مريح للنصوص وأقصى وضوح على الخلفية السوداء */
+        /* وضع كبار السن */
         html.senior-mode {
             font-size: 19px;
         }
@@ -35,223 +35,201 @@
         html.senior-mode .agri-card,
         html.senior-mode .choice-card {
             border-width: 2px !important;
-            border-color: #38bdf8 !important;
+            border-color: #4ade80 !important;
         }
 
-        /* الخلفية السوداء الهادئة مع إضاءة الذكاء الاصطناعي (سيان + بنفسجي + زمردي خفيف جداً) */
+        /* الخلفية العامة: أسود صريح تماماً بدون أي كحلي */
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #03050a !important;
-            color: #f1f5f9 !important;
+            background-color: #000000 !important;
+            background-image: none !important;
+            color: #f5f5f5 !important;
             overflow-x: hidden;
-            background-image:
-                radial-gradient(circle at 12% 10%, rgba(99, 102, 241, 0.13), transparent 38%),
-                radial-gradient(circle at 88% 18%, rgba(6, 182, 212, 0.12), transparent 40%),
-                radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.09), transparent 44%) !important;
-            background-attachment: fixed;
         }
 
         .font-mono-tech {
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* شبكة نقاط عصبية هادئة توحي بالذكاء الاصطناعي (AI Neural Dot Matrix) */
+        /* شبكة خفيفة جداً بالرمادي المحايد على الأسود */
         .bg-agri-grid {
-            background-size: 28px 28px;
-            background-image: radial-gradient(rgba(56, 189, 248, 0.13) 1px, transparent 1px);
+            background-color: #000000 !important;
+            background-size: 32px 32px;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px) !important;
         }
 
-        /* الشريط العلوي والهيدر والفوتر بأسلوب زجاجي داكن مع خط إضاءة AI */
+        /* الشريط العلوي والهيدر والفوتر بالأسود الصريح */
         body > div.no-print {
-            background: linear-gradient(90deg, #060913 0%, #0a1020 50%, #060c14 100%) !important;
-            border-bottom: 1px solid rgba(99, 102, 241, 0.28) !important;
+            background-color: #050505 !important;
+            background-image: none !important;
+            border-bottom: 1px solid #262626 !important;
         }
 
         header.no-print {
-            background-color: rgba(6, 10, 18, 0.88) !important;
-            backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(56, 189, 248, 0.25) !important;
-            box-shadow: 0 6px 24px -10px rgba(56, 189, 248, 0.18);
+            background-color: rgba(8, 8, 8, 0.95) !important;
+            background-image: none !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #262626 !important;
         }
 
         footer.no-print {
-            background-color: #060911 !important;
-            border-top: 1px solid rgba(99, 102, 241, 0.25) !important;
-            color: #94a3b8 !important;
+            background-color: #050505 !important;
+            background-image: none !important;
+            border-top: 1px solid #262626 !important;
+            color: #a3a3a3 !important;
         }
 
-        /* الكروت السوداء الزجاجية بإضاءة حواف AI هادئة */
+        /* الكروت بالأسود الفحمي النقي (بدون أي كحلي) */
         .agri-card {
-            background: linear-gradient(165deg, rgba(11, 16, 28, 0.94) 0%, rgba(8, 13, 22, 0.96) 100%) !important;
-            border: 1px solid rgba(99, 102, 241, 0.24) !important;
-            box-shadow:
-                0 0 28px -12px rgba(56, 189, 248, 0.15),
-                0 14px 36px -12px rgba(0, 0, 0, 0.90) !important;
-            color: #f1f5f9 !important;
+            background-color: #0c0c0c !important;
+            background-image: none !important;
+            border: 1px solid #262626 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9) !important;
+            color: #f5f5f5 !important;
         }
 
-        /* إبراز أزرار الذكاء الاصطناعي الأساسية (تحليل الأرض + إرسال الشات) بتدرج AI مميز */
-        #analyze-submit-btn,
-        #ai-send-btn {
-            background: linear-gradient(135deg, #0284c7 0%, #6366f1 55%, #10b981 100%) !important;
-            border: 1px solid rgba(125, 211, 252, 0.35) !important;
-            box-shadow: 0 8px 24px -6px rgba(99, 102, 241, 0.45) !important;
-        }
-        #analyze-submit-btn:hover,
-        #ai-send-btn:hover {
-            filter: brightness(1.12);
-            box-shadow: 0 10px 28px -4px rgba(56, 189, 248, 0.55) !important;
-        }
-
-        /* إبراز قسم اسأل المرشد الذكي AI بتوهج هادئ ومميز */
-        #ai-advisor-section {
-            background: linear-gradient(155deg, rgba(13, 18, 36, 0.96) 0%, rgba(9, 20, 28, 0.96) 100%) !important;
-            border: 1.5px solid rgba(139, 92, 246, 0.45) !important;
-            box-shadow:
-                0 0 36px -12px rgba(139, 92, 246, 0.30),
-                0 0 24px -10px rgba(34, 211, 238, 0.20) !important;
-        }
-        #ai-chat-messages {
-            background-color: #050811 !important;
-            border: 1px solid rgba(56, 189, 248, 0.25) !important;
-        }
-
-        /* تحويل جميع الخلفيات الفاتحة للداكن المتناسق */
+        /* الصناديق الداخلية بالدرجات الرمادية الداكنة النقية */
         .bg-white,
         .bg-white\/90,
         .bg-white\/80 {
-            background-color: #101727 !important;
+            background-color: #141414 !important;
         }
 
         .bg-slate-50,
         .bg-slate-50\/80,
         .bg-slate-100 {
-            background-color: #121b2d !important;
+            background-color: #171717 !important;
         }
 
         .bg-green-50, .bg-green-50\/70, .bg-green-50\/60,
         .bg-emerald-50, .bg-emerald-50\/70, .bg-green-100, .bg-emerald-100 {
-            background-color: rgba(16, 185, 129, 0.13) !important;
+            background-color: rgba(34, 197, 94, 0.10) !important;
         }
 
         .bg-sky-50, .bg-sky-50\/70, .bg-sky-50\/80, .bg-sky-50\/60,
         .bg-cyan-50, .bg-cyan-50\/70, .bg-indigo-50, .bg-indigo-50\/70, .bg-sky-100 {
-            background-color: rgba(56, 189, 248, 0.13) !important;
+            background-color: rgba(56, 189, 248, 0.10) !important;
         }
 
         .bg-amber-50, .bg-amber-50\/70, .bg-orange-50, .bg-orange-50\/70,
         .bg-amber-100, .bg-orange-100 {
-            background-color: rgba(168, 85, 247, 0.12) !important;
+            background-color: rgba(250, 204, 21, 0.10) !important;
         }
 
-        /* نافذة المنهجية */
+        /* نافذة المنهجية وقسم المرشد الذكي AI */
         #methodology-modal > div {
-            background-color: #0b101d !important;
-            border: 1.5px solid rgba(99, 102, 241, 0.4) !important;
+            background-color: #0d0d0d !important;
+            border: 1.5px solid #333333 !important;
+        }
+        #ai-advisor-section {
+            background-color: #0c0c0c !important;
+            background-image: none !important;
+            border: 1.5px solid #2e2e2e !important;
+            border-top: 4px solid #22c55e !important;
+        }
+        #ai-chat-messages {
+            background-color: #050505 !important;
+            border: 1px solid #262626 !important;
         }
 
-        /* ألوان النصوص المضيئة الهادئة على الأسود */
-        .text-slate-900, .text-slate-800 { color: #f8fafc !important; }
-        .text-slate-700, .text-slate-600 { color: #cbd5e1 !important; }
-        .text-slate-500, .text-slate-400 { color: #94a3b8 !important; }
+        /* ألوان الكلام: واضحة ومريحة جداً على الخلفية السوداء */
+        .text-slate-900, .text-slate-800 { color: #ffffff !important; }
+        .text-slate-700, .text-slate-600 { color: #e5e5e5 !important; }
+        .text-slate-500, .text-slate-400 { color: #a3a3a3 !important; }
 
         .text-green-950, .text-green-900, .text-green-800, .text-green-700,
         .text-emerald-900, .text-emerald-800, .text-emerald-700 {
-            color: #34d399 !important;
+            color: #4ade80 !important;
         }
 
         .text-sky-950, .text-sky-900, .text-sky-800, .text-sky-700,
-        .text-cyan-900, .text-cyan-800, .text-cyan-700 {
-            color: #22d3ee !important;
-        }
-
+        .text-cyan-900, .text-cyan-800, .text-cyan-700,
         .text-indigo-900, .text-indigo-800 {
-            color: #a5b4fc !important;
+            color: #38bdf8 !important;
         }
 
         .text-amber-950, .text-amber-900, .text-amber-800, .text-amber-700 {
-            color: #c4b5fd !important;
+            color: #facc15 !important;
         }
 
         .text-orange-950, .text-orange-900, .text-orange-800, .text-orange-700, .text-orange-600 {
-            color: #fbbf24 !important;
+            color: #fb923c !important;
         }
 
         .text-white {
             color: #ffffff !important;
         }
 
-        /* حدود AI الهادئة */
+        /* الحدود باللون الرمادي المحايد الواضح */
         .border-slate-200, .border-slate-200\/90, .border-slate-200\/80, .border-slate-300 {
-            border-color: rgba(148, 163, 184, 0.18) !important;
+            border-color: #262626 !important;
         }
         .border-green-200, .border-green-200\/70, .border-green-300,
         .border-emerald-200, .border-emerald-300, .border-emerald-400 {
-            border-color: rgba(52, 211, 153, 0.35) !important;
+            border-color: rgba(74, 222, 128, 0.35) !important;
         }
         .border-sky-200, .border-sky-200\/70, .border-sky-300, .border-sky-100,
         .border-cyan-200, .border-indigo-200 {
-            border-color: rgba(34, 211, 238, 0.35) !important;
+            border-color: rgba(56, 189, 248, 0.35) !important;
         }
         .border-amber-200, .border-amber-200\/70, .border-amber-200\/80,
         .border-amber-300, .border-amber-300\/80, .border-orange-200, .border-orange-300 {
-            border-color: rgba(167, 139, 250, 0.38) !important;
+            border-color: rgba(250, 204, 21, 0.35) !important;
         }
 
         /* حقول الإدخال والقوائم المنسدلة */
         .custom-select, .custom-input, .custom-textarea {
-            background-color: #060913 !important;
-            border: 1.5px solid #263248 !important;
-            color: #f8fafc !important;
+            background-color: #080808 !important;
+            border: 1.5px solid #333333 !important;
+            color: #ffffff !important;
             transition: all 0.2s ease;
         }
         .custom-select option {
-            background-color: #0b101d;
-            color: #f8fafc;
+            background-color: #0c0c0c;
+            color: #ffffff;
         }
         .custom-select:focus, .custom-input:focus, .custom-textarea:focus {
             outline: none;
-            border-color: #22d3ee !important;
-            box-shadow: 0 0 0 3.5px rgba(34, 211, 238, 0.18) !important;
+            border-color: #4ade80 !important;
+            box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2) !important;
         }
 
-        /* أزرار الاختيارات بنبض AI لطيف */
+        /* أزرار الاختيارات */
         .choice-card {
-            background-color: #0e1524 !important;
-            border: 1.5px solid #1e2b42 !important;
-            color: #e2e8f0 !important;
+            background-color: #141414 !important;
+            border: 1.5px solid #2b2b2b !important;
+            color: #f5f5f5 !important;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             user-select: none;
         }
         .choice-card:hover {
-            border-color: #38bdf8 !important;
-            background-color: #131e33 !important;
+            border-color: #4ade80 !important;
+            background-color: #1c1c1c !important;
             transform: translateY(-2px);
-            box-shadow: 0 6px 18px -6px rgba(56, 189, 248, 0.30);
         }
         .choice-card.selected {
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.22) 0%, rgba(99, 102, 241, 0.24) 100%) !important;
-            border-color: #22d3ee !important;
-            box-shadow: 0 0 0 2.5px rgba(34, 211, 238, 0.25) !important;
-            color: #f0f9ff !important;
+            background-color: #112218 !important;
+            border-color: #4ade80 !important;
+            box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.25) !important;
+            color: #ffffff !important;
         }
         .choice-card.selected .icon-box {
-            background: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%) !important;
+            background: #16a34a !important;
             color: #ffffff !important;
-            border-color: #22d3ee !important;
+            border-color: #22c55e !important;
         }
 
         /* مسار الحلقة الدائرية للنتيجة */
         svg circle:first-child {
-            stroke: #1e293b !important;
+            stroke: #262626 !important;
         }
 
         /* نافذة الخريطة التفاعلية */
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-            background-color: #0b101d !important;
-            color: #f8fafc !important;
-            border: 1px solid rgba(56, 189, 248, 0.35);
+            background-color: #111111 !important;
+            color: #ffffff !important;
+            border: 1px solid #333333;
         }
 
         .step-container {
@@ -278,9 +256,9 @@
             height: 310px;
             width: 100%;
             border-radius: 1rem;
-            border: 1.5px solid rgba(56, 189, 248, 0.32);
+            border: 1.5px solid #333333;
             z-index: 1;
-            background-color: #03050a;
+            background-color: #000000;
         }
 
         .custom-scrollbar::-webkit-scrollbar {
@@ -288,15 +266,15 @@
             width: 7px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #080c16;
+            background: #0a0a0a;
             border-radius: 999px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #334155;
+            background: #333333;
             border-radius: 999px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #22d3ee;
+            background: #4ade80;
         }
 
         @media print {
@@ -323,7 +301,6 @@
             }
         }
     </style>
-
 
 </head>
 <body class="bg-agri-grid min-h-screen flex flex-col">
